@@ -20,6 +20,7 @@ class Settings:
     gcp_project_id: str | None
     google_api_key: str | None
     model: str
+    embedding_model: str
     persona: str
     dataset_id: str
     max_bytes_billed: int
@@ -42,6 +43,7 @@ def get_settings(*, load_env: bool = True) -> Settings:
         gcp_project_id=gcp_project_id,
         google_api_key=_optional_str("GOOGLE_API_KEY"),
         model=getenv("RETAIL_AGENT_MODEL", "gemini-2.5-flash"),
+        embedding_model=getenv("RETAIL_AGENT_EMBEDDING_MODEL", "gemini-embedding-001"),
         persona=getenv("RETAIL_AGENT_PERSONA", "default"),
         dataset_id=getenv("BQ_DATASET_ID", DEFAULT_DATASET),
         max_bytes_billed=_int_env("BQ_MAX_BYTES_BILLED", DEFAULT_MAX_BYTES_BILLED),

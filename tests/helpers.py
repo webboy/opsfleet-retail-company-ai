@@ -8,6 +8,7 @@ def make_settings(**overrides) -> Settings:
         "gcp_project_id": "test-project",
         "google_api_key": "test-key",
         "model": "gemini-2.5-flash",
+        "embedding_model": "gemini-embedding-001",
         "persona": "default",
         "dataset_id": "bigquery-public-data.thelook_ecommerce",
         "max_bytes_billed": 1_073_741_824,

@@ -72,7 +72,7 @@ class GeminiEmbedder:
         from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
         self._client = GoogleGenerativeAIEmbeddings(
-            model="models/text-embedding-004",
+            model=settings.embedding_model,
             google_api_key=settings.google_api_key,
         )
 
