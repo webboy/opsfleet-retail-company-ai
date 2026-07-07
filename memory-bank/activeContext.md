@@ -2,7 +2,7 @@
 
 ## Current focus
 
-Task **0009** (final documentation & submission polish) is **pending_review** — implementation complete, awaiting user approval. Next optional work: task **0010** (MCP server stretch).
+Task **0009** (final documentation & submission polish) is **done** (user approved 2026-07-08). Next optional work: task **0010** (MCP server stretch).
 
 ## How work is organized
 
@@ -30,6 +30,7 @@ Task **0009** (final documentation & submission polish) is **pending_review** �
 
 ## Recent changes
 
+- 2026-07-08: Task 0009 **done** (user approved) — submission README, USAGE, EVALUATION, architecture drift fixes.
 - 2026-07-08: Task 0009 **pending_review** — full README, USAGE, EVALUATION, architecture/technical drift fixes, fresh venv verified (120 pytest, 16 eval).
 - 2026-07-08: Task 0008 **done** (user approved) — observability JSONL tracing, trace/metrics CLIs, eval suite, version **0.8.0**.
 - 2026-07-07: Task 0011 **done** (user approved) — LLM provider factory + fallback, version **0.7.0**.

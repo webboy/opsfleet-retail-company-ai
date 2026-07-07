@@ -4,7 +4,7 @@
 
 - **Task ID**: 0009
 - **Title**: Final accompanying documentation & submission polish
-- **Status**: pending_review
+- **Status**: done
 - **Owner**: Engineer
 - **Created**: 2026-07-07
 - **Updated**: 2026-07-08

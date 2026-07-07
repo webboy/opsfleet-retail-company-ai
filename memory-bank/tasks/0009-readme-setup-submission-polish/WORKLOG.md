@@ -16,3 +16,4 @@
 - Fresh-machine verification in `/tmp/retail-agent-verify-sG8TB9`: `pip install -e ".[dev]"` → **120 pytest passed** → **16/16 eval dry-run passed** → `retail-agent --help` OK.
 - Separation audit: grep `README.md` + `docs/` for `memory-bank`, `.cursor`, task IDs — **no matches**.
 - Main repo verification: `pytest -q` 120 passed; `python -m retail_agent.evals` 16/16 passed.
+- 2026-07-08: User approved — task marked **done**.
