@@ -27,6 +27,11 @@ def compose_report(state: AgentState, deps: AgentDeps) -> dict:
 
     system_prompt = (
         f"{persona_text}\n\n"
+        "You are writing for a retail manager who needs to make a decision, "
+        "not for an analyst reading raw data. "
+        "Lead with the direct answer to the question in the first sentence, "
+        "then the key supporting numbers. When the data warrants it, close with "
+        "one short takeaway or what to look at next. Do not pad the report. "
         "Write a concise, clear answer grounded in the SQL results. "
         "Do not mention SQL errors or internal retries. "
         "Never include raw customer emails or phone numbers in the report. "

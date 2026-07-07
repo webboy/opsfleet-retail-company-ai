@@ -15,7 +15,8 @@ Deliver the complete **accompanying documentation package** and make the reposit
 
 ## Scope
 
-- `README.md` (entry point): project overview, documentation map (links to everything below), **step-by-step setup** (venv, pip install, GCP auth via `gcloud auth application-default login`, AI Studio key, `.env`), example runs with real transcripts (analysis question, self-heal example, PII masking example, delete confirmation example), how to run tests and evals, project layout map.
+- `README.md` (entry point): project overview, documentation map (links to everything below), **step-by-step setup** (venv, pip install, GCP auth via `gcloud auth application-default login`, AI Studio key, `.env`), example runs with real transcripts, how to run tests and evals, project layout map.
+- **Example transcripts are one continuous manager workflow, not isolated feature demos** (see `productContext.md` → Product lens): a Store Manager's session — analysis question → follow-up comparison → "I prefer tables" → save the report → later "delete the reports we made today" with the confirmation flow. Self-heal and PII masking appear naturally inside this story (plus a short separate snippet each if needed). The README opens with this user moment before any architecture talk.
 - **Complete `docs/` package**, finalized and cross-linked so it matches the implemented system exactly:
   - `docs/ARCHITECTURE.md` + technical explanation (from task 0001) — final pass: verify every claim against the shipped code, update diagrams where the implementation evolved.
   - `docs/USAGE.md`: CLI reference (all commands/flags: `--user`, `/save`, `/prefs`, `/persona`, `/help`), how to edit personas, how to add golden trios, how to read traces and metrics output.
@@ -32,7 +33,7 @@ Deliver the complete **accompanying documentation package** and make the reposit
 ## Acceptance criteria
 
 - [ ] Following README alone on a clean environment produces a working chat session.
-- [ ] README contains real (redacted where needed) example transcripts for the 4 showcase flows.
+- [ ] README contains real (redacted where needed) transcripts telling one continuous manager workflow that covers the 4 showcase flows (analysis, self-heal, PII masking, guarded delete).
 - [ ] `docs/` package complete and accurate: architecture/technical explanation verified against shipped code, USAGE and EVALUATION docs present and cross-linked from README.
 - [ ] Requirements coverage table maps all 8 requirements to code **and** documentation.
 - [ ] Separation audit passes: grep of `README.md` + `docs/` for `memory-bank`, task IDs and `.cursor` returns nothing.

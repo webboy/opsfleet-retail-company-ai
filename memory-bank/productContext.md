@@ -25,6 +25,16 @@ The agent turns those assets into a self-service conversational analyst.
 - Reports can be saved to a personal library. Deleting reports is conversational but guarded: the agent lists exactly what will be deleted and requires explicit confirmation; users can only delete their own reports.
 - Off-topic or malicious requests ("ignore your instructions...", "drop table...") are politely refused.
 
+## Product lens — start from the user moment
+
+The system is judged by a specific moment: *a Regional Manager, five minutes before a call, asks why branch X is underperforming — and gets something they can act on.* Everything is built backwards from that moment, not forwards from a feature list.
+
+Consequences:
+
+- **Reports guide decisions, not display information.** Every report leads with the direct answer/key insight, then the supporting numbers, then — when warranted — what to look at next. A table dump without a "so what" is a failed report even if the SQL was perfect.
+- **Workflows over features.** The capabilities (ask → follow up → save → preferences → guarded delete) matter as one continuous working session of a manager, and that is how they are demonstrated and documented — not as isolated feature demos.
+- **Quality is measured against intent** (does the report answer what the user meant, is it actionable), not against "did the pipeline run".
+
 ## Product qualities
 
 - **Trustworthy**: grounded in expert-approved query patterns, honest when unsure.

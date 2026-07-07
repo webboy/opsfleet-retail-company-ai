@@ -28,6 +28,8 @@ Task **0011** (LLM provider fallback) is **done** (user approved 2026-07-07). Ne
 
 ## Recent changes
 
+- 2026-07-07 (evening): **Product lens adopted** (user shared recruiter feedback: winning take-homes start from a user moment and build backwards; features ≠ workflows). Changes: `productContext.md` new "Product lens" section; `compose_report` system prompt now demands answer-first, decision-guiding reports; task 0008 judge rubric scores decision-usefulness; task 0009 README transcripts restructured as one continuous manager workflow story instead of isolated feature demos.
+
 - 2026-07-07: Task 0011 **done** (user approved) — LLM provider factory + OpenRouter/Ollama fallback, version **0.7.0**.
 - 2026-07-07: Task 0007 **done** (user approved) — user preferences, hot-reload personas, version **0.6.0**.
 - 2026-07-07: Tasks 0001–0006 **done** (user approved).
