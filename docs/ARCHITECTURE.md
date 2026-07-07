@@ -111,9 +111,9 @@ flowchart TB
 | **reports_router** | Save, list, delete saved reports. Delete resolves candidates scoped to `owner = current_user`, lists exact matches, then pauses for confirmation. |
 | **retrieve_trios** | Top-k similarity search over Golden Bucket question embeddings; keyword fallback if embedding API is down. |
 | **generate_sql** | LLM generates SQL using schema context + retrieved trios + conversation history. |
-| **sql_guard** | Deterministic pre-execution checks: single statement, SELECT-only, allowed tables only, LIMIT injection, `maximum_bytes_billed` cap. |
-| **execute_bq** | Runs guarded SQL via BigQuery client; returns rows or typed errors. |
-| **self_heal** | On SQL error or empty result, feeds error + prior SQL back to LLM; max N retries (default 2); then graceful fallback message. |
+| **sql_guard** | Deterministic pre-execution checks inside `BigQueryRunner.execute()`: single statement, SELECT-only, allowed tables only, LIMIT injection, `maximum_bytes_billed` cap. Not a separate LangGraph node in the prototype. |
+| **execute_bq** | Graph node that calls `BigQueryRunner` (sql_guard + BigQuery client); returns rows or typed errors that trigger the self-heal loop. |
+| **self_heal** | On SQL error, guard block, or empty result, feeds error + prior SQL back to LLM; max N retries (default **3**); then graceful fallback message. Implemented as conditional routing from `execute_bq` → `generate_sql`, not a separate graph node. |
 | **pii_mask** | Deterministic masking on DataFrame columns and final report text — never trust the LLM for PII. |
 | **compose_report** | LLM composes analyst-style answer using masked rows, persona file, and user format preferences. |
 | **Golden Bucket + vector index** | Stores curated Trios; embeddings indexed for query-time retrieval; curation pipeline promotes analyst-approved candidates. |
@@ -136,14 +136,13 @@ flowchart TD
     Interrupt -->|yes confirm| DeleteOwn[Delete scoped to owner]
     Interrupt -->|no or other| Cancel[Cancel keep reports]
     RepRoute -->|save or list| RepAction[Persist or list reports]
-    Guard -->|analysis question| Retrieve[retrieve_trios top-k]
+    Guard -->|analysis question| RouteTurn[route_turn]
+    RouteTurn --> Retrieve[retrieve_trios top-k]
     Retrieve --> SQLGen[generate_sql LLM plus schema plus trios]
-    SQLGen --> Lint[sql_guard static checks]
-    Lint -->|blocked| Apology1[Explain policy violation]
-    Lint --> Exec[execute_bq read-only]
-    Exec -->|error or empty| Heal{self_heal retry up to N}
+    SQLGen --> Exec[execute_bq sql_guard plus BigQuery]
+    Exec -->|error empty or guard block| Heal{retry up to 3}
     Heal -->|retry| SQLGen
-    Heal -->|give up| Apology2[Graceful fallback answer]
+    Heal -->|exhausted| Apology[fallback_answer]
     Exec -->|rows| Mask[pii_mask column deny-list plus regex]
     Mask --> Report[compose_report persona plus prefs]
     Report --> Out[Answer plus offer to save]
@@ -203,7 +202,7 @@ flowchart LR
 | Personas | Local `personas/` hot-read files | GCS objects or CMS |
 | Observability | JSONL event log + optional LangSmith | Cloud Logging, Monitoring, alerting |
 | Eval gate | Local pytest + eval runner | CI pipeline blocking deploy |
-| Conversation memory | LangGraph SQLite/in-memory checkpointer | Managed checkpointer backing store |
+| Conversation memory | LangGraph `MemorySaver` (in-process, per CLI session) | Managed checkpointer backing store |
 
 ## Extensibility
 
@@ -258,3 +257,5 @@ In production, reusable capabilities are exposed as **MCP (Model Context Protoco
 ## Related documentation
 
 - [Technical Explanation](./TECHNICAL_EXPLANATION.md) — technology choices, error handling, setup overview, and requirement-by-requirement design.
+- [Usage Guide](./USAGE.md) — CLI commands, personas, golden trios, observability.
+- [Evaluation Guide](./EVALUATION.md) — pytest, eval suite, judge scoring, baseline workflow.

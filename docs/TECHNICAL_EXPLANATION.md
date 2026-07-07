@@ -47,7 +47,7 @@ This document explains **why** the system is built the way it is, how data flows
 | Saved reports | Cloud SQL or Firestore | SQLite (`RETAIL_AGENT_DB_PATH`, default `./data/reports.sqlite3`) |
 | User preferences | Cloud SQL or Firestore | SQLite (`preferences` table in `RETAIL_AGENT_DB_PATH`) |
 | Personas | GCS objects or CMS | Local `personas/` files, hot-read each turn (`RETAIL_AGENT_PERSONAS_DIR`) |
-| Conversation threads | Checkpointer + managed store | LangGraph SQLite/in-memory checkpointer |
+| Conversation threads | Checkpointer + managed store | LangGraph `MemorySaver` (in-process, per CLI session) |
 | Observability / eval runs | Cloud Logging + GCS JSONL | Local `logs/agent_events.jsonl` |
 
 **Reasoning:** SQLite and local files eliminate infrastructure for the prototype. Production moves to managed services for durability, backup, and multi-instance agent replicas.
@@ -83,13 +83,13 @@ A single analysis turn proceeds as follows:
 2. **input_guard** classifies intent. Malicious/off-topic → polite refusal (no BigQuery, minimal LLM).
 3. **retrieve_trios** embeds the question, searches the Golden Bucket index, returns top-k Trios.
 4. **generate_sql** calls the LLM with: table schemas, retrieved trios, conversation history, and safety instructions.
-5. **sql_guard** validates generated SQL. Failure → user-facing policy message (no execution).
-6. **execute_bq** submits the job. On syntax error, permission error, or empty result → **self_heal** loop (feed error + prior SQL to LLM, retry up to N times).
-7. **pii_mask** scrubs email/phone columns in the DataFrame and regex-sweeps the composed report.
-8. **compose_report** calls the LLM with masked rows, active persona, and user format preference.
-9. **Response** returned to client; optional prompt to save report.
-10. **Observability** emits one structured event per node (latency, SQL text, error class, retry count, mask hits).
-11. **Learning seam:** successful turn may append a candidate trio for analyst review.
+5. **execute_bq** runs `sql_guard` (inside `BigQueryRunner`) then submits the job. Guard violations, syntax errors, permission errors, or empty results → **self_heal** loop (feed error + prior SQL to LLM, retry up to N times, default **3**).
+6. **pii_mask** scrubs email/phone columns in the DataFrame.
+7. **compose_report** calls the LLM with masked rows, active persona, and user format preference.
+8. **output_mask** regex-sweeps the final report text for residual PII.
+9. **capture_candidate** optionally appends a candidate trio for analyst review.
+10. **Response** returned to client; optional prompt to save report.
+11. **Observability** emits one structured event per node (latency, SQL text, error class, retry count, mask hits).
 
 Report-management turns skip steps 3–8 and route through **reports_router** (save/list/delete with confirmation interrupt). Preference turns route through **preferences_router** (save/show output format without LLM).
 
@@ -103,7 +103,7 @@ Report-management turns skip steps 3–8 and route through **reports_router** (s
 | **LLM outage (5xx)** | Provider errors | Retry; fallback provider; graceful apology if all fail | Same budget |
 | **Bad SQL syntax** | BigQuery error message | Self-heal: LLM regenerates SQL with error context (max N retries) | Retries bounded; bytes cap on each attempt |
 | **Empty result set** | Zero rows returned | Self-heal: LLM revises query (e.g. wrong filter/date); then fallback suggestion | Same |
-| **sql_guard violation** | Static linter | No BigQuery call; explain which rule failed | Zero query cost |
+| **sql_guard violation** | Static linter in `BigQueryRunner` | No BigQuery job; error fed into self-heal retry loop (up to 3 attempts), then graceful fallback | Zero query cost per blocked attempt |
 | **BigQuery timeout / quota** | Job API error | User-facing retry suggestion; log error class | `maximum_bytes_billed` prevents runaway scans |
 | **Embedding API down** | Embed call failure | Keyword overlap retrieval over local trios | Degraded but functional |
 | **PII in SQL result** | Column names + content regex | Deterministic mask before LLM sees rows; output regex sweep | N/A |
@@ -116,7 +116,7 @@ Report-management turns skip steps 3–8 and route through **reports_router** (s
 
 ## Setup and run (overview)
 
-Detailed step-by-step setup (venv, GCP auth walkthrough, example transcripts) will ship with the repository README once the prototype is implemented. At a high level:
+Full step-by-step setup, example manager workflow transcript, and verification commands are in the [README](../README.md). This section summarizes the essentials.
 
 ### Prerequisites
 
@@ -127,29 +127,32 @@ Detailed step-by-step setup (venv, GCP auth walkthrough, example transcripts) wi
 ### Environment
 
 ```bash
-# Clone the repository, create a virtual environment, install dependencies
 python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -e .
+pip install -e ".[dev]"     # runtime + pytest (canonical install from pyproject.toml)
 
-# Authenticate for BigQuery (Application Default Credentials)
 gcloud auth application-default login
 
-# Configure environment (copy .env.example → .env)
+cp .env.example .env
 # GOOGLE_API_KEY=...
 # GCP_PROJECT_ID=your-billing-project
 ```
 
-### Example run (once prototype is available)
+> `requirements.txt` is a legacy assignment artifact. Prefer `pip install -e ".[dev]"` — it includes OpenRouter/Ollama dependencies and pytest.
+
+### Example run
 
 ```bash
-python -m retail_agent.cli --user alice
-# Ask: "What was our monthly revenue last quarter?"
-# Ask: "Who are our top 10 customers by total spend?"
-# Follow-up: "And how does that compare to the previous quarter?"
+retail-agent --user alice
+# Ask: "How did monthly revenue trend last year?"
+# Follow-up: "And how does that compare to our top product categories?"
+# Preference: "I prefer tables from now on"
+# /save — then "show my reports"
 ```
 
-Optional: set `LANGSMITH_TRACING=true` and `LANGSMITH_API_KEY` for full trace export. LLM provider env vars: `RETAIL_AGENT_PROVIDER`, `RETAIL_AGENT_FALLBACK_PROVIDER`, `OPENROUTER_API_KEY`, `RETAIL_AGENT_OPENROUTER_MODEL`, `OLLAMA_HOST`, `RETAIL_AGENT_OLLAMA_MODEL`.
+Optional: `LANGSMITH_TRACING=true` and `LANGSMITH_API_KEY` for full trace export. LLM provider env vars: `RETAIL_AGENT_PROVIDER`, `RETAIL_AGENT_FALLBACK_PROVIDER`, `OPENROUTER_API_KEY`, `RETAIL_AGENT_OPENROUTER_MODEL`, `OLLAMA_HOST`, `RETAIL_AGENT_OLLAMA_MODEL`.
+
+See [Usage Guide](./USAGE.md) for all CLI flags and commands.
 
 ---
 
@@ -212,7 +215,7 @@ Explicit PII requests (e.g. top buyers with emails) may still run as analysis, b
 
 **Problem:** SQL errors and empty results must self-correct; the UI must not crash; costs must not inflate; third-party APIs fail.
 
-**Self-heal loop:** On BigQuery error or zero rows, feed error message + previous SQL to the LLM; regenerate; retry up to N (default 2). After exhaustion → graceful fallback ("I couldn't find an answer; try rephrasing…").
+**Self-heal loop:** On BigQuery error, sql_guard block, or zero rows, feed error message + previous SQL to the LLM; regenerate; retry up to N (default **3**). After exhaustion → `fallback_answer` with a graceful rephrase suggestion.
 
 **Resilience elsewhere:** LLM retry/backoff; optional provider fallback; embedding keyword fallback; top-level CLI exception handler; per-turn LLM call budget; sql_guard prevents expensive bad queries.
 
@@ -282,3 +285,5 @@ User format preferences (Requirement 4a) complement personas: persona = company 
 ## Related documentation
 
 - [Architecture](./ARCHITECTURE.md) — production HLD, Mermaid diagrams, extensibility (including MCP), prototype vs production mapping.
+- [Usage Guide](./USAGE.md) — CLI reference, personas, golden trios, observability.
+- [Evaluation Guide](./EVALUATION.md) — pytest, eval suite layers, judge scoring, baseline workflow.

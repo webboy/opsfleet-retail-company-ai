@@ -1,5 +1,9 @@
+# Legacy assignment artifact — prefer: pip install -e ".[dev]"
+# Canonical dependencies are defined in pyproject.toml (includes langchain-openai, langchain-ollama, pytest via [dev]).
 langgraph>=0.2.0
 langchain-google-genai>=1.0.0
+langchain-openai>=0.3.0
+langchain-ollama>=0.3.0
 google-cloud-bigquery>=3.13.0
 pandas>=2.0.0
 python-dotenv>=1.0.0
