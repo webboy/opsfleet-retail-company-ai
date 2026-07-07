@@ -7,7 +7,7 @@ Bootstrap phase complete. No application code exists yet — the repo contains t
 ## What works
 
 - Memory bank initialized (6 core files) and adapted task-workflow rules in `.cursor/rules/`.
-- Task backlog defined: 9 tasks (`0001`–`0009`) in `memory-bank/tasks/` with INDEX, template and per-task TASK/PLAN files.
+- Task backlog defined: 9 core tasks (`0001`–`0009`) plus optional stretch task `0010`, in `memory-bank/tasks/` with INDEX, template and per-task TASK/PLAN files.
 
 ## What's left to build
 
@@ -22,6 +22,7 @@ In task order (details in each `memory-bank/tasks/<id>-*/TASK.md`):
 7. `0007` Learning loop: user format preferences + persona files (no-redeploy tone changes)
 8. `0008` Observability (structured events, metrics) + QA eval suite
 9. `0009` Final accompanying documentation package (README, usage & evaluation guides, verified architecture docs) and submission polish
+10. `0010` *(optional stretch, only if time remains after 0009)* Expose guarded query + trio retrieval as an MCP server
 
 ## Known issues
 

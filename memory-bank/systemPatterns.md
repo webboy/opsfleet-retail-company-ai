@@ -83,3 +83,4 @@ Every node emits a structured JSON event (turn id, node, latency, model, tokens 
 - **Every failure path has a user-facing sentence** — no raw exceptions in chat.
 - **Bounded loops and budgets**: self-heal max N (default 2) retries; LLM call cap per turn.
 - **Assets over code** for anything a non-developer must change (personas, trios, evals).
+- **Extensibility**: in the prototype, a new capability = a new LangGraph node/tool and an edge in the graph (in-process, no servers). In the production HLD, MCP servers are the documented tool-integration mechanism (BigQuery access, Golden Bucket, reports library as reusable MCP servers; new data sources plug in as new servers) — design option only, deliberately not implemented in the prototype to keep it simple and working.

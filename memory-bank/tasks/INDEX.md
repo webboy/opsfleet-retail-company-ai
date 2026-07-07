@@ -13,3 +13,4 @@ Quick overview of all tasks. Source of truth for each row is the task's `TASK.md
 | 0007 | Learning loop: user preferences & personas | todo | Engineer | 2026-07-07 |
 | 0008 | Observability & QA evaluation suite | todo | Engineer | 2026-07-07 |
 | 0009 | Final accompanying documentation & submission polish | todo | Engineer | 2026-07-07 |
+| 0010 | Optional: expose guarded capabilities as an MCP server | todo | Engineer | 2026-07-07 |
