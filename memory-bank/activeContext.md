@@ -2,7 +2,7 @@
 
 ## Current focus
 
-Task **0009** (final documentation & submission polish) is **done** (user approved 2026-07-08). Next optional work: task **0010** (MCP server stretch).
+Task **0010** (optional MCP server) is **pending_review** — implementation complete, awaiting user approval. All core tasks 0001–0009 and 0011 are **done**.
 
 ## How work is organized
 
@@ -20,7 +20,8 @@ Task **0009** (final documentation & submission polish) is **done** (user approv
 - Golden Bucket prototype = local trio files + embedding retrieval with keyword fallback.
 - **Maximum-effort scope (user decision, 2026-07-07)**: the prototype implements **all five** optional requirements as first-class features.
 - **Documentation separation (user decision, 2026-07-07)**: `README.md` + `docs/` are human-facing; `memory-bank/` is internal agent documentation.
-- **Submission docs (task 0009)**: README is reviewer entry point; USAGE + EVALUATION complete the `docs/` package; MCP documented as production extension only.
+- **Submission docs (task 0009)**: README is reviewer entry point; USAGE + EVALUATION complete the `docs/` package.
+- **MCP stretch (task 0010)**: optional `retail-agent-mcp` stdio server; `docs/MCP.md`; version **0.9.0**.
 
 ## Open questions / risks
 
@@ -30,6 +31,7 @@ Task **0009** (final documentation & submission polish) is **done** (user approv
 
 ## Recent changes
 
+- 2026-07-08: Task 0010 **pending_review** — MCP server (`query_retail_data`, `retrieve_trios`), handler tests, `docs/MCP.md`, version **0.9.0**; 131 pytest, 16/16 eval.
 - 2026-07-08: Task 0009 **done** (user approved) — submission README, USAGE, EVALUATION, architecture drift fixes.
 - 2026-07-08: Task 0009 **pending_review** — full README, USAGE, EVALUATION, architecture/technical drift fixes, fresh venv verified (120 pytest, 16 eval).
 - 2026-07-08: Task 0008 **done** (user approved) — observability JSONL tracing, trace/metrics CLIs, eval suite, version **0.8.0**.

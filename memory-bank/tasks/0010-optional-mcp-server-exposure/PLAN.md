@@ -1,10 +1,20 @@
 # Plan — Task 0010
 
-> Optional stretch goal — only after 0001–0009 are delivered and polished.
+Concrete implementation plan (approved 2026-07-08).
 
-1. Pick the MCP Python SDK (official `mcp` package), stdio transport; add as optional dependency (extra: `pip install .[mcp]`).
-2. `src/retail_agent/mcp_server.py`: thin handlers delegating to `bq.py` (`sql_guard` → execute → `pii_mask`) and `golden.py` (`retrieve`).
-3. Unit tests: handler-level — DML rejected, PII masked in returned rows, trio retrieval shape.
-4. Manual verification from a real MCP client (Cursor/Claude): both tools, safety proven client-side; capture transcript in WORKLOG.
-5. Docs: `docs/MCP.md` (run, register, examples) + HLD extensibility section update.
-6. Version minor bump. Commit: `feat(mcp): expose guarded query and trio retrieval as MCP server (task 0010)`.
+## Steps
+
+1. Mark task `in_progress`; sync `INDEX.md`.
+2. Add optional `mcp` extra in `pyproject.toml` and `retail-agent-mcp` console script.
+3. Implement `src/retail_agent/mcp_server.py`:
+   - `query_retail_data_handler(sql)` → `BigQueryRunner.execute()` + `mask_dataframe()`
+   - `retrieve_trios_handler(question, k)` → `TrioStore.retrieve()`
+   - FastMCP stdio server registering both tools.
+4. Add `tests/test_mcp_server.py` for handler-level guard/mask/retrieval tests.
+5. Real MCP stdio client verification; record in WORKLOG/HANDOFF.
+6. Add `docs/MCP.md`; link from README/USAGE; update ARCHITECTURE extensibility.
+7. Bump version `0.8.0` → `0.9.0`; pytest + evals; commit; `pending_review`.
+
+## Out of scope
+
+Reports library MCP, HTTP/SSE transport, auth.

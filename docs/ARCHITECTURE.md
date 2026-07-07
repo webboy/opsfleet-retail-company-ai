@@ -210,6 +210,17 @@ flowchart LR
 
 Adding a capability in the prototype means adding a **new node or tool** and wiring an edge in the graph — for example, a `generate_chart` node after `pii_mask`, or an `email_report` node after `compose_report`. Everything runs in one Python process; no separate servers. This keeps the prototype **simple and working**, which is the assignment's explicit constraint.
 
+### Prototype: optional MCP demonstration
+
+The prototype also ships an **optional** stdio MCP server (`retail-agent-mcp`) that exposes two guarded tools without changing CLI behavior:
+
+| Tool | Capability | Safety boundary |
+|------|------------|-----------------|
+| `query_retail_data` | Guarded BigQuery SQL execution | `sql_guard` + `pii_mask` enforced server-side |
+| `retrieve_trios` | Read-only Golden Bucket search | No write path; no candidate capture |
+
+Install with `pip install -e ".[mcp]"`. See [MCP Server Guide](./MCP.md). The CLI agent does not depend on this server.
+
 ### Production: MCP as the tool-integration mechanism
 
 In production, reusable capabilities are exposed as **MCP (Model Context Protocol) servers** so any agent or MCP client can call them with the same safety guarantees:
@@ -222,7 +233,7 @@ In production, reusable capabilities are exposed as **MCP (Model Context Protoco
 
 **Why MCP in production:** New data sources (inventory API, CRM, regional spreadsheets) plug in as new MCP servers without changing the agent graph core. Other internal agents (procurement bot, finance assistant) reuse the same guarded BigQuery and Golden Bucket servers. Tool contracts are versioned and testable independently.
 
-**Why not MCP in the prototype:** MCP adds process management, transport setup, and client registration overhead. The assignment prioritizes a working end-to-end demo over integration plumbing. The HLD documents MCP so production teams know the intended extension path; an optional follow-up can demonstrate a thin MCP wrapper over existing modules without changing prototype behavior.
+The prototype demonstrates this pattern with a thin MCP wrapper over `bq.py` and `golden.py`. Reports library, HTTP/SSE transport, and auth remain production-only extensions.
 
 ### Future capabilities (same extension model)
 
@@ -259,3 +270,4 @@ In production, reusable capabilities are exposed as **MCP (Model Context Protoco
 - [Technical Explanation](./TECHNICAL_EXPLANATION.md) — technology choices, error handling, setup overview, and requirement-by-requirement design.
 - [Usage Guide](./USAGE.md) — CLI commands, personas, golden trios, observability.
 - [Evaluation Guide](./EVALUATION.md) — pytest, eval suite, judge scoring, baseline workflow.
+- [MCP Server Guide](./MCP.md) — optional guarded query and trio retrieval server.

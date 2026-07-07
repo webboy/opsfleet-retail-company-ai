@@ -287,3 +287,4 @@ User format preferences (Requirement 4a) complement personas: persona = company 
 - [Architecture](./ARCHITECTURE.md) — production HLD, Mermaid diagrams, extensibility (including MCP), prototype vs production mapping.
 - [Usage Guide](./USAGE.md) — CLI reference, personas, golden trios, observability.
 - [Evaluation Guide](./EVALUATION.md) — pytest, eval suite layers, judge scoring, baseline workflow.
+- [MCP Server Guide](./MCP.md) — optional guarded query and trio retrieval server.

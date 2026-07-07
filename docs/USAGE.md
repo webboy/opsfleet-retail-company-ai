@@ -2,7 +2,7 @@
 
 How to run the retail analysis agent CLI, manage personas and golden trios, inspect observability output, and understand runtime artifacts.
 
-See also: [README](../README.md) (quick setup), [Architecture](./ARCHITECTURE.md), [Technical Explanation](./TECHNICAL_EXPLANATION.md), [Evaluation Guide](./EVALUATION.md).
+See also: [README](../README.md) (quick setup), [Architecture](./ARCHITECTURE.md), [Technical Explanation](./TECHNICAL_EXPLANATION.md), [Evaluation Guide](./EVALUATION.md), [MCP Server](./MCP.md).
 
 ## CLI entry points
 
@@ -14,6 +14,7 @@ See also: [README](../README.md) (quick setup), [Architecture](./ARCHITECTURE.md
 | `python -m retail_agent.metrics` | Aggregate metrics from `logs/agent_events.jsonl` |
 | `python -m retail_agent.trace <turn_id>` | Reconstruct one turn from the event log |
 | `python -m retail_agent.evals` | QA eval suite (dry-run by default) |
+| `retail-agent-mcp` | Optional MCP server (stdio; guarded query + trio retrieval) |
 
 Run all commands from the **repository root** so relative paths resolve.
 
@@ -195,6 +196,17 @@ python -m retail_agent.trace <turn_id>
 ### LangSmith (optional)
 
 Set `LANGSMITH_TRACING=true` and `LANGSMITH_API_KEY` for full LLM trace export alongside JSONL events.
+
+## MCP server (optional)
+
+Install and run the guarded MCP server for external clients (Cursor, Claude Desktop):
+
+```bash
+pip install -e ".[mcp]"
+retail-agent-mcp
+```
+
+See [MCP Server Guide](./MCP.md) for tool schemas, client registration, and safety boundaries.
 
 ## Runtime artifacts
 

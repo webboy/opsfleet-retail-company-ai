@@ -12,6 +12,7 @@ This repository is the **Opsfleet AI Technical Assignment** prototype: LangGraph
 | [Technical Explanation](docs/TECHNICAL_EXPLANATION.md) | Technology choices, data flow, error handling, requirements |
 | [Usage Guide](docs/USAGE.md) | CLI commands, personas, golden trios, traces, artifacts |
 | [Evaluation Guide](docs/EVALUATION.md) | pytest, eval suite, judge scoring, baseline workflow |
+| [MCP Server](docs/MCP.md) | Optional guarded BigQuery + Golden Bucket MCP tools |
 
 Assignment brief: `docs/AI Technical Assignment - Retail Company.pdf`
 

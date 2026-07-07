@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009 and **0011** **done** (user approved). Optional: **0010** MCP stretch.
+Tasks 0001–0009 and **0011** **done** (user approved). **0010** MCP stretch **pending_review**.
 
 ## What works
 
@@ -17,12 +17,13 @@ Tasks 0001–0009 and **0011** **done** (user approved). Optional: **0010** MCP 
 - Observability: per-node JSONL events, `trace`/`metrics` CLIs (task 0008, **done**).
 - QA eval suite: 16 cases, dry-run default, judge scoring, baseline regression (task 0008, **done**).
 - **Human docs package**: README, USAGE, EVALUATION, drift-corrected architecture/technical (task 0009, **done**).
-- `pytest` **120 passed**; eval dry-run **16/16 passed**.
+- **Optional MCP server**: `retail-agent-mcp`, guarded `query_retail_data` + `retrieve_trios` (task 0010, **pending_review**).
+- `pytest` **131 passed**; eval dry-run **16/16 passed**.
 
 ## What's left to build
 
 1. ~~`0001`–`0009`, `0011`~~ — **done**
-2. `0010` *(optional)* MCP server stretch
+2. `0010` *(optional)* MCP server — **pending_review** (awaiting user approval)
 
 ## Known issues
 
@@ -32,4 +33,4 @@ Tasks 0001–0009 and **0011** **done** (user approved). Optional: **0010** MCP 
 
 ## Version
 
-- Project version **0.8.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (unchanged — task 0009 is docs-only).
+- Project version **0.9.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (task 0010 MCP delivery).

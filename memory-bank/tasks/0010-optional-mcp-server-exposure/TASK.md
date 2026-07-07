@@ -4,10 +4,10 @@
 
 - **Task ID**: 0010
 - **Title**: Optional: expose guarded capabilities as an MCP server
-- **Status**: todo
+- **Status**: pending_review
 - **Owner**: Engineer
 - **Created**: 2026-07-07
-- **Updated**: 2026-07-07
+- **Updated**: 2026-07-08
 
 > **Stretch goal** — start only after tasks 0001–0009 are `pending_review`/`done` and polished, and only if time remains. The core prototype must never depend on this task.
 
@@ -31,10 +31,10 @@ Materialize the HLD's MCP extensibility story with a small, working demonstratio
 
 ## Acceptance criteria
 
-- [ ] MCP server starts and both tools are callable from a real MCP client; a `SELECT` with PII columns returns masked values, DML is rejected — proven from the client side.
-- [ ] Core prototype behavior unchanged with the server absent (evals pass identically).
-- [ ] Human docs cover setup/usage; HLD updated.
-- [ ] pytest green for tool handlers.
+- [x] MCP server starts and both tools are callable from a real MCP client; a `SELECT` with PII columns returns masked values, DML is rejected — proven from the client side.
+- [x] Core prototype behavior unchanged with the server absent (evals pass identically).
+- [x] Human docs cover setup/usage; HLD updated.
+- [x] pytest green for tool handlers.
 
 ## References
 
