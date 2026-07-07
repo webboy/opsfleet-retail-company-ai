@@ -27,11 +27,14 @@ Applies to **every task** that changes code or system behavior in this repositor
 - For bugfixes: a test that **fails on the old behavior** and passes after the fix.
 - Run the relevant test suite before finishing and report the result (passed/failed counts). If something is objectively not testable (e.g. live LLM behavior), briefly explain why.
 
-## 4. Commit
+## 4. Commit (required — see `task-execution-commit-required.mdc`)
 
-- At the end of the task make **one or more commits** with meaningful messages (English, Conventional Commits per `conventional-commits.mdc`, reference the task ID where one exists, e.g. `feat(agent): add SQL self-heal loop (task 0004)`).
+- A task execution is **not complete** without **one or more commits** containing all deliverable changes.
+- Use meaningful messages in English, Conventional Commits per `conventional-commits.mdc`, reference the task ID where one exists, e.g. `feat(agent): add SQL self-heal loop (task 0004)`.
 - Logically separate changes → separate commits; a version bump goes in the same commit as the change that requires it.
+- After committing, run `git status` and confirm task deliverables are no longer unstaged/untracked.
 - **Push is not automatic** — the user decides when to push/publish.
+- If the user explicitly asks for "no commit" / "just an experiment" — follow the instruction (only explicit opt-out).
 
 ## 5. Verification
 
@@ -43,4 +46,4 @@ Applies to **every task** that changes code or system behavior in this repositor
 ## Exceptions
 
 - Documentation-only changes: no tests, but the commit still applies.
-- If the user explicitly asks for "no commit" / "just an experiment" — follow the instruction.
+- Commit opt-out only when the user **explicitly** asks for "no commit" / "just an experiment" — see `task-execution-commit-required.mdc`.

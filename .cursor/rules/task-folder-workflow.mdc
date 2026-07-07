@@ -57,9 +57,10 @@ Optional: `CONTEXT.md`, `artifacts/`, `patches/`, `refs/`.
 1. **Version bump**: if the task changed versioned source code, apply a **minor semver bump** on completion — see `memory-task-minor-version-bump.mdc`.
 2. **`HANDOFF.md`**: summary, changed files, impact on data/env, test steps, risks / rollback.
 3. Walk through the **acceptance criteria** from `TASK.md` and explicitly record what was verified.
-4. When the implementation is ready, set **`TASK.md`** to `pending_review` (or `cancelled` if abandoned), with an updated **Updated** date.
-5. **`INDEX.md`** must show the same status and date as `TASK.md`.
-6. **`done` is allowed only after explicit user confirmation** that the task was tested and approved. Without that message the task stays `pending_review`.
+4. **Commits**: one or more git commits with all deliverable changes — see `task-execution-commit-required.mdc`; verify `git status` is clean for task files.
+5. When the implementation is ready, set **`TASK.md`** to `pending_review` (or `cancelled` if abandoned), with an updated **Updated** date.
+6. **`INDEX.md`** must show the same status and date as `TASK.md`.
+7. **`done` is allowed only after explicit user confirmation** that the task was tested and approved. Without that message the task stays `pending_review`.
 
 ## If something is unclear
 

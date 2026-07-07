@@ -43,6 +43,7 @@ All implementation work is tracked in **task folders** under `memory-bank/tasks/
 - `task-folder-workflow.mdc` — folder structure, mandatory files (TASK/PLAN/WORKLOG/HANDOFF), status protocol;
 - `task-index-workflow.mdc` — keeping `tasks/INDEX.md` in sync;
 - `task-quality-lifecycle.mdc` — docs/tests/commit/verification per task;
+- `task-execution-commit-required.mdc` — every task must end with ≥1 commit before handoff;
 - `memory-task-minor-version-bump.mdc` — version bump on task completion.
 
 ### Additional context

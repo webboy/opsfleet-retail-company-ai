@@ -1,0 +1,56 @@
+---
+description: Every task execution must end with one or more git commits before handoff
+alwaysApply: true
+---
+
+# Task execution — commit required before handoff
+
+A task execution is **not finished** until its changes are committed to git.
+
+Applies to **every** implementation task in this repository:
+
+- memory-bank tasks under `memory-bank/tasks/<id>-*/`
+- ad-hoc user requests that change code, config, tests, or repo artifacts
+
+## Requirement
+
+Before marking a task `pending_review`, before final handoff, and before telling the user the work is done:
+
+1. Make **one or more commits** that contain **all** deliverable changes for that task.
+2. Use **Conventional Commits** (see `conventional-commits.mdc`).
+3. Reference the task ID in the message when one exists, e.g. `fix(golden): use gemini-embedding-001 (task 0004)`.
+4. Split logically separate changes into separate commits when that improves reviewability.
+5. Include version bumps in the same commit as the code they belong to (see `memory-task-minor-version-bump.mdc`).
+
+## Completion gate
+
+Do **not** end the session / handoff while any of these are true:
+
+- Deliverable files are modified or untracked but not committed.
+- `git status` still shows task-related changes under "Changes not staged" or "Untracked files" (except files that must never be committed, such as `.env`).
+- You reported "done" or `pending_review` without at least one commit for that delivery.
+
+After committing, run `git status` and confirm the working tree is clean for task deliverables.
+
+## What is not required
+
+- **Push** to remote — the user decides when to push/publish.
+- A commit when there is genuinely **nothing** to commit (e.g. user question answered with no repo changes).
+
+## Exceptions (explicit user opt-out only)
+
+Skip commits only when the user **explicitly** asks for one of:
+
+- "no commit"
+- "just an experiment" / "don't commit"
+- read-only exploration with no file changes
+
+If unclear, **commit** — do not wait for the user to ask.
+
+## Relation to other rules
+
+- Commit format: `conventional-commits.mdc`
+- Full lifecycle (docs, tests, verification): `task-quality-lifecycle.mdc`
+- Task folder protocol: `task-folder-workflow.mdc`
+
+This rule makes the commit step a **hard gate**, not an optional follow-up.
