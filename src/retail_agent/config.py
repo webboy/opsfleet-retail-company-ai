@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from os import getenv
+from os import environ, getenv
 
 from dotenv import load_dotenv
 
@@ -33,8 +33,13 @@ def get_settings(*, load_env: bool = True) -> Settings:
     if load_env:
         load_dotenv()
 
+    gcp_project_id = _resolve_gcp_project_id()
+    if gcp_project_id:
+        # Google auth libraries read GOOGLE_CLOUD_PROJECT, not GCP_PROJECT_ID.
+        environ.setdefault("GOOGLE_CLOUD_PROJECT", gcp_project_id)
+
     return Settings(
-        gcp_project_id=_optional_str("GCP_PROJECT_ID"),
+        gcp_project_id=gcp_project_id,
         google_api_key=_optional_str("GOOGLE_API_KEY"),
         model=getenv("RETAIL_AGENT_MODEL", "gemini-2.5-flash"),
         persona=getenv("RETAIL_AGENT_PERSONA", "default"),
@@ -42,6 +47,16 @@ def get_settings(*, load_env: bool = True) -> Settings:
         max_bytes_billed=_int_env("BQ_MAX_BYTES_BILLED", DEFAULT_MAX_BYTES_BILLED),
         default_limit=_int_env("BQ_DEFAULT_LIMIT", DEFAULT_QUERY_LIMIT),
     )
+
+
+def _resolve_gcp_project_id() -> str | None:
+    """Resolve billing project from env (supports GCP and Google SDK variable names)."""
+
+    for name in ("GCP_PROJECT_ID", "GOOGLE_CLOUD_PROJECT"):
+        value = _optional_str(name)
+        if value:
+            return value
+    return None
 
 
 def _optional_str(name: str) -> str | None:

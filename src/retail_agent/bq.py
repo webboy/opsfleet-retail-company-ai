@@ -137,7 +137,7 @@ class BigQueryRunner:
 
         try:
             query_job = self.client.query(guard.sql, job_config=job_config)
-            dataframe = query_job.to_dataframe()
+            dataframe = query_job.to_dataframe(create_bqstorage_client=False)
             return QueryResult(
                 ok=True,
                 dataframe=dataframe,
