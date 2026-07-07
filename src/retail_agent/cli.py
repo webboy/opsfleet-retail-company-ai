@@ -14,6 +14,7 @@ from langgraph.types import Command
 from retail_agent.deps import AgentDeps
 from retail_agent.graph import compile_graph
 from retail_agent.llm import is_quota_exhausted_error, quota_exhausted_message
+from retail_agent.observability import DEFAULT_EVENTS_PATH, TurnTracer
 from retail_agent.personas import list_persona_names, load_persona
 
 HELP_TEXT = """
@@ -38,6 +39,7 @@ def run_repl(*, user_id: str, thread_id: str | None = None, deps: AgentDeps | No
     config = {"configurable": {"thread_id": thread_id}}
     awaiting_interrupt = False
     session_persona = deps.settings.persona
+    active_tracer: TurnTracer | None = None
 
     print(f"Retail Agent CLI — user={user_id} thread={thread_id}")
     print(f"Persona: {session_persona}")
@@ -73,6 +75,16 @@ def run_repl(*, user_id: str, thread_id: str | None = None, deps: AgentDeps | No
                 result = graph.invoke(Command(resume=question), config)
                 awaiting_interrupt = False
             else:
+                active_tracer = TurnTracer(
+                    turn_id=uuid.uuid4().hex,
+                    user_id=user_id,
+                    thread_id=thread_id,
+                    log_path=DEFAULT_EVENTS_PATH,
+                    provider=deps.settings.provider,
+                    model=deps.settings.model,
+                )
+                deps.tracer = active_tracer
+                active_tracer.emit_turn_start(question)
                 result = graph.invoke(
                     _invoke_context(user_id, session_persona, question=question),
                     config,
@@ -86,6 +98,8 @@ def run_repl(*, user_id: str, thread_id: str | None = None, deps: AgentDeps | No
                 continue
 
             report = result.get("report") or "I couldn't produce an answer for that question."
+            if active_tracer is not None:
+                active_tracer.emit_turn_end(status=result.get("status"), report=report)
             print(f"\nAgent: {report}\n")
             if result.get("sql"):
                 attempts = result.get("sql_attempts", 0)
@@ -94,6 +108,8 @@ def run_repl(*, user_id: str, thread_id: str | None = None, deps: AgentDeps | No
                 method = result.get("retrieval_method", "unknown")
                 print(f"[retrieved trios={result['retrieved_trio_ids']} method={method}]\n")
         except Exception as exc:  # noqa: BLE001 — never leak stack traces in CLI
+            if active_tracer is not None:
+                active_tracer.emit_turn_end(status="fallback", report=str(exc))
             if is_quota_exhausted_error(exc):
                 logging.warning("CLI turn blocked by Gemini quota exhaustion")
                 print(

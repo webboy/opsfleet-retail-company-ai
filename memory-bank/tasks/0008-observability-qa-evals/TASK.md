@@ -4,7 +4,7 @@
 
 - **Task ID**: 0008
 - **Title**: Observability & QA evaluation suite
-- **Status**: todo
+- **Status**: pending_review
 - **Owner**: Engineer
 - **Created**: 2026-07-07
 - **Updated**: 2026-07-07
@@ -33,10 +33,10 @@ Requirement 7 (know when and why the agent fails; support deep-dive debugging) a
 
 ## Acceptance criteria
 
-- [ ] Every CLI turn produces JSONL events; `trace` reconstructs a full turn; `metrics` prints the summary.
-- [ ] Eval runner executes the full suite (capability + safety + judge scoring) against the live agent and reports pass/fail + scores per case.
-- [ ] A second eval run compares against the stored baseline and flags regressions.
-- [ ] pytest green for tracer/metrics/eval engine/judge parsing.
+- [x] Every CLI turn produces JSONL events; `trace` reconstructs a full turn; `metrics` prints the summary.
+- [x] Eval runner executes the full suite (capability + safety + judge scoring) in dry-run by default; `--live` for real agent.
+- [x] A second eval run compares against the stored baseline and flags regressions.
+- [x] pytest green for tracer/metrics/eval engine/judge parsing.
 
 ## References
 

@@ -10,6 +10,7 @@ from retail_agent.bq import BigQueryRunner
 from retail_agent.config import Settings, get_settings
 from retail_agent.golden import TrioStore
 from retail_agent.llm import CallBudget, create_chat_model
+from retail_agent.observability import TurnTracer
 from retail_agent.stores import ReportStore
 
 
@@ -22,6 +23,7 @@ class AgentDeps:
     report_store: ReportStore | None = None
     max_sql_attempts: int = 3
     max_llm_calls: int = 8
+    tracer: TurnTracer | None = field(default=None, repr=False)
 
     def __post_init__(self) -> None:
         if self.trio_store is None:
@@ -40,6 +42,7 @@ class AgentDeps:
         *,
         max_sql_attempts: int = 3,
         max_llm_calls: int = 8,
+        tracer: TurnTracer | None = None,
     ) -> AgentDeps:
         settings = settings or get_settings()
         return cls(
@@ -51,6 +54,7 @@ class AgentDeps:
             or ReportStore(db_path=settings.reports_db_path),
             max_sql_attempts=max_sql_attempts,
             max_llm_calls=max_llm_calls,
+            tracer=tracer,
         )
 
 

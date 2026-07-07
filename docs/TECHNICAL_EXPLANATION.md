@@ -56,9 +56,22 @@ This document explains **why** the system is built the way it is, how data flows
 
 **Production:** Structured JSON logs → Cloud Logging; metric dashboards and alerts in Cloud Monitoring; optional **LangSmith** for full LLM trace replay.
 
-**Prototype:** Per-node JSONL events; CLI commands to reconstruct a turn (`trace`) and summarize metrics (`metrics`); optional LangSmith when env vars are set.
+**Prototype:** Per-node JSONL events written to `logs/agent_events.jsonl` (safe summaries only — no full result rows or prompt dumps). Commands:
 
-**Eval gate:** pytest unit tests for pure logic; full eval suite (`evals/`) with property assertions, safety cases, and LLM-as-judge intent scoring — run before deploy; results persisted for regression comparison.
+```bash
+python -m retail_agent.metrics              # aggregate success/fallback/guard/latency metrics
+python -m retail_agent.trace <turn_id>      # reconstruct one turn's node sequence
+```
+
+Optional LangSmith: set `LANGSMITH_TRACING=true` and `LANGSMITH_API_KEY` for full LLM trace export.
+
+**Eval gate:** `pytest` for pure logic; full eval suite under `evals/` with property assertions, safety cases, and LLM-as-judge intent scoring. Default runner is dry-run (no live API keys); use `--live` for pre-deploy gate against real Gemini + BigQuery:
+
+```bash
+python -m retail_agent.evals                # dry-run default; compares to evals/baseline/dry-run-v0.8.0.jsonl
+python -m retail_agent.evals --live         # live pre-deploy gate (requires .env + BigQuery auth)
+python -m retail_agent.evals --layer safety # safety subset only
+```
 
 ---
 
@@ -235,7 +248,7 @@ Explicit PII requests (e.g. top buyers with emails) may still run as analysis, b
 
 **Deep dive:** Reconstruct full turn from turn id (messages, SQL attempts, mask actions, final report). Optional LangSmith trace for LLM-level debugging.
 
-**Prototype:** JSONL log + CLI `trace` / `metrics`. **Production:** Cloud Logging + Monitoring dashboards + alert policies (e.g. success rate drop, spike in guard blocks).
+**Prototype:** JSONL log at `logs/agent_events.jsonl` + `python -m retail_agent.trace <turn_id>` / `python -m retail_agent.metrics`. **Production:** Cloud Logging + Monitoring dashboards + alert policies (e.g. success rate drop, spike in guard blocks).
 
 ---
 

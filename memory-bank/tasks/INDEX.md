@@ -11,7 +11,7 @@ Quick overview of all tasks. Source of truth for each row is the task's `TASK.md
 | 0005 | Safety: input guard & PII masking | done | Engineer | 2026-07-07 |
 | 0006 | High-Stakes Oversight: saved reports & delete confirmation | done | Engineer | 2026-07-07 |
 | 0007 | Learning loop: user preferences & personas | done | Engineer | 2026-07-07 |
-| 0008 | Observability & QA evaluation suite | todo | Engineer | 2026-07-07 |
+| 0008 | Observability & QA evaluation suite | pending_review | Engineer | 2026-07-07 |
 | 0009 | Final accompanying documentation & submission polish | todo | Engineer | 2026-07-07 |
 | 0010 | Optional: expose guarded capabilities as an MCP server | todo | Engineer | 2026-07-07 |
 | 0011 | LLM provider fallback: OpenRouter / Ollama | done | Engineer | 2026-07-07 |

@@ -12,6 +12,7 @@ venv/
 
 # Local runtime artifacts
 logs/
+evals/runs/
 *.sqlite3
 golden_bucket/candidates/*.jsonl
 
