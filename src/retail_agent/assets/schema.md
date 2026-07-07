@@ -2,6 +2,8 @@
 
 Read-only dataset. Only these four tables are allowed in generated SQL.
 
+Schema below matches the live public dataset (verified via BigQuery API).
+
 ## orders
 
 Customer order headers.
@@ -9,7 +11,7 @@ Customer order headers.
 | Column | Type | Notes |
 |--------|------|-------|
 | order_id | INT64 | Primary key |
-| user_id | INT64 | FK → users.user_id |
+| user_id | INT64 | FK → users.id |
 | status | STRING | e.g. Complete, Cancelled, Processing |
 | gender | STRING | |
 | created_at | TIMESTAMP | Order creation time |
@@ -24,10 +26,12 @@ Line items per order.
 
 | Column | Type | Notes |
 |--------|------|-------|
-| order_item_id | INT64 | Primary key |
+| id | INT64 | Primary key (line item id) |
 | order_id | INT64 | FK → orders.order_id |
+| user_id | INT64 | FK → users.id |
 | product_id | INT64 | FK → products.id |
 | inventory_item_id | INT64 | |
+| status | STRING | Line item status |
 | sale_price | FLOAT64 | Price paid for line item |
 | created_at | TIMESTAMP | |
 | shipped_at | TIMESTAMP | Nullable |
@@ -71,16 +75,19 @@ Customer demographics (contains PII — emails in raw data; masking handled in l
 | longitude | FLOAT64 | |
 | traffic_source | STRING | |
 | created_at | TIMESTAMP | |
+| user_geom | GEOGRAPHY | User location geometry |
 
 ## Common joins
 
 - `orders.user_id = users.id`
 - `order_items.order_id = orders.order_id`
+- `order_items.user_id = users.id`
 - `order_items.product_id = products.id`
 
 ## Query notes
 
 - Use fully qualified table names: `` `bigquery-public-data.thelook_ecommerce.orders` ``
-- Revenue metrics typically sum `order_items.sale_price` for completed orders.
+- The line-item primary key is `order_items.id` — **not** `order_item_id`.
+- Revenue metrics typically sum `order_items.sale_price` for completed orders (`orders.status = 'Complete'`).
 - Time filters usually use `orders.created_at` or `order_items.created_at`.
 - Always include a reasonable `LIMIT` (the sql_guard will inject one if missing).
