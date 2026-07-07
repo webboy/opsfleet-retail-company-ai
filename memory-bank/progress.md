@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-07)
 
-Tasks 0001–0007 **done** (user approved). Next: LLM provider fallback (0011), then observability/QA evals (0008).
+Tasks 0001–0007 **done** (user approved). Task **0011** **pending_review** (LLM provider fallback). Next after approval: observability/QA evals (0008).
 
 ## What works
 
@@ -13,7 +13,8 @@ Tasks 0001–0007 **done** (user approved). Next: LLM provider fallback (0011), 
 - Safety: input guard, DataFrame PII mask, output sweep + policy note (task 0005, **done**).
 - Saved reports: SQLite store, save/list/delete with interrupt confirmation (task 0006, **done**).
 - User preferences + personas: SQLite prefs, deterministic routing, hot-reload persona files, `/prefs` and `/persona` (task 0007, **done**).
-- `pytest` **88 passed**.
+- LLM provider factory: Gemini, OpenRouter, Ollama with optional fallback on quota/outage (task 0011, **pending_review**).
+- `pytest` **98 passed**.
 
 ## What's left to build
 
@@ -24,17 +25,17 @@ Tasks 0001–0007 **done** (user approved). Next: LLM provider fallback (0011), 
 5. ~~`0005` Safety: input guard + PII masking~~ — **done**
 6. ~~`0006` High-Stakes Oversight: saved reports + interrupt-based delete confirmation~~ — **done**
 7. ~~`0007` Learning loop: user preferences + personas~~ — **done**
-8. `0011` LLM provider fallback: OpenRouter/Ollama (gap from 0003; do before 0008's live evals)
+8. `0011` LLM provider fallback: OpenRouter/Ollama — **pending_review**
 9. `0008` Observability + QA eval suite
 10. `0009` Final documentation package and submission polish
 11. `0010` *(optional)* MCP server stretch
 
 ## Known issues
 
-- `llm.py` is Gemini-only; OpenRouter/Ollama fallback from task 0003 scope not implemented — tracked as task 0011.
 - Candidate JSONL grows without automatic pruning — curation workflow documented only.
 - Preference phrase detection is deterministic and may miss unusual phrasing.
+- Fallback LLM quality not yet evaluated — task 0008 evals will cover this.
 
 ## Version
 
-- Project version **0.6.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (task 0007).
+- Project version **0.7.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (task 0011).

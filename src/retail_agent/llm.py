@@ -1,9 +1,10 @@
-"""LLM factory, retry/backoff, and per-turn call budget."""
+"""LLM factory, retry/backoff, fallback providers, and per-turn call budget."""
 
 from __future__ import annotations
 
 import time
 from dataclasses import dataclass
+from typing import Literal
 
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import BaseMessage
@@ -14,6 +15,12 @@ from retail_agent.config import Settings, get_settings
 DEFAULT_MAX_LLM_CALLS = 8
 DEFAULT_MAX_RETRIES = 3
 INITIAL_BACKOFF_SECONDS = 1.0
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+DEFAULT_OPENROUTER_MODEL = "google/gemini-2.0-flash-exp:free"
+DEFAULT_OLLAMA_HOST = "http://localhost:11434"
+DEFAULT_OLLAMA_MODEL = "llama3.2"
+SUPPORTED_PROVIDERS = frozenset({"gemini", "openrouter", "ollama"})
+ProviderName = Literal["gemini", "openrouter", "ollama"]
 
 
 class BudgetExhaustedError(Exception):
@@ -46,40 +53,135 @@ class CallBudget:
         return cls(max_calls=data.get("max_calls", DEFAULT_MAX_LLM_CALLS), used=data.get("used", 0))
 
 
-def create_chat_model(settings: Settings | None = None) -> BaseChatModel:
+@dataclass
+class FallbackChatModel:
+    """Primary provider with optional transparent fallback on quota/outage."""
+
+    primary: BaseChatModel
+    fallback: BaseChatModel | None
+    primary_provider: str
+    fallback_provider: str | None = None
+    fallback_count: int = 0
+    last_fallback_provider: str | None = None
+    last_primary_error: str | None = None
+
+    def record_fallback_use(self, *, error: Exception) -> None:
+        self.fallback_count += 1
+        self.last_fallback_provider = self.fallback_provider
+        self.last_primary_error = str(error)
+
+
+def create_chat_model(settings: Settings | None = None) -> BaseChatModel | FallbackChatModel:
     settings = settings or get_settings()
-    if not settings.google_api_key:
-        raise ValueError("GOOGLE_API_KEY is required for the chat agent.")
-    return ChatGoogleGenerativeAI(
-        model=settings.model,
-        google_api_key=settings.google_api_key,
-        temperature=0.1,
+    primary_name = _normalize_provider(settings.provider)
+    primary = _create_provider_model(primary_name, settings)
+    if not settings.fallback_provider:
+        return primary
+    fallback_name = _normalize_provider(settings.fallback_provider)
+    fallback = _create_provider_model(fallback_name, settings)
+    return FallbackChatModel(
+        primary=primary,
+        fallback=fallback,
+        primary_provider=primary_name,
+        fallback_provider=fallback_name,
     )
 
 
+def _create_provider_model(provider: str, settings: Settings) -> BaseChatModel:
+    normalized = _normalize_provider(provider)
+    if normalized == "gemini":
+        if not settings.google_api_key:
+            raise ValueError("GOOGLE_API_KEY is required when RETAIL_AGENT_PROVIDER=gemini.")
+        return ChatGoogleGenerativeAI(
+            model=settings.model,
+            google_api_key=settings.google_api_key,
+            temperature=0.1,
+        )
+    if normalized == "openrouter":
+        if not settings.openrouter_api_key:
+            raise ValueError(
+                "OPENROUTER_API_KEY is required when using the openrouter provider."
+            )
+        from langchain_openai import ChatOpenAI
+
+        return ChatOpenAI(
+            model=settings.openrouter_model,
+            api_key=settings.openrouter_api_key,
+            base_url=OPENROUTER_BASE_URL,
+            temperature=0.1,
+        )
+    if normalized == "ollama":
+        from langchain_ollama import ChatOllama
+
+        return ChatOllama(
+            model=settings.ollama_model,
+            base_url=settings.ollama_host,
+            temperature=0.1,
+        )
+    raise ValueError(f"Unsupported LLM provider: {provider!r}")
+
+
 def invoke_with_retry(
-    llm: BaseChatModel,
+    llm: BaseChatModel | FallbackChatModel,
     messages: list[BaseMessage],
     budget: CallBudget,
     *,
     max_retries: int = DEFAULT_MAX_RETRIES,
     initial_backoff: float = INITIAL_BACKOFF_SECONDS,
 ):
-    """Invoke the LLM with transient-error retry and budget enforcement."""
+    """Invoke the LLM with transient-error retry, optional fallback, and budget enforcement."""
 
+    primary, fallback, fallback_wrapper = _resolve_providers(llm)
     last_exc: Exception | None = None
+
     for attempt in range(max_retries + 1):
         budget.consume()
         try:
-            return llm.invoke(messages)
+            return primary.invoke(messages)
         except Exception as exc:  # noqa: BLE001 — classify transient provider errors
             last_exc = exc
+            if fallback is not None and is_quota_exhausted_error(exc):
+                return _invoke_fallback(fallback_wrapper, fallback, messages, budget, exc)
             if not is_transient_error(exc) or attempt >= max_retries:
+                if fallback is not None and attempt >= max_retries:
+                    return _invoke_fallback(fallback_wrapper, fallback, messages, budget, exc)
                 raise
             time.sleep(initial_backoff * (2**attempt))
+
     if last_exc:
         raise last_exc
     raise RuntimeError("invoke_with_retry failed without exception")  # pragma: no cover
+
+
+def _invoke_fallback(
+    wrapper: FallbackChatModel | None,
+    fallback: BaseChatModel,
+    messages: list[BaseMessage],
+    budget: CallBudget,
+    primary_error: Exception,
+):
+    budget.consume()
+    if wrapper is not None:
+        wrapper.record_fallback_use(error=primary_error)
+    return fallback.invoke(messages)
+
+
+def _resolve_providers(
+    llm: BaseChatModel | FallbackChatModel,
+) -> tuple[BaseChatModel, BaseChatModel | None, FallbackChatModel | None]:
+    if isinstance(llm, FallbackChatModel):
+        return llm.primary, llm.fallback, llm
+    return llm, None, None
+
+
+def _normalize_provider(provider: str) -> str:
+    normalized = (provider or "gemini").strip().lower()
+    if normalized not in SUPPORTED_PROVIDERS:
+        raise ValueError(
+            f"Unsupported LLM provider {provider!r}. "
+            f"Expected one of: {', '.join(sorted(SUPPORTED_PROVIDERS))}."
+        )
+    return normalized
 
 
 def is_transient_error(exc: Exception) -> bool:
@@ -112,11 +214,35 @@ def is_quota_exhausted_error(exc: Exception) -> bool:
     )
 
 
-def quota_exhausted_message(*, model: str | None = None) -> str:
+def quota_exhausted_message(
+    *,
+    model: str | None = None,
+    provider: str | None = None,
+    fallback_provider: str | None = None,
+) -> str:
     model_hint = f" ({model})" if model else ""
-    return (
-        "The Gemini API quota is exhausted{model_hint}. The free tier allows roughly "
-        "20 requests per day per model. Wait for the daily reset, set a different "
-        "RETAIL_AGENT_MODEL in .env, or use a billed API key. "
-        "Report commands such as /save and show my reports still work without LLM calls."
-    ).format(model_hint=model_hint)
+    provider_label = provider or "gemini"
+    base = (
+        f"The {provider_label} API quota is exhausted{model_hint}. "
+        "Wait for the daily reset, switch models/providers, or use a billed API key."
+    )
+    if fallback_provider:
+        base += f" A fallback provider ({fallback_provider}) is configured but also failed or was unavailable."
+    else:
+        base += (
+            " To enable automatic fallback, set RETAIL_AGENT_FALLBACK_PROVIDER to "
+            "openrouter or ollama and configure the matching credentials."
+        )
+    return base + " Report commands such as /save and show my reports still work without LLM calls."
+
+
+def get_fallback_metadata(llm: BaseChatModel | FallbackChatModel) -> dict[str, object]:
+    if not isinstance(llm, FallbackChatModel):
+        return {}
+    return {
+        "primary_provider": llm.primary_provider,
+        "fallback_provider": llm.fallback_provider,
+        "fallback_count": llm.fallback_count,
+        "last_fallback_provider": llm.last_fallback_provider,
+        "last_primary_error": llm.last_primary_error,
+    }

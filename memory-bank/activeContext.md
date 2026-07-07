@@ -2,7 +2,7 @@
 
 ## Current focus
 
-Task **0007** (user preferences + personas) is **done** (user approved 2026-07-07). Next up: task **0011** (LLM provider fallback), then **0008** (observability/QA evals).
+Task **0011** (LLM provider fallback) is **pending_review** — implementation complete, awaiting user testing/approval. Next after approval: task **0008** (observability/QA evals).
 
 ## How work is organized
 
@@ -11,7 +11,7 @@ Task **0007** (user preferences + personas) is **done** (user approved 2026-07-0
 
 ## Active decisions (see systemPatterns.md for full ADRs)
 
-- LangGraph + Gemini (`gemini-2.5-flash` default, env-configurable), optional OpenRouter/Ollama fallback (task 0011).
+- LangGraph + configurable LLM providers: Gemini (default), OpenRouter, Ollama via `create_chat_model()`; optional fallback on quota/outage (task 0011).
 - Safety is deterministic: `input_guard` (scope/injection/off-topic), `sql_guard` (SELECT-only, allowed tables, LIMIT, bytes cap), and `pii_mask` + `output_mask` (column deny-list + regex sweep) are code, not prompts.
 - Saved reports and user preferences: SQLite via `RETAIL_AGENT_DB_PATH`; delete uses LangGraph `interrupt()` with owner-scoped selectors.
 - Personas: hot-read from `personas/` (`RETAIL_AGENT_PERSONAS_DIR`); `/persona` is session-only override.
@@ -21,12 +21,13 @@ Task **0007** (user preferences + personas) is **done** (user approved 2026-07-0
 
 ## Open questions / risks
 
-- Gemini free-tier rate limits during development — mitigate with call caps, alternate models, and task 0011 fallback provider.
+- Gemini free-tier rate limits during development — mitigated by call caps, alternate models, and task 0011 fallback provider.
 - BigQuery auth on the reviewer's machine is the most fragile setup step — README must cover it carefully (task 0009).
 - Preference phrase detection is deterministic; edge phrasing may need expansion over time.
+- Fallback provider model quality may differ from Gemini — monitor during evals (task 0008).
 
 ## Recent changes
 
+- 2026-07-07: Task 0011 **pending_review** — LLM provider factory + OpenRouter/Ollama fallback, version **0.7.0**, **98 pytest passed**.
 - 2026-07-07: Task 0007 **done** (user approved) — user preferences, hot-reload personas, version **0.6.0**.
 - 2026-07-07: Tasks 0001–0006 **done** (user approved).
-- 2026-07-07: Task 0011 created for OpenRouter/Ollama fallback gap from task 0003.

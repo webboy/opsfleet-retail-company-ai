@@ -11,6 +11,10 @@ DEFAULT_ALLOWED_TABLES = frozenset({"orders", "order_items", "products", "users"
 DEFAULT_DATASET = "bigquery-public-data.thelook_ecommerce"
 DEFAULT_MAX_BYTES_BILLED = 1_073_741_824  # 1 GiB
 DEFAULT_QUERY_LIMIT = 1000
+DEFAULT_LLM_PROVIDER = "gemini"
+DEFAULT_OPENROUTER_MODEL = "google/gemini-2.0-flash-exp:free"
+DEFAULT_OLLAMA_HOST = "http://localhost:11434"
+DEFAULT_OLLAMA_MODEL = "llama3.2"
 
 
 @dataclass(frozen=True)
@@ -22,6 +26,12 @@ class Settings:
     model: str
     embedding_model: str
     persona: str
+    provider: str
+    fallback_provider: str | None
+    openrouter_api_key: str | None
+    openrouter_model: str
+    ollama_host: str
+    ollama_model: str
     dataset_id: str
     reports_db_path: str | None
     personas_dir: str | None
@@ -47,6 +57,12 @@ def get_settings(*, load_env: bool = True) -> Settings:
         model=getenv("RETAIL_AGENT_MODEL", "gemini-2.5-flash"),
         embedding_model=getenv("RETAIL_AGENT_EMBEDDING_MODEL", "gemini-embedding-001"),
         persona=getenv("RETAIL_AGENT_PERSONA", "default"),
+        provider=getenv("RETAIL_AGENT_PROVIDER", DEFAULT_LLM_PROVIDER),
+        fallback_provider=_optional_str("RETAIL_AGENT_FALLBACK_PROVIDER"),
+        openrouter_api_key=_optional_str("OPENROUTER_API_KEY"),
+        openrouter_model=getenv("RETAIL_AGENT_OPENROUTER_MODEL", DEFAULT_OPENROUTER_MODEL),
+        ollama_host=getenv("OLLAMA_HOST", DEFAULT_OLLAMA_HOST),
+        ollama_model=getenv("RETAIL_AGENT_OLLAMA_MODEL", DEFAULT_OLLAMA_MODEL),
         dataset_id=getenv("BQ_DATASET_ID", DEFAULT_DATASET),
         reports_db_path=_optional_str("RETAIL_AGENT_DB_PATH"),
         personas_dir=_optional_str("RETAIL_AGENT_PERSONAS_DIR"),

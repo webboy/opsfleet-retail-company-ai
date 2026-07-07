@@ -4,7 +4,7 @@
 
 - **Task ID**: 0011
 - **Title**: LLM provider fallback: OpenRouter / Ollama
-- **Status**: todo
+- **Status**: pending_review
 - **Owner**: Engineer
 - **Created**: 2026-07-07
 - **Updated**: 2026-07-07
@@ -31,10 +31,10 @@ Close the gap left by task 0003: the assignment (Requirement 5, resilience to th
 
 ## Acceptance criteria
 
-- [ ] With `RETAIL_AGENT_PROVIDER=openrouter` (valid key) the CLI answers questions with no Gemini key at all.
-- [ ] With Gemini primary + OpenRouter fallback configured, a simulated quota-exhausted error transparently completes the turn via fallback (visible in logs).
-- [ ] With no fallback configured, behavior is unchanged (current graceful quota message).
-- [ ] pytest green for factory + fallback logic (fake providers, no live calls).
+- [x] With `RETAIL_AGENT_PROVIDER=openrouter` (valid key) the CLI answers questions with no Gemini key at all.
+- [x] With Gemini primary + OpenRouter fallback configured, a simulated quota-exhausted error transparently completes the turn via fallback (visible in logs).
+- [x] With no fallback configured, behavior is unchanged (current graceful quota message).
+- [x] pytest green for factory + fallback logic (fake providers, no live calls).
 
 ## References
 

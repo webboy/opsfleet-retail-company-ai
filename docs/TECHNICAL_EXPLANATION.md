@@ -22,7 +22,7 @@ This document explains **why** the system is built the way it is, how data flows
 
 **Production:** Vertex AI Gemini with project-level quotas, billing alerts, and optional model routing. **Prototype:** AI Studio API key (`GOOGLE_API_KEY`).
 
-**Fallback:** Optional OpenRouter or Ollama behind a small factory interface. On 429/5xx, retry with exponential backoff; after exhaustion, switch provider if configured; hard cap on LLM calls per user turn prevents cost runaway.
+**Fallback:** Configurable primary provider via `RETAIL_AGENT_PROVIDER` (`gemini`, `openrouter`, `ollama`) with optional `RETAIL_AGENT_FALLBACK_PROVIDER`. On quota exhaustion or primary outage after retries, the agent transparently retries on the fallback provider within the same per-turn LLM budget. OpenRouter uses an OpenAI-compatible endpoint; Ollama uses a local host.
 
 ### Data warehouse: Google BigQuery
 
@@ -136,7 +136,7 @@ python -m retail_agent.cli --user alice
 # Follow-up: "And how does that compare to the previous quarter?"
 ```
 
-Optional: set `LANGSMITH_TRACING=true` and `LANGSMITH_API_KEY` for full trace export. Optional OpenRouter/Ollama keys for LLM fallback.
+Optional: set `LANGSMITH_TRACING=true` and `LANGSMITH_API_KEY` for full trace export. LLM provider env vars: `RETAIL_AGENT_PROVIDER`, `RETAIL_AGENT_FALLBACK_PROVIDER`, `OPENROUTER_API_KEY`, `RETAIL_AGENT_OPENROUTER_MODEL`, `OLLAMA_HOST`, `RETAIL_AGENT_OLLAMA_MODEL`.
 
 ---
 

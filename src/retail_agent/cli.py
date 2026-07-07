@@ -96,7 +96,9 @@ def run_repl(*, user_id: str, thread_id: str | None = None, deps: AgentDeps | No
         except Exception as exc:  # noqa: BLE001 — never leak stack traces in CLI
             if is_quota_exhausted_error(exc):
                 logging.warning("CLI turn blocked by Gemini quota exhaustion")
-                print(f"\nAgent: {quota_exhausted_message(model=deps.settings.model)}\n")
+                print(
+                    f"\nAgent: {quota_exhausted_message(model=deps.settings.model, provider=deps.settings.provider, fallback_provider=deps.settings.fallback_provider)}\n"
+                )
             else:
                 logging.exception("CLI turn failed")
                 print(
