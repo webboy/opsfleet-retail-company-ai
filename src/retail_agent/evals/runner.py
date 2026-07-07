@@ -75,7 +75,6 @@ def run_suite(
                 result.state,
                 question=case.question or "",
                 settings=settings,
-                llm=None if not live else deps.llm,
                 dry_run=None if live else case.dry_run,
             )
             result.judge_score = score

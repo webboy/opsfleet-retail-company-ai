@@ -3,14 +3,18 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
+from dataclasses import replace
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from retail_agent.config import Settings
 from retail_agent.evals.cases import judge_prompt_path
-from retail_agent.llm import create_chat_model, invoke_with_retry
+from retail_agent.llm import CallBudget, create_chat_model, invoke_with_retry
 from retail_agent.state import AgentState
+
+logger = logging.getLogger(__name__)
 
 _SCORE_RE = re.compile(r'"score"\s*:\s*([1-5])', re.I)
 
@@ -45,6 +49,12 @@ def parse_judge_response(text: str) -> tuple[int | None, str]:
     return None, text
 
 
+def _judge_settings(settings: Settings) -> Settings:
+    """Judge uses the configured primary provider only — no agent fallback chain."""
+
+    return replace(settings, fallback_provider=None)
+
+
 def score_intent(
     state: AgentState,
     *,
@@ -74,10 +84,15 @@ def score_intent(
         max_bytes_billed=1_073_741_824,
         default_limit=1000,
     )
-    llm = llm or create_chat_model(settings)
+    judge_settings = _judge_settings(settings)
+    llm = llm or create_chat_model(judge_settings)
     messages = [
         SystemMessage(content=load_judge_prompt()),
         HumanMessage(content=build_judge_input(state, question=question)),
     ]
-    response = invoke_with_retry(llm, messages)
+    try:
+        response = invoke_with_retry(llm, messages, CallBudget(max_calls=2))
+    except Exception as exc:  # noqa: BLE001 — judge failure must not abort the eval run
+        logger.warning("Intent judge unavailable for question=%r: %s", question, exc)
+        return None, f"judge unavailable: {type(exc).__name__}: {exc}"
     return parse_judge_response(getattr(response, "content", str(response)))
