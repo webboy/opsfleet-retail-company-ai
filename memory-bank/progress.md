@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-07)
 
-Tasks 0001–0007 **done** (user approved). Task **0011** **pending_review** (LLM provider fallback). Next after approval: observability/QA evals (0008).
+Tasks 0001–0007 and **0011** **done** (user approved). Next: observability/QA evals (**0008**).
 
 ## What works
 
@@ -13,7 +13,7 @@ Tasks 0001–0007 **done** (user approved). Task **0011** **pending_review** (LL
 - Safety: input guard, DataFrame PII mask, output sweep + policy note (task 0005, **done**).
 - Saved reports: SQLite store, save/list/delete with interrupt confirmation (task 0006, **done**).
 - User preferences + personas: SQLite prefs, deterministic routing, hot-reload persona files, `/prefs` and `/persona` (task 0007, **done**).
-- LLM provider factory: Gemini, OpenRouter, Ollama with optional fallback on quota/outage (task 0011, **pending_review**).
+- LLM provider factory: Gemini, OpenRouter, Ollama with optional fallback on quota/outage (task 0011, **done**).
 - `pytest` **98 passed**.
 
 ## What's left to build
@@ -25,7 +25,7 @@ Tasks 0001–0007 **done** (user approved). Task **0011** **pending_review** (LL
 5. ~~`0005` Safety: input guard + PII masking~~ — **done**
 6. ~~`0006` High-Stakes Oversight: saved reports + interrupt-based delete confirmation~~ — **done**
 7. ~~`0007` Learning loop: user preferences + personas~~ — **done**
-8. `0011` LLM provider fallback: OpenRouter/Ollama — **pending_review**
+8. ~~`0011` LLM provider fallback: OpenRouter/Ollama~~ — **done**
 9. `0008` Observability + QA eval suite
 10. `0009` Final documentation package and submission polish
 11. `0010` *(optional)* MCP server stretch

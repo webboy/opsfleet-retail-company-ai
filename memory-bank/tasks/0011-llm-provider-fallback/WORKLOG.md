@@ -15,3 +15,4 @@
 - Updated `.env.example` and `docs/TECHNICAL_EXPLANATION.md` fallback section.
 - Expanded `tests/test_llm.py` and `tests/helpers.py` with offline factory/fallback tests (monkeypatched ChatOpenAI/ChatOllama).
 - Version bump **0.6.0 → 0.7.0**; `pytest -q`: **98 passed**.
+- User approved 2026-07-07 → task **done**.

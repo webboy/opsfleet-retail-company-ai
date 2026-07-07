@@ -2,7 +2,7 @@
 
 ## Current focus
 
-Task **0011** (LLM provider fallback) is **pending_review** — implementation complete, awaiting user testing/approval. Next after approval: task **0008** (observability/QA evals).
+Task **0011** (LLM provider fallback) is **done** (user approved 2026-07-07). Next up: task **0008** (observability/QA evals).
 
 ## How work is organized
 
@@ -28,6 +28,6 @@ Task **0011** (LLM provider fallback) is **pending_review** — implementation c
 
 ## Recent changes
 
-- 2026-07-07: Task 0011 **pending_review** — LLM provider factory + OpenRouter/Ollama fallback, version **0.7.0**, **98 pytest passed**.
+- 2026-07-07: Task 0011 **done** (user approved) — LLM provider factory + OpenRouter/Ollama fallback, version **0.7.0**.
 - 2026-07-07: Task 0007 **done** (user approved) — user preferences, hot-reload personas, version **0.6.0**.
 - 2026-07-07: Tasks 0001–0006 **done** (user approved).
