@@ -2,7 +2,7 @@
 
 ## Current focus
 
-Task **0008** (observability & QA eval suite) is **done** (user approved 2026-07-08). Next up: task **0009** (final documentation & submission polish).
+Task **0009** (final documentation & submission polish) is **pending_review** — implementation complete, awaiting user approval. Next optional work: task **0010** (MCP server stretch).
 
 ## How work is organized
 
@@ -20,15 +20,16 @@ Task **0008** (observability & QA eval suite) is **done** (user approved 2026-07
 - Golden Bucket prototype = local trio files + embedding retrieval with keyword fallback.
 - **Maximum-effort scope (user decision, 2026-07-07)**: the prototype implements **all five** optional requirements as first-class features.
 - **Documentation separation (user decision, 2026-07-07)**: `README.md` + `docs/` are human-facing; `memory-bank/` is internal agent documentation.
+- **Submission docs (task 0009)**: README is reviewer entry point; USAGE + EVALUATION complete the `docs/` package; MCP documented as production extension only.
 
 ## Open questions / risks
 
-- BigQuery auth on the reviewer's machine is the most fragile setup step — README must cover it carefully (task 0009).
 - Live eval judge scores may vary; dry-run baseline is committed for CI-stable regression checks.
 - Preference phrase detection is deterministic; edge phrasing may need expansion over time.
+- README transcripts are curated; spot-check with live chat recommended before final demo.
 
 ## Recent changes
 
-- 2026-07-08: Task 0008 **done** (user approved) — observability JSONL tracing, trace/metrics CLIs, eval suite, live judge fix, version **0.8.0**.
+- 2026-07-08: Task 0009 **pending_review** — full README, USAGE, EVALUATION, architecture/technical drift fixes, fresh venv verified (120 pytest, 16 eval).
+- 2026-07-08: Task 0008 **done** (user approved) — observability JSONL tracing, trace/metrics CLIs, eval suite, version **0.8.0**.
 - 2026-07-07: Task 0011 **done** (user approved) — LLM provider factory + fallback, version **0.7.0**.
-- 2026-07-07: Tasks 0001–0007 **done** (user approved).

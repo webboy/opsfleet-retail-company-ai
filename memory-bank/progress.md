@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0008 and **0011** **done** (user approved). Next: final docs polish (**0009**).
+Tasks 0001–0008 and **0011** **done** (user approved). Task **0009** **pending_review** (docs package delivered). Optional: **0010** MCP stretch.
 
 ## What works
 
@@ -16,12 +16,13 @@ Tasks 0001–0008 and **0011** **done** (user approved). Next: final docs polish
 - LLM provider factory: Gemini, OpenRouter, Ollama with optional fallback (task 0011, **done**).
 - Observability: per-node JSONL events, `trace`/`metrics` CLIs (task 0008, **done**).
 - QA eval suite: 16 cases, dry-run default, judge scoring, baseline regression (task 0008, **done**).
-- `pytest` **120 passed** (incl. live judge fix).
+- **Human docs package**: README, USAGE, EVALUATION, drift-corrected architecture/technical (task 0009, **pending_review**).
+- `pytest` **120 passed**; eval dry-run **16/16 passed**.
 
 ## What's left to build
 
 1. ~~`0001`–`0008`, `0011`~~ — **done**
-2. `0009` Final documentation package and submission polish
+2. `0009` Final documentation package — **pending_review** (awaiting user approval)
 3. `0010` *(optional)* MCP server stretch
 
 ## Known issues
@@ -32,4 +33,4 @@ Tasks 0001–0008 and **0011** **done** (user approved). Next: final docs polish
 
 ## Version
 
-- Project version **0.8.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (task 0008).
+- Project version **0.8.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (unchanged — task 0009 is docs-only).
