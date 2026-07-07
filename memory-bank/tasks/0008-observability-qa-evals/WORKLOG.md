@@ -10,3 +10,5 @@
 - Added `src/retail_agent/evals/` package: fakes, assertions, cases loader, judge, baseline compare, runner, `__main__.py`.
 - Tests: observability, metrics, trace CLI, eval assertions/judge/baseline/runner — **118 pytest passed**.
 - Updated `docs/TECHNICAL_EXPLANATION.md`; version **0.8.0**; task **pending_review**.
+- Post-review fix: live judge uses primary-only LLM with graceful failure (`fix(evals)` commit).
+- User approved 2026-07-08 → task **done**.

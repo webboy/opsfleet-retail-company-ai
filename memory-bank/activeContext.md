@@ -2,7 +2,7 @@
 
 ## Current focus
 
-Task **0008** (observability & QA eval suite) is **pending_review** — implementation complete, awaiting user testing/approval. Next after approval: task **0009** (final documentation & submission polish).
+Task **0008** (observability & QA eval suite) is **done** (user approved 2026-07-08). Next up: task **0009** (final documentation & submission polish).
 
 ## How work is organized
 
@@ -29,6 +29,6 @@ Task **0008** (observability & QA eval suite) is **pending_review** — implemen
 
 ## Recent changes
 
-- 2026-07-07: Task 0008 **pending_review** — observability JSONL tracing, trace/metrics CLIs, eval suite, version **0.8.0**, **118 pytest passed**.
+- 2026-07-08: Task 0008 **done** (user approved) — observability JSONL tracing, trace/metrics CLIs, eval suite, live judge fix, version **0.8.0**.
 - 2026-07-07: Task 0011 **done** (user approved) — LLM provider factory + fallback, version **0.7.0**.
 - 2026-07-07: Tasks 0001–0007 **done** (user approved).

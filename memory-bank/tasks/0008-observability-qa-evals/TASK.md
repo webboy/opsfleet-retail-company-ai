@@ -4,10 +4,10 @@
 
 - **Task ID**: 0008
 - **Title**: Observability & QA evaluation suite
-- **Status**: pending_review
+- **Status**: done
 - **Owner**: Engineer
 - **Created**: 2026-07-07
-- **Updated**: 2026-07-07
+- **Updated**: 2026-07-08
 
 ## Goal
 
