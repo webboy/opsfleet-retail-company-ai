@@ -44,3 +44,4 @@ Delivered Requirement 2 safety: deterministic input guard before the main pipeli
 - [x] Prompt injection refused gracefully — verified by `test_prompt_injection_is_refused_without_bq_or_retrieval`.
 - [x] Off-topic declined without BigQuery — verified by `test_off_topic_request_is_declined_without_bq`.
 - [x] pytest green — **54 passed**.
+- [x] User approved task on 2026-07-07.

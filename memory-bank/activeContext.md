@@ -2,7 +2,7 @@
 
 ## Current focus
 
-Task **0005** (input guard + PII masking) is **pending_review** — implementation complete, awaiting user verification. Next after approval: task **0006** (saved reports + delete confirmation).
+Task **0005** (input guard + PII masking) is **done** (user approved 2026-07-07). Next up: task **0006** (saved reports + delete confirmation).
 
 ## How work is organized
 
@@ -28,6 +28,6 @@ Task **0005** (input guard + PII masking) is **pending_review** — implementati
 
 ## Recent changes
 
-- 2026-07-07: Task 0005 **pending_review** — input guard, PII masking, 54 pytest passed, version **0.4.0**.
+- 2026-07-07: Task 0005 **done** (user approved) — input guard, PII masking, version **0.4.0**.
 - 2026-07-07: Task 0004 **done** — Golden Bucket trio retrieval and candidate capture.
 - 2026-07-07: Schema doc aligned with live BigQuery (`order_items.id` not `order_item_id`).

@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-07)
 
-Bootstrap + BigQuery foundation complete (0001–0002 done). Agent core done (0003). Golden Bucket done (0004). Safety guard + PII masking implemented (0005 **pending_review**). Next after approval: High-Stakes Oversight (0006).
+Bootstrap + BigQuery foundation complete (0001–0002 done). Agent core done (0003). Golden Bucket done (0004). Safety done (0005). Next: High-Stakes Oversight (0006).
 
 ## What works
 
@@ -10,7 +10,7 @@ Bootstrap + BigQuery foundation complete (0001–0002 done). Agent core done (00
 - Production HLD + technical explanation in `docs/` (task 0001, **done**).
 - Agent core: LangGraph SQL self-heal + CLI (task 0003, **done**).
 - Golden Bucket: trio retrieval, prompt injection, candidate capture (task 0004, **done**).
-- Safety: input guard, DataFrame PII mask, output sweep + policy note (task 0005, **pending_review**).
+- Safety: input guard, DataFrame PII mask, output sweep + policy note (task 0005, **done**).
 - `pytest` **54 passed**; CLI verified live on prior tasks.
 
 ## What's left to build
@@ -19,7 +19,7 @@ Bootstrap + BigQuery foundation complete (0001–0002 done). Agent core done (00
 2. ~~`0002` Scaffolding + BigQuery~~ — **done**
 3. ~~`0003` Agent core~~ — **done**
 4. ~~`0004` Golden Bucket~~ — **done**
-5. ~~`0005` Safety: input guard + PII masking~~ — **pending_review**
+5. ~~`0005` Safety: input guard + PII masking~~ — **done**
 6. `0006` High-Stakes Oversight: saved reports + interrupt-based delete confirmation
 7. `0007` Learning loop: user preferences + personas
 8. `0008` Observability + QA eval suite
