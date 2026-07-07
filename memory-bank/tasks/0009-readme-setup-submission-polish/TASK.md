@@ -33,7 +33,7 @@ Deliver the complete **accompanying documentation package** and make the reposit
 ## Acceptance criteria
 
 - [ ] Following README alone on a clean environment produces a working chat session.
-- [ ] README contains real (redacted where needed) transcripts telling one continuous manager workflow that covers the 4 showcase flows (analysis, self-heal, PII masking, guarded delete).
+- [ ] README contains realistic transcripts telling one continuous manager workflow that covers the 4 showcase flows (analysis, self-heal, PII masking, guarded delete). Transcripts are curated for brevity but **grounded in actually observed outputs — no invented numbers or behaviors**; one live spot-check of the workflow is run before submission to confirm they still match reality.
 - [ ] `docs/` package complete and accurate: architecture/technical explanation verified against shipped code, USAGE and EVALUATION docs present and cross-linked from README.
 - [ ] Requirements coverage table maps all 8 requirements to code **and** documentation.
 - [ ] Separation audit passes: grep of `README.md` + `docs/` for `memory-bank`, task IDs and `.cursor` returns nothing.
