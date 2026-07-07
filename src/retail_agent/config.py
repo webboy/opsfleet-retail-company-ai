@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from os import environ, getenv
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -12,7 +13,7 @@ DEFAULT_DATASET = "bigquery-public-data.thelook_ecommerce"
 DEFAULT_MAX_BYTES_BILLED = 1_073_741_824  # 1 GiB
 DEFAULT_QUERY_LIMIT = 1000
 DEFAULT_LLM_PROVIDER = "gemini"
-DEFAULT_OPENROUTER_MODEL = "google/gemini-2.0-flash-exp:free"
+DEFAULT_OPENROUTER_MODEL = "openrouter/auto"
 DEFAULT_OLLAMA_HOST = "http://localhost:11434"
 DEFAULT_OLLAMA_MODEL = "llama3.2"
 
@@ -44,7 +45,7 @@ def get_settings(*, load_env: bool = True) -> Settings:
     """Load settings from the environment (and optional `.env` file)."""
 
     if load_env:
-        load_dotenv()
+        _load_env_file()
 
     gcp_project_id = _resolve_gcp_project_id()
     if gcp_project_id:
@@ -69,6 +70,17 @@ def get_settings(*, load_env: bool = True) -> Settings:
         max_bytes_billed=_int_env("BQ_MAX_BYTES_BILLED", DEFAULT_MAX_BYTES_BILLED),
         default_limit=_int_env("BQ_DEFAULT_LIMIT", DEFAULT_QUERY_LIMIT),
     )
+
+
+def _load_env_file() -> None:
+    """Load `.env` from the repository root (works regardless of shell cwd)."""
+
+    repo_root = Path(__file__).resolve().parents[2]
+    env_path = repo_root / ".env"
+    if env_path.is_file():
+        load_dotenv(env_path, override=True)
+        return
+    load_dotenv(override=True)
 
 
 def _resolve_gcp_project_id() -> str | None:

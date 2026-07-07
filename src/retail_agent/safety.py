@@ -378,7 +378,13 @@ def mask_text(text: str) -> tuple[str, int]:
         return _mask_phone_value(match.group(0))
 
     masked = EMAIL_RE.sub(_mask_email, text)
-    masked = PHONE_RE.sub(_mask_phone, masked)
+
+    def _phone_replacer(match: re.Match[str]) -> str:
+        if not _value_looks_like_phone(match.group(0)):
+            return match.group(0)
+        return _mask_phone(match)
+
+    masked = PHONE_RE.sub(_phone_replacer, masked)
     return masked, hits
 
 
@@ -396,10 +402,49 @@ def _column_is_pii(column: object) -> bool:
 
 
 def _series_contains_pii(series: pd.Series, *, sample_size: int = 25) -> bool:
+    # Numeric metrics (revenue, counts, prices) are never phone numbers.
+    if pd.api.types.is_numeric_dtype(series.dtype):
+        return False
+
     sample = series.dropna().astype(str).head(sample_size)
     for value in sample:
-        if EMAIL_RE.search(value) or PHONE_RE.search(value):
+        if EMAIL_RE.search(value):
             return True
+        if _value_looks_like_phone(value):
+            return True
+    return False
+
+
+def _value_looks_like_phone(value: str) -> bool:
+    """Detect phone-shaped contact values, not plain numeric amounts or IDs."""
+
+    stripped = (value or "").strip()
+    if not stripped or not PHONE_RE.search(stripped):
+        return False
+
+    if _looks_like_numeric_amount(stripped):
+        return False
+
+    digits_only = re.sub(r"\D", "", stripped)
+    if len(digits_only) < 7:
+        return False
+
+    # Require real phone punctuation — a lone decimal point in floats is not a phone.
+    has_phone_formatting = bool(re.search(r"[-+()\s]", stripped))
+    if not has_phone_formatting:
+        return False
+
+    return True
+
+
+def _looks_like_numeric_amount(value: str) -> bool:
+    """True for integers/decimals/currency amounts that must not match phone regex."""
+
+    normalized = value.strip().replace(",", "").lstrip("$€£")
+    if re.fullmatch(r"[-+]?\d+(\.\d+)?", normalized):
+        return True
+    if re.fullmatch(r"[-+]?\d+(\.\d+)?[eE][-+]?\d+", normalized):
+        return True
     return False
 
 
@@ -409,7 +454,7 @@ def _mask_cell_value(value: object) -> object:
     text = str(value)
     if EMAIL_RE.fullmatch(text) or EMAIL_RE.search(text):
         return _mask_email_value(text)
-    if PHONE_RE.fullmatch(text) or PHONE_RE.search(text):
+    if _value_looks_like_phone(text):
         return _mask_phone_value(text)
     if _column_is_pii(text):
         return "***"

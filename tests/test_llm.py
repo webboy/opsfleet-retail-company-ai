@@ -8,6 +8,7 @@ from retail_agent.llm import (
     CallBudget,
     FallbackChatModel,
     create_chat_model,
+    format_llm_startup_line,
     get_fallback_metadata,
     invoke_with_retry,
     is_quota_exhausted_error,
@@ -166,6 +167,23 @@ def test_fallback_triggers_on_quota_exhausted(monkeypatch):
     assert metadata["fallback_count"] == 1
 
 
+def test_fallback_failure_reraises_primary_quota_error():
+    quota_error = RuntimeError(
+        "429 RESOURCE_EXHAUSTED quota exceeded for generate_content_free_tier_requests"
+    )
+    llm = FallbackChatModel(
+        primary=_FakeLLM([quota_error]),
+        fallback=_FakeLLM([RuntimeError("401 Missing Authentication header")]),
+        primary_provider="gemini",
+        fallback_provider="openrouter",
+    )
+
+    with pytest.raises(RuntimeError, match="RESOURCE_EXHAUSTED"):
+        invoke_with_retry(llm, [HumanMessage(content="hi")], CallBudget(max_calls=3))
+
+    assert llm.fallback_count == 1
+
+
 def test_no_fallback_preserves_primary_error():
     llm = _FakeLLM(
         [
@@ -211,3 +229,19 @@ def test_quota_message_mentions_fallback_when_configured():
 def test_quota_message_explains_how_to_enable_fallback():
     message = quota_exhausted_message(provider="gemini")
     assert "RETAIL_AGENT_FALLBACK_PROVIDER" in message
+
+
+def test_format_llm_startup_line_primary_only():
+    settings = make_settings(provider="openrouter", openrouter_model="openrouter/auto")
+    assert format_llm_startup_line(settings) == "LLM: openrouter / openrouter/auto"
+
+
+def test_format_llm_startup_line_with_fallback():
+    settings = make_settings(
+        provider="gemini",
+        model="gemini-2.5-flash",
+        fallback_provider="openrouter",
+        openrouter_model="openrouter/auto",
+    )
+    line = format_llm_startup_line(settings)
+    assert line == "LLM: gemini / gemini-2.5-flash (fallback: openrouter / openrouter/auto)"

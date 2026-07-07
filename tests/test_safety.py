@@ -88,6 +88,46 @@ def test_mask_dataframe_by_content_sampling():
     assert "***-***-" in masked.dataframe.loc[1, "contact_value"]
 
 
+def test_mask_dataframe_does_not_mask_plain_revenue_amounts():
+    df = pd.DataFrame(
+        {
+            "month": ["2024-01", "2024-02"],
+            "revenue": [1167610000, 1234567890],
+        }
+    )
+
+    masked = mask_dataframe(df)
+
+    assert masked.masked_columns == ()
+    assert masked.pii_note_required is False
+    assert masked.dataframe.loc[0, "revenue"] == 1167610000
+    assert masked.dataframe.loc[1, "revenue"] == 1234567890
+
+
+def test_mask_dataframe_does_not_mask_float_revenue_from_bigquery():
+    """Regression: decimal floats must not false-positive as phone numbers."""
+
+    df = pd.DataFrame(
+        {
+            "month": ["2025-07", "2025-08"],
+            "revenue": [51664.79010748863, 63568.79005122185],
+        }
+    )
+
+    masked = mask_dataframe(df)
+
+    assert masked.masked_columns == ()
+    assert masked.dataframe.loc[0, "revenue"] == 51664.79010748863
+
+
+def test_mask_text_ignores_plain_long_numbers():
+    text = "Monthly revenue reached 1234567890 dollars last year."
+    masked, hits = mask_text(text)
+
+    assert hits == 0
+    assert "1234567890" in masked
+
+
 def test_mask_text_sweeps_email_and_phone():
     text = "Contact alice@example.com or 555-123-4567 for details."
     masked, hits = mask_text(text)

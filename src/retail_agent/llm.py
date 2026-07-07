@@ -16,7 +16,7 @@ DEFAULT_MAX_LLM_CALLS = 8
 DEFAULT_MAX_RETRIES = 3
 INITIAL_BACKOFF_SECONDS = 1.0
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
-DEFAULT_OPENROUTER_MODEL = "google/gemini-2.0-flash-exp:free"
+DEFAULT_OPENROUTER_MODEL = "openrouter/auto"
 DEFAULT_OLLAMA_HOST = "http://localhost:11434"
 DEFAULT_OLLAMA_MODEL = "llama3.2"
 SUPPORTED_PROVIDERS = frozenset({"gemini", "openrouter", "ollama"})
@@ -163,7 +163,12 @@ def _invoke_fallback(
     budget.consume()
     if wrapper is not None:
         wrapper.record_fallback_use(error=primary_error)
-    return fallback.invoke(messages)
+    try:
+        return fallback.invoke(messages)
+    except Exception as fallback_exc:
+        if is_quota_exhausted_error(primary_error):
+            raise primary_error from fallback_exc
+        raise fallback_exc from primary_error
 
 
 def _resolve_providers(
@@ -234,6 +239,30 @@ def quota_exhausted_message(
             "openrouter or ollama and configure the matching credentials."
         )
     return base + " Report commands such as /save and show my reports still work without LLM calls."
+
+
+def resolve_provider_model(settings: Settings, provider: str) -> str:
+    """Return the configured model id for a provider name."""
+
+    normalized = _normalize_provider(provider)
+    if normalized == "gemini":
+        return settings.model
+    if normalized == "openrouter":
+        return settings.openrouter_model
+    if normalized == "ollama":
+        return settings.ollama_model
+    return settings.model
+
+
+def format_llm_startup_line(settings: Settings) -> str:
+    """Human-readable primary (and optional fallback) LLM for CLI startup."""
+
+    primary = _normalize_provider(settings.provider)
+    line = f"LLM: {primary} / {resolve_provider_model(settings, primary)}"
+    if settings.fallback_provider:
+        fallback = _normalize_provider(settings.fallback_provider)
+        line += f" (fallback: {fallback} / {resolve_provider_model(settings, fallback)})"
+    return line
 
 
 def get_fallback_metadata(llm: BaseChatModel | FallbackChatModel) -> dict[str, object]:

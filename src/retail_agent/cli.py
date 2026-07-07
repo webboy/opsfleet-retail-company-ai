@@ -13,7 +13,12 @@ from langgraph.types import Command
 
 from retail_agent.deps import AgentDeps
 from retail_agent.graph import compile_graph
-from retail_agent.llm import is_quota_exhausted_error, quota_exhausted_message
+from retail_agent.llm import (
+    format_llm_startup_line,
+    is_quota_exhausted_error,
+    quota_exhausted_message,
+    resolve_provider_model,
+)
 from retail_agent.observability import DEFAULT_EVENTS_PATH, TurnTracer
 from retail_agent.personas import list_persona_names, load_persona
 
@@ -42,6 +47,7 @@ def run_repl(*, user_id: str, thread_id: str | None = None, deps: AgentDeps | No
     active_tracer: TurnTracer | None = None
 
     print(f"Retail Agent CLI — user={user_id} thread={thread_id}")
+    print(format_llm_startup_line(deps.settings))
     print(f"Persona: {session_persona}")
     print("Type /help for commands.\n")
 
@@ -81,7 +87,7 @@ def run_repl(*, user_id: str, thread_id: str | None = None, deps: AgentDeps | No
                     thread_id=thread_id,
                     log_path=DEFAULT_EVENTS_PATH,
                     provider=deps.settings.provider,
-                    model=deps.settings.model,
+                    model=resolve_provider_model(deps.settings, deps.settings.provider),
                 )
                 deps.tracer = active_tracer
                 active_tracer.emit_turn_start(question)
