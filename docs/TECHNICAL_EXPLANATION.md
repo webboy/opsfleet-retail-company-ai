@@ -45,8 +45,8 @@ This document explains **why** the system is built the way it is, how data flows
 | Data | Production | Prototype |
 |------|------------|-----------|
 | Saved reports | Cloud SQL or Firestore | SQLite (`RETAIL_AGENT_DB_PATH`, default `./data/reports.sqlite3`) |
-| User preferences | Cloud SQL or Firestore | SQLite |
-| Personas | GCS objects or CMS | Local `personas/` files, hot-read each turn |
+| User preferences | Cloud SQL or Firestore | SQLite (`preferences` table in `RETAIL_AGENT_DB_PATH`) |
+| Personas | GCS objects or CMS | Local `personas/` files, hot-read each turn (`RETAIL_AGENT_PERSONAS_DIR`) |
 | Conversation threads | Checkpointer + managed store | LangGraph SQLite/in-memory checkpointer |
 | Observability / eval runs | Cloud Logging + GCS JSONL | Local `logs/agent_events.jsonl` |
 
@@ -78,7 +78,7 @@ A single analysis turn proceeds as follows:
 10. **Observability** emits one structured event per node (latency, SQL text, error class, retry count, mask hits).
 11. **Learning seam:** successful turn may append a candidate trio for analyst review.
 
-Report-management turns skip steps 3–8 and route through **reports_router** (save/list/delete with confirmation interrupt).
+Report-management turns skip steps 3–8 and route through **reports_router** (save/list/delete with confirmation interrupt). Preference turns route through **preferences_router** (save/show output format without LLM).
 
 ---
 
@@ -187,11 +187,11 @@ Explicit PII requests (e.g. top buyers with emails) may still run as analysis, b
 
 ### 4. Continuous Improvement (Learning Loop)
 
-**4a — User level:** Per-manager format preferences ("I prefer tables", "bullet points from now on") persisted in preferences store; injected into every `compose_report` call. Survives session restart.
+**4a — User level:** Per-manager format preferences (`table`, `bullets`, `prose`) are detected deterministically from phrases like "I prefer tables" or `/prefs`, persisted in the shared SQLite store (`preferences` table, keyed by `user_id`), and injected into every `compose_report` system prompt. Survives CLI restart; scoped per user.
 
 **4b — System level:** Successful turns capture candidate trios (see Requirement 1). Interaction logs feed eval baselines and analyst review. Over time, approved trios improve retrieval quality for all users.
 
-**Prototype:** SQLite preferences + local candidate capture. **Production:** Managed DB + GCS curation pipeline.
+**Prototype:** SQLite preferences in `src/retail_agent/stores.py` + local candidate capture. **Production:** Managed DB + GCS curation pipeline.
 
 ---
 
@@ -243,9 +243,9 @@ Explicit PII requests (e.g. top buyers with emails) may still run as analysis, b
 
 **Problem:** CEO changes report tone weekly; non-developers must update instructions without redeployment.
 
-**Design:** Persona = plain text or YAML file containing tone/style/system instructions. Selected via environment variable or runtime command. File content is **re-read on every turn** — editing the file changes the next answer immediately, no restart.
+**Design:** Persona = plain text or YAML file containing tone/style/system instructions. Default selection via `RETAIL_AGENT_PERSONA`; runtime override via CLI `/persona <name>` for the current session/thread. File content is **re-read on every `compose_report` turn** — editing the file changes the next answer immediately, no restart.
 
-**Production:** Persona objects in GCS or a lightweight CMS/admin page; agent hot-reads each turn. **Prototype:** `personas/default.md`, `personas/formal.md`, etc.
+**Production:** Persona objects in GCS or a lightweight CMS/admin page; agent hot-reads each turn. **Prototype:** `personas/default.md`, `personas/formal.md`, `personas/punchy.md` loaded by `src/retail_agent/personas.py`.
 
 User format preferences (Requirement 4a) complement personas: persona = company tone; preferences = individual manager format.
 

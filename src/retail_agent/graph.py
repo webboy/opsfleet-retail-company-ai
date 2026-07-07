@@ -18,6 +18,7 @@ from retail_agent.nodes.generate_sql import generate_sql
 from retail_agent.nodes.input_guard import input_guard
 from retail_agent.nodes.output_mask import output_mask
 from retail_agent.nodes.pii_mask import pii_mask
+from retail_agent.nodes.preferences_router import preferences_router
 from retail_agent.nodes.reports_router import reports_router
 from retail_agent.nodes.retrieve_trios import retrieve_trios
 from retail_agent.nodes.route_turn import route_turn
@@ -40,6 +41,7 @@ def build_graph(deps: AgentDeps):
     graph.add_node("capture_candidate", lambda state: capture_candidate(state, deps))
     graph.add_node("fallback_answer", fallback_answer)
     graph.add_node("reports_router", lambda state: reports_router(state, deps))
+    graph.add_node("preferences_router", lambda state: preferences_router(state, deps))
 
     graph.add_edge(START, "input_guard")
     graph.add_conditional_edges(
@@ -49,6 +51,7 @@ def build_graph(deps: AgentDeps):
             "allowed": "route_turn",
             "refused": "fallback_answer",
             "reports": "reports_router",
+            "preferences": "preferences_router",
         },
     )
     graph.add_conditional_edges(
@@ -78,6 +81,7 @@ def build_graph(deps: AgentDeps):
     graph.add_edge("output_mask", "capture_candidate")
     graph.add_edge("capture_candidate", END)
     graph.add_edge("reports_router", END)
+    graph.add_edge("preferences_router", END)
     graph.add_edge("fallback_answer", END)
 
     return graph
@@ -89,11 +93,15 @@ def compile_graph(deps: AgentDeps | None = None, *, checkpointer: MemorySaver | 
     return build_graph(deps).compile(checkpointer=checkpointer)
 
 
-def _route_after_guard(state: AgentState) -> Literal["allowed", "refused", "reports"]:
+def _route_after_guard(
+    state: AgentState,
+) -> Literal["allowed", "refused", "reports", "preferences"]:
     if state.get("guard_decision") == "refused":
         return "refused"
     if state.get("guard_route") == "reports":
         return "reports"
+    if state.get("guard_route") == "preferences":
+        return "preferences"
     return "allowed"
 
 

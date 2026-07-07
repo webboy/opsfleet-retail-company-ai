@@ -4,7 +4,7 @@
 
 - **Task ID**: 0007
 - **Title**: Learning loop: user preferences & personas
-- **Status**: todo
+- **Status**: pending_review
 - **Owner**: Engineer
 - **Created**: 2026-07-07
 - **Updated**: 2026-07-07

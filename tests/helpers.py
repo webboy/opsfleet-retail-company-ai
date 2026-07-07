@@ -12,6 +12,7 @@ def make_settings(**overrides) -> Settings:
         "persona": "default",
         "dataset_id": "bigquery-public-data.thelook_ecommerce",
         "reports_db_path": None,
+        "personas_dir": None,
         "max_bytes_billed": 1_073_741_824,
         "default_limit": 1000,
     }

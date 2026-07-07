@@ -24,6 +24,7 @@ class Settings:
     persona: str
     dataset_id: str
     reports_db_path: str | None
+    personas_dir: str | None
     max_bytes_billed: int
     default_limit: int
     allowed_tables: frozenset[str] = field(default=DEFAULT_ALLOWED_TABLES)
@@ -48,6 +49,7 @@ def get_settings(*, load_env: bool = True) -> Settings:
         persona=getenv("RETAIL_AGENT_PERSONA", "default"),
         dataset_id=getenv("BQ_DATASET_ID", DEFAULT_DATASET),
         reports_db_path=_optional_str("RETAIL_AGENT_DB_PATH"),
+        personas_dir=_optional_str("RETAIL_AGENT_PERSONAS_DIR"),
         max_bytes_billed=_int_env("BQ_MAX_BYTES_BILLED", DEFAULT_MAX_BYTES_BILLED),
         default_limit=_int_env("BQ_DEFAULT_LIMIT", DEFAULT_QUERY_LIMIT),
     )

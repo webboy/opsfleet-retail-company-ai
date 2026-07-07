@@ -10,12 +10,21 @@ from pathlib import Path
 from typing import Literal
 
 ReportSelectorKind = Literal["mention", "today", "all"]
+OutputFormat = Literal["table", "bullets", "prose"]
 
 
 @dataclass(frozen=True)
 class ReportSelector:
     kind: ReportSelectorKind
     mention: str | None = None
+
+
+@dataclass(frozen=True)
+class UserPreferences:
+    user_id: str
+    output_format: OutputFormat | None
+    notes: str | None
+    updated_at: str | None = None
 
 
 @dataclass(frozen=True)
@@ -125,6 +134,46 @@ class ReportStore:
             conn.commit()
             return int(cursor.rowcount)
 
+    def get_preferences(self, user_id: str) -> UserPreferences | None:
+        with self._connect() as conn:
+            row = conn.execute(
+                """
+                SELECT user_id, output_format, notes, updated_at
+                FROM preferences
+                WHERE user_id = ?
+                """,
+                (user_id,),
+            ).fetchone()
+        return _row_to_preferences(row) if row else None
+
+    def set_output_format(
+        self,
+        user_id: str,
+        output_format: OutputFormat,
+        *,
+        notes: str | None = None,
+    ) -> UserPreferences:
+        updated_at = datetime.now(timezone.utc).isoformat()
+        with self._connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO preferences (user_id, output_format, notes, updated_at)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(user_id) DO UPDATE SET
+                    output_format = excluded.output_format,
+                    notes = COALESCE(excluded.notes, preferences.notes),
+                    updated_at = excluded.updated_at
+                """,
+                (user_id, output_format, notes, updated_at),
+            )
+            conn.commit()
+        return UserPreferences(
+            user_id=user_id,
+            output_format=output_format,
+            notes=notes,
+            updated_at=updated_at,
+        )
+
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
@@ -149,6 +198,16 @@ class ReportStore:
             conn.execute(
                 "CREATE INDEX IF NOT EXISTS idx_reports_owner ON reports(owner)"
             )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS preferences (
+                    user_id TEXT PRIMARY KEY,
+                    output_format TEXT,
+                    notes TEXT,
+                    updated_at TEXT
+                )
+                """
+            )
             conn.commit()
 
 
@@ -160,6 +219,27 @@ def format_report_summary(report: SavedReport) -> str:
 def format_candidate_list(reports: list[SavedReport]) -> str:
     lines = [format_report_summary(report) for report in reports]
     return "\n".join(lines)
+
+
+def format_preferences_summary(prefs: UserPreferences | None) -> str:
+    if prefs is None or prefs.output_format is None:
+        return "You have no saved output preferences yet."
+    lines = [f"Output format: {prefs.output_format}"]
+    if prefs.notes:
+        lines.append(f"Notes: {prefs.notes}")
+    if prefs.updated_at:
+        lines.append(f"Updated: {prefs.updated_at[:10]}")
+    return "\n".join(lines)
+
+
+def output_format_instruction(output_format: OutputFormat | None) -> str:
+    if output_format == "table":
+        return "Format the answer primarily as a markdown table when the data supports it."
+    if output_format == "bullets":
+        return "Format the answer as concise bullet points."
+    if output_format == "prose":
+        return "Format the answer as short prose paragraphs without bullet lists."
+    return "Use short paragraphs or bullet points when helpful."
 
 
 def is_delete_confirmed(reply: object) -> bool:
@@ -181,6 +261,16 @@ def _row_to_report(row: sqlite3.Row) -> SavedReport:
         sql=row["sql"],
         created_at=row["created_at"],
         tags=row["tags"],
+    )
+
+
+def _row_to_preferences(row: sqlite3.Row) -> UserPreferences:
+    output_format = row["output_format"]
+    return UserPreferences(
+        user_id=row["user_id"],
+        output_format=output_format if output_format else None,  # type: ignore[arg-type]
+        notes=row["notes"],
+        updated_at=row["updated_at"],
     )
 
 

@@ -14,15 +14,19 @@ from langgraph.types import Command
 from retail_agent.deps import AgentDeps
 from retail_agent.graph import compile_graph
 from retail_agent.llm import is_quota_exhausted_error, quota_exhausted_message
+from retail_agent.personas import list_persona_names, load_persona
 
 HELP_TEXT = """
 Commands:
-  /help  Show this help
-  /save  Save the most recent report to your library
-  /exit  Exit the chat (also /quit)
+  /help            Show this help
+  /save            Save the most recent report to your library
+  /prefs           Show your saved output preferences
+  /persona <name>  Switch report tone for this session (e.g. default, formal, punchy)
+  /exit            Exit the chat (also /quit)
 
 Ask natural-language questions about retail sales, products, customers, or the database schema.
 Saved report commands include "show my reports" and "delete reports mentioning <term>".
+Preference examples: "I prefer tables from now on", "give me bullet points from now on".
 """.strip()
 
 
@@ -33,8 +37,10 @@ def run_repl(*, user_id: str, thread_id: str | None = None, deps: AgentDeps | No
     thread_id = thread_id or f"{user_id}-{uuid.uuid4().hex[:8]}"
     config = {"configurable": {"thread_id": thread_id}}
     awaiting_interrupt = False
+    session_persona = deps.settings.persona
 
     print(f"Retail Agent CLI — user={user_id} thread={thread_id}")
+    print(f"Persona: {session_persona}")
     print("Type /help for commands.\n")
 
     while True:
@@ -52,8 +58,15 @@ def run_repl(*, user_id: str, thread_id: str | None = None, deps: AgentDeps | No
         if user_input == "/help":
             print(HELP_TEXT)
             continue
+        if user_input.startswith("/persona"):
+            session_persona = _handle_persona_command(user_input, deps)
+            continue
 
-        question = "save this report" if user_input == "/save" else user_input
+        question = user_input
+        if user_input == "/save":
+            question = "save this report"
+        elif user_input == "/prefs":
+            question = "show my preferences"
 
         try:
             if awaiting_interrupt:
@@ -61,11 +74,7 @@ def run_repl(*, user_id: str, thread_id: str | None = None, deps: AgentDeps | No
                 awaiting_interrupt = False
             else:
                 result = graph.invoke(
-                    {
-                        "messages": [HumanMessage(content=question)],
-                        "user_id": user_id,
-                        "question": question,
-                    },
+                    _invoke_context(user_id, session_persona, question=question),
                     config,
                 )
 
@@ -95,6 +104,41 @@ def run_repl(*, user_id: str, thread_id: str | None = None, deps: AgentDeps | No
                     "Please try again or rephrase your question.\n"
                 )
             awaiting_interrupt = False
+
+
+def _invoke_context(
+    user_id: str,
+    persona_name: str,
+    *,
+    question: str | None = None,
+) -> dict:
+    payload = {
+        "user_id": user_id,
+        "persona_name": persona_name,
+    }
+    if question is not None:
+        payload["messages"] = [HumanMessage(content=question)]
+        payload["question"] = question
+    return payload
+
+
+def _handle_persona_command(user_input: str, deps: AgentDeps) -> str:
+    parts = user_input.split(maxsplit=1)
+    if len(parts) < 2 or not parts[1].strip():
+        available = ", ".join(list_persona_names(personas_dir=deps.settings.personas_dir))
+        print(f"\nAgent: Usage: /persona <name>. Available personas: {available}\n")
+        return deps.settings.persona
+
+    persona_name = parts[1].strip()
+    try:
+        load_persona(persona_name, personas_dir=deps.settings.personas_dir)
+    except (FileNotFoundError, ValueError) as exc:
+        available = ", ".join(list_persona_names(personas_dir=deps.settings.personas_dir))
+        print(f"\nAgent: {exc}. Available personas: {available}\n")
+        return deps.settings.persona
+
+    print(f"\nAgent: Persona switched to '{persona_name}' for this session.\n")
+    return persona_name
 
 
 def _print_interrupt_prompt(snapshot) -> bool:

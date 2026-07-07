@@ -9,10 +9,12 @@ from typing import Literal
 import pandas as pd
 
 from retail_agent.sql_utils import is_greeting_or_chitchat, is_schema_question
+from retail_agent.stores import OutputFormat
 
-GuardRoute = Literal["analysis", "schema", "chitchat", "off_topic", "malicious", "reports"]
+GuardRoute = Literal["analysis", "schema", "chitchat", "off_topic", "malicious", "reports", "preferences"]
 GuardDecision = Literal["allowed", "refused"]
 ReportAction = Literal["save", "list", "delete"]
+PreferenceAction = Literal["set", "show"]
 
 EMAIL_RE = re.compile(
     r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b",
@@ -127,6 +129,37 @@ _MENTION_DELETE_PATTERNS = (
     re.compile(r"delete\s+reports?\s+about\s+(.+)", re.IGNORECASE),
 )
 
+PREFERENCE_SHOW_MARKERS = (
+    "/prefs",
+    "show my preferences",
+    "my preferences",
+    "what are my preferences",
+)
+
+_TABLE_PREFERENCE_PATTERNS = (
+    re.compile(r"\b(?:i prefer|prefer|use)\b.*\btables?\b", re.IGNORECASE),
+    re.compile(r"\btable format\b", re.IGNORECASE),
+    re.compile(r"\bformat.*\btables?\b", re.IGNORECASE),
+)
+
+_BULLET_PREFERENCE_PATTERNS = (
+    re.compile(r"\b(?:i prefer|prefer|use)\b.*\bbullet points?\b", re.IGNORECASE),
+    re.compile(r"\bbullet points?\b.*\bfrom now on\b", re.IGNORECASE),
+    re.compile(r"\bgive me bullet points\b", re.IGNORECASE),
+)
+
+_PROSE_PREFERENCE_PATTERNS = (
+    re.compile(r"\b(?:i prefer|prefer|use)\b.*\b(?:prose|paragraphs?)\b", re.IGNORECASE),
+    re.compile(r"\b(?:prose|paragraphs?)\b.*\bfrom now on\b", re.IGNORECASE),
+)
+
+
+@dataclass(frozen=True)
+class PreferenceCommand:
+    action: PreferenceAction
+    output_format: OutputFormat | None = None
+    notes: str | None = None
+
 
 @dataclass(frozen=True)
 class ReportCommand:
@@ -190,6 +223,13 @@ def classify_input_precheck(question: str) -> InputPrecheck:
             reason="report management",
         )
 
+    if parse_preference_command(text):
+        return InputPrecheck(
+            decision="allowed",
+            route="preferences",
+            reason="preference management",
+        )
+
     if any(marker in lowered for marker in MALICIOUS_MARKERS):
         return InputPrecheck(
             decision="refused",
@@ -247,6 +287,28 @@ def parse_report_command(question: str) -> ReportCommand | None:
             mention = match.group(1).strip().strip("\"'")
             if mention:
                 return ReportCommand(action="delete", selector_kind="mention", mention=mention)
+
+    return None
+
+
+def parse_preference_command(question: str) -> PreferenceCommand | None:
+    text = (question or "").strip()
+    lowered = text.lower()
+
+    if lowered in PREFERENCE_SHOW_MARKERS:
+        return PreferenceCommand(action="show")
+
+    for pattern in _TABLE_PREFERENCE_PATTERNS:
+        if pattern.search(text):
+            return PreferenceCommand(action="set", output_format="table")
+
+    for pattern in _BULLET_PREFERENCE_PATTERNS:
+        if pattern.search(text):
+            return PreferenceCommand(action="set", output_format="bullets")
+
+    for pattern in _PROSE_PREFERENCE_PATTERNS:
+        if pattern.search(text):
+            return PreferenceCommand(action="set", output_format="prose")
 
     return None
 

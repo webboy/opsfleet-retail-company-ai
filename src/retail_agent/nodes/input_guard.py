@@ -18,6 +18,7 @@ from retail_agent.safety import (
     InputPrecheck,
     classify_input_precheck,
     parse_llm_guard_label,
+    parse_preference_command,
     parse_report_command,
     refusal_message,
 )
@@ -57,6 +58,11 @@ def input_guard(state: AgentState, deps: AgentDeps) -> dict:
             update["report_action"] = report_cmd.action
             update["report_selector_kind"] = report_cmd.selector_kind
             update["report_mention"] = report_cmd.mention
+    if precheck.route == "preferences":
+        pref_cmd = parse_preference_command(question)
+        if pref_cmd:
+            update["preference_action"] = pref_cmd.action
+            update["preference_output_format"] = pref_cmd.output_format
     return update
 
 

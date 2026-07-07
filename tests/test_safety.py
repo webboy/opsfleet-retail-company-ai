@@ -50,6 +50,18 @@ def test_classify_typo_sales_question_without_llm():
     assert result.needs_llm is False
 
 
+def test_classify_preference_statement():
+    result = classify_input_precheck("I prefer tables from now on")
+    assert result.decision == "allowed"
+    assert result.route == "preferences"
+
+
+def test_classify_show_preferences_command():
+    result = classify_input_precheck("/prefs")
+    assert result.decision == "allowed"
+    assert result.route == "preferences"
+
+
 def test_mask_dataframe_by_column_name():
     df = pd.DataFrame(
         {
