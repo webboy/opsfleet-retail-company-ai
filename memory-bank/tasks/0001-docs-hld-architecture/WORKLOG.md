@@ -9,3 +9,4 @@
 - Created `docs/TECHNICAL_EXPLANATION.md`: technology choice rationale (LangGraph, Gemini, BigQuery, GCS/vector search, persistence, observability), runtime data flow, error/fallback matrix, brief setup overview, requirement-by-requirement sections for all 8 requirements.
 - Documentation separation audit: grep of `docs/*.md` for `memory-bank`, task IDs, `.cursor` — clean.
 - Task moved to `pending_review`.
+- User approved; task marked **done**; INDEX and memory bank core files updated.

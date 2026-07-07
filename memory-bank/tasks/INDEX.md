@@ -4,8 +4,8 @@ Quick overview of all tasks. Source of truth for each row is the task's `TASK.md
 
 | ID | Title | Status | Owner | Updated |
 |------|-------|--------|-------|---------|
-| 0001 | HLD, architecture diagram & technical explanation | pending_review | Engineer | 2026-07-07 |
-| 0002 | Project scaffolding, config & BigQuery foundation | todo | Engineer | 2026-07-07 |
+| 0001 | HLD, architecture diagram & technical explanation | done | Engineer | 2026-07-07 |
+| 0002 | Project scaffolding, config & BigQuery foundation | pending_review | Engineer | 2026-07-07 |
 | 0003 | Agent core: LangGraph, SQL generation, self-heal, CLI | todo | Engineer | 2026-07-07 |
 | 0004 | Hybrid Intelligence: Golden Bucket trio retrieval | todo | Engineer | 2026-07-07 |
 | 0005 | Safety: input guard & PII masking | todo | Engineer | 2026-07-07 |

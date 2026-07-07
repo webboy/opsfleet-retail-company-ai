@@ -1,15 +1,9 @@
-# WSL / Windows metadata
-*:Zone.Identifier
+# pytest cache
+.pytest_cache/
+htmlcov/
+.coverage
 
-# Python (will grow with the codebase; see task 0002)
-__pycache__/
-*.py[cod]
-.venv/
-venv/
-
-# Local environment & secrets
-.env
-
-# Local runtime artifacts
-logs/
-*.sqlite3
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
