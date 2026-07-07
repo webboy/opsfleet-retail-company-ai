@@ -8,6 +8,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
 
 from retail_agent.deps import AgentDeps
+from retail_agent.nodes.answer_chitchat import answer_chitchat
 from retail_agent.nodes.answer_schema import answer_schema
 from retail_agent.nodes.compose_report import compose_report
 from retail_agent.nodes.execute_bq import execute_bq
@@ -21,6 +22,7 @@ def build_graph(deps: AgentDeps):
     graph = StateGraph(AgentState)
 
     graph.add_node("route_turn", lambda state: route_turn(state, deps))
+    graph.add_node("answer_chitchat", answer_chitchat)
     graph.add_node("answer_schema", lambda state: answer_schema(state, deps))
     graph.add_node("generate_sql", lambda state: generate_sql(state, deps))
     graph.add_node("execute_bq", lambda state: execute_bq(state, deps))
@@ -31,8 +33,9 @@ def build_graph(deps: AgentDeps):
     graph.add_conditional_edges(
         "route_turn",
         _route_after_turn,
-        {"schema": "answer_schema", "analysis": "generate_sql"},
+        {"schema": "answer_schema", "analysis": "generate_sql", "chitchat": "answer_chitchat"},
     )
+    graph.add_edge("answer_chitchat", END)
     graph.add_edge("answer_schema", END)
     graph.add_conditional_edges(
         "generate_sql",
@@ -60,9 +63,12 @@ def compile_graph(deps: AgentDeps | None = None, *, checkpointer: MemorySaver | 
     return build_graph(deps).compile(checkpointer=checkpointer)
 
 
-def _route_after_turn(state: AgentState) -> Literal["schema", "analysis"]:
-    if state.get("turn_mode") == "schema":
+def _route_after_turn(state: AgentState) -> Literal["schema", "analysis", "chitchat"]:
+    mode = state.get("turn_mode")
+    if mode == "schema":
         return "schema"
+    if mode == "chitchat":
+        return "chitchat"
     return "analysis"
 
 

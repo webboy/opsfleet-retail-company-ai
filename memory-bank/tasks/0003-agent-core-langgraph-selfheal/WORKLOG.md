@@ -10,4 +10,5 @@
 - Added `cli.py` REPL with `--user`, `/help`, `/exit`, in-memory checkpointer for follow-ups.
 - Tests: 12 new cases (graph self-heal paths, schema routing, budget, LLM retry) — **28 passed** total.
 - Live smoke: schema question via graph returned structured table/column answer (Gemini + static schema).
-- Version bumped `0.1.0 → 0.2.0`. Task moved to `pending_review`.
+- Post-review fix: greetings (`Helo`) route to chitchat reply; `sql_guard` catches sqlglot `TokenError` on non-SQL LLM output.
+- User approved CLI manually (2026-07-07). Task marked **done**.

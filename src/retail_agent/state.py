@@ -12,7 +12,7 @@ class AgentState(TypedDict, total=False):
     messages: Annotated[list[BaseMessage], add_messages]
     user_id: str
     question: str
-    turn_mode: Literal["analysis", "schema"]
+    turn_mode: Literal["analysis", "schema", "chitchat"]
     sql: str | None
     sql_attempts: int
     max_sql_attempts: int

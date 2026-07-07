@@ -102,3 +102,12 @@ def test_empty_sql_is_blocked(settings):
     result = sql_guard("   ", settings)
     assert result.ok is False
     assert result.error == "Empty SQL."
+
+
+def test_non_sql_prose_is_blocked(settings):
+    result = sql_guard(
+        "a you'd like to retrieve from the BigQuery tables",
+        settings,
+    )
+    assert result.ok is False
+    assert "parse error" in (result.error or "").lower()

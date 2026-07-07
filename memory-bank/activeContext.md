@@ -4,7 +4,7 @@
 
 Project bootstrap is done (2026-07-07): assignment analyzed, memory bank initialized, task workflow rules adapted into `.cursor/rules/`, and the task backlog created in `memory-bank/tasks/`. The workflow for any implementing agent is fully described by the memory bank plus the rules in `.cursor/rules/` — read the memory bank first, then work through `memory-bank/tasks/INDEX.md` in order.
 
-**Next up: task `0004-golden-bucket-hybrid-intelligence`** — Golden Bucket trio retrieval. Task 0003 (LangGraph agent core) is at `pending_review`.
+**Next up: task `0004-golden-bucket-hybrid-intelligence`** — Golden Bucket trio retrieval. Task 0003 (LangGraph agent core) is **done** (user approved 2026-07-07).
 
 ## How work is organized
 
@@ -34,4 +34,4 @@ Project bootstrap is done (2026-07-07): assignment analyzed, memory bank initial
 - 2026-07-07: scope raised to maximum effort — all five optional prototype requirements are in scope as first-class features; task 0008 QA scope expanded accordingly.
 - 2026-07-07: MCP positioned as the production tool-integration mechanism in the HLD (task 0001, systemPatterns extensibility pattern); prototype capabilities stay in-process LangGraph nodes/tools. Optional stretch task 0010 added: expose guarded query + trio retrieval as an MCP server, strictly after 0001–0009 and strictly additive.
 - 2026-07-07: Task 0001 **done** (user approved) — `docs/ARCHITECTURE.md` and `docs/TECHNICAL_EXPLANATION.md`.
-- 2026-07-07: Task 0003 delivered — LangGraph agent core, CLI REPL, self-heal loop, schema-aware SQL/report flow, version 0.2.0. Awaiting user review.
+- 2026-07-07: Task 0003 **done** (user approved) — LangGraph agent core, CLI REPL, self-heal; follow-up fix for greetings/invalid SQL guard.

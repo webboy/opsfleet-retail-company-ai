@@ -10,7 +10,7 @@ from typing import Optional
 import pandas as pd
 import sqlglot
 from google.cloud import bigquery
-from sqlglot import exp, parse_one
+from sqlglot import exp
 
 from retail_agent.config import Settings, get_settings
 
@@ -49,7 +49,7 @@ def sql_guard(sql: str, settings: Settings) -> GuardResult:
 
     try:
         statements = sqlglot.parse(raw, read="bigquery")
-    except sqlglot.errors.ParseError as exc:
+    except sqlglot.errors.SqlglotError as exc:
         return GuardResult(ok=False, error=f"SQL parse error: {exc}")
 
     if len(statements) != 1:

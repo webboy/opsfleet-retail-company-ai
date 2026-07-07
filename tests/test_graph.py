@@ -123,6 +123,43 @@ def test_schema_question_routes_to_schema_answer(settings):
     assert llm.calls == 1
 
 
+def test_greeting_routes_without_llm_or_bq(settings):
+    llm = ScriptLLM(["should not be called"])
+    bq = FakeBQRunner([])
+    deps = AgentDeps(settings=settings, llm=llm, bq_runner=bq)
+
+    result = _run_turn(deps, "Helo")
+
+    assert result["status"] == "done"
+    assert "retail data analysis assistant" in result["report"].lower()
+    assert bq.calls == 0
+    assert llm.calls == 0
+
+
+def test_invalid_sql_prose_self_heals_without_crashing(settings):
+    prose = "a you'd like to retrieve from the BigQuery tables"
+    llm = ScriptLLM(
+        [
+            prose,
+            f"```sql\n{GOOD_SQL}\n```",
+            "Recovered after invalid sql",
+        ]
+    )
+    bq = FakeBQRunner(
+        [
+            QueryResult(ok=False, error="SQL parse error: invalid syntax", sql=prose),
+            QueryResult(ok=True, dataframe=pd.DataFrame({"order_id": [1]}), sql=GOOD_SQL),
+        ]
+    )
+    deps = AgentDeps(settings=settings, llm=llm, bq_runner=bq, max_sql_attempts=3)
+
+    result = _run_turn(deps, "Show me something")
+
+    assert result["status"] == "done"
+    assert bq.calls == 2
+    assert llm.calls == 3
+
+
 def test_budget_exhaustion_returns_controlled_fallback(settings):
     llm = ScriptLLM(["unused"])
     bq = FakeBQRunner([])

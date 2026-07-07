@@ -11,3 +11,11 @@ def test_extract_sql_from_code_block():
 def test_is_schema_question_detects_structure_queries():
     assert is_schema_question("What tables and columns do you have?")
     assert not is_schema_question("What was monthly revenue last quarter?")
+
+
+def test_is_greeting_detects_hello_variants():
+    from retail_agent.sql_utils import is_greeting_or_chitchat
+
+    assert is_greeting_or_chitchat("Helo")
+    assert is_greeting_or_chitchat("Hello!")
+    assert not is_greeting_or_chitchat("monthly revenue")

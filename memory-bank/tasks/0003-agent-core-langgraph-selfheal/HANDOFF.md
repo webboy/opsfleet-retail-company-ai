@@ -38,8 +38,9 @@ Delivered the first end-to-end agent core: LangGraph state machine from natural-
 
 ## Acceptance criteria check
 
-- [x] CLI answers schema + analytics questions — live smoke for schema; analytics path implemented with BQ + report composition
+- [x] CLI answers schema + analytics questions — user verified live CLI
 - [x] Self-heal on SQL error/empty with max retries then polite fallback — graph tests + routing logic
 - [x] LLM call budget + retry/backoff — `llm.py` + unit tests
 - [x] Follow-up conversation context — checkpointer + conversation snippet in prompts; graph test
-- [x] pytest green with mocked LLM/BQ — 28 passed
+- [x] pytest green with mocked LLM/BQ — 32 passed
+- [x] User approval — 2026-07-07

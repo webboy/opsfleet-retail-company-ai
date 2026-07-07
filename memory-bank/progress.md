@@ -2,15 +2,15 @@
 
 ## Status snapshot (2026-07-07)
 
-Bootstrap + BigQuery foundation complete (0001 done, 0002 done). Agent core delivered (0003 pending_review). Next: Golden Bucket retrieval (0004).
+Bootstrap + BigQuery foundation complete (0001–0002 done). Agent core done (0003). Next: Golden Bucket retrieval (0004).
 
 ## What works
 
 - Memory bank initialized (6 core files) and adapted task-workflow rules in `.cursor/rules/`.
 - Task backlog defined: 9 core tasks (`0001`–`0009`) plus optional stretch task `0010`, in `memory-bank/tasks/` with INDEX, template and per-task TASK/PLAN files.
 - Production HLD + technical explanation in `docs/` (task 0001, **done**).
-- Agent core: LangGraph SQL self-heal + CLI (`retail-agent` 0.2.0, task 0003, pending_review).
-- `pytest` 28 passed; live Gemini smoke for schema question succeeded.
+- Agent core: LangGraph SQL self-heal + CLI (`retail-agent` 0.2.0, task 0003, **done**).
+- `pytest` 32 passed; CLI verified live by user.
 
 ## What's left to build
 
@@ -18,7 +18,7 @@ In task order (details in each `memory-bank/tasks/<id>-*/TASK.md`):
 
 1. ~~`0001` HLD + architecture diagram + detailed technical explanation (`docs/`)~~ — **done**
 2. ~~`0002` Project scaffolding: pyproject, package layout, config, BigQueryRunner + sql_guard~~ — delivered, pending_review
-3. ~~`0003` Agent core: LangGraph graph, SQL generation, execution, self-heal loop, report composer, CLI~~ — delivered, pending_review
+3. ~~`0003` Agent core: LangGraph graph, SQL generation, execution, self-heal loop, report composer, CLI~~ — **done**
 4. `0004` Hybrid Intelligence: Golden Bucket trio store + retrieval + candidate capture
 5. `0005` Safety: input guard (scope/injection) + deterministic PII masking
 6. `0006` High-Stakes Oversight: saved reports library + interrupt-based delete confirmation

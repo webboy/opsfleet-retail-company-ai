@@ -3,13 +3,18 @@
 from __future__ import annotations
 
 from retail_agent.deps import AgentDeps, fresh_budget
-from retail_agent.sql_utils import is_schema_question
+from retail_agent.sql_utils import is_greeting_or_chitchat, is_schema_question
 from retail_agent.state import AgentState
 
 
 def route_turn(state: AgentState, deps: AgentDeps) -> dict:
     question = state.get("question") or _latest_user_message(state)
-    turn_mode = "schema" if is_schema_question(question) else "analysis"
+    if is_greeting_or_chitchat(question):
+        turn_mode = "chitchat"
+    elif is_schema_question(question):
+        turn_mode = "schema"
+    else:
+        turn_mode = "analysis"
     return {
         "question": question,
         "turn_mode": turn_mode,

@@ -30,3 +30,26 @@ def is_schema_question(question: str) -> bool:
         "what data do you have",
     )
     return any(marker in q for marker in markers)
+
+
+def is_greeting_or_chitchat(question: str) -> bool:
+    q = question.lower().strip().rstrip("!?.,")
+    if not q:
+        return False
+    exact = {
+        "hello",
+        "helo",
+        "hi",
+        "hey",
+        "thanks",
+        "thank you",
+        "good morning",
+        "good afternoon",
+        "good evening",
+    }
+    if q in exact:
+        return True
+    words = q.split()
+    if len(words) <= 4 and words[0] in {"hello", "helo", "hi", "hey"}:
+        return True
+    return False
