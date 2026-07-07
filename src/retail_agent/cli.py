@@ -13,6 +13,7 @@ from langgraph.types import Command
 
 from retail_agent.deps import AgentDeps
 from retail_agent.graph import compile_graph
+from retail_agent.llm import is_quota_exhausted_error, quota_exhausted_message
 
 HELP_TEXT = """
 Commands:
@@ -83,13 +84,17 @@ def run_repl(*, user_id: str, thread_id: str | None = None, deps: AgentDeps | No
             if result.get("retrieved_trio_ids"):
                 method = result.get("retrieval_method", "unknown")
                 print(f"[retrieved trios={result['retrieved_trio_ids']} method={method}]\n")
-        except Exception:  # noqa: BLE001 — never leak stack traces in CLI
-            logging.exception("CLI turn failed")
+        except Exception as exc:  # noqa: BLE001 — never leak stack traces in CLI
+            if is_quota_exhausted_error(exc):
+                logging.warning("CLI turn blocked by Gemini quota exhaustion")
+                print(f"\nAgent: {quota_exhausted_message(model=deps.settings.model)}\n")
+            else:
+                logging.exception("CLI turn failed")
+                print(
+                    "\nAgent: Sorry, something went wrong while processing your question. "
+                    "Please try again or rephrase your question.\n"
+                )
             awaiting_interrupt = False
-            print(
-                "\nAgent: Sorry, something went wrong while processing your question. "
-                "Please try again or rephrase your question.\n"
-            )
 
 
 def _print_interrupt_prompt(snapshot) -> bool:

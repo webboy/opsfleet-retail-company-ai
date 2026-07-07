@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-07)
 
-Bootstrap + BigQuery foundation complete (0001–0002 done). Agent core done (0003). Golden Bucket done (0004). Safety done (0005). Saved reports done in code (0006 pending_review). Next: Learning loop (0007).
+Tasks 0001–0006 **done** (user approved). Next: Learning loop (0007), then LLM provider fallback (0011) before observability/QA evals (0008).
 
 ## What works
 
@@ -11,7 +11,7 @@ Bootstrap + BigQuery foundation complete (0001–0002 done). Agent core done (00
 - Agent core: LangGraph SQL self-heal + CLI (task 0003, **done**).
 - Golden Bucket: trio retrieval, prompt injection, candidate capture (task 0004, **done**).
 - Safety: input guard, DataFrame PII mask, output sweep + policy note (task 0005, **done**).
-- Saved reports: SQLite store, save/list/delete with interrupt confirmation (task 0006, **pending_review**).
+- Saved reports: SQLite store, save/list/delete with interrupt confirmation (task 0006, **done**).
 - `pytest` **72 passed**; CLI supports `/save` and delete confirmation resume.
 
 ## What's left to build
@@ -21,7 +21,7 @@ Bootstrap + BigQuery foundation complete (0001–0002 done). Agent core done (00
 3. ~~`0003` Agent core~~ — **done**
 4. ~~`0004` Golden Bucket~~ — **done**
 5. ~~`0005` Safety: input guard + PII masking~~ — **done**
-6. `0006` High-Stakes Oversight: saved reports + interrupt-based delete confirmation — **pending_review**
+6. ~~`0006` High-Stakes Oversight: saved reports + interrupt-based delete confirmation~~ — **done**
 7. `0007` Learning loop: user preferences + personas
 8. `0011` LLM provider fallback: OpenRouter/Ollama (gap from 0003; do before 0008's live evals)
 9. `0008` Observability + QA eval suite

@@ -83,6 +83,8 @@ def invoke_with_retry(
 
 
 def is_transient_error(exc: Exception) -> bool:
+    if is_quota_exhausted_error(exc):
+        return False
     message = str(exc).lower()
     markers = (
         "429",
@@ -93,6 +95,28 @@ def is_transient_error(exc: Exception) -> bool:
         "504",
         "overloaded",
         "unavailable",
-        "resource exhausted",
     )
     return any(marker in message for marker in markers)
+
+
+def is_quota_exhausted_error(exc: Exception) -> bool:
+    message = str(exc).lower()
+    return any(
+        marker in message
+        for marker in (
+            "resource_exhausted",
+            "quota exceeded",
+            "exceeded your current quota",
+            "generate_content_free_tier_requests",
+        )
+    )
+
+
+def quota_exhausted_message(*, model: str | None = None) -> str:
+    model_hint = f" ({model})" if model else ""
+    return (
+        "The Gemini API quota is exhausted{model_hint}. The free tier allows roughly "
+        "20 requests per day per model. Wait for the daily reset, set a different "
+        "RETAIL_AGENT_MODEL in .env, or use a billed API key. "
+        "Report commands such as /save and show my reports still work without LLM calls."
+    ).format(model_hint=model_hint)

@@ -2,7 +2,7 @@
 
 ## Current focus
 
-Task **0006** (saved reports + delete confirmation) is **pending_review** (2026-07-07). Next up after user approval: task **0007** (learning loop / preferences / personas).
+Task **0006** (saved reports + delete confirmation) is **done** (user approved 2026-07-07). Next up: task **0007** (learning loop / preferences / personas), then **0011** (LLM provider fallback) before eval-heavy **0008**.
 
 ## How work is organized
 
@@ -29,6 +29,6 @@ Task **0006** (saved reports + delete confirmation) is **pending_review** (2026-
 ## Recent changes
 
 - 2026-07-07: Gemini free-tier daily quota hit during testing. Mitigation: `RETAIL_AGENT_MODEL=gemini-2.5-flash-lite` in `.env` (separate per-model quota). Gap found: task 0003 shipped without the OpenRouter/Ollama fallback provider promised in its scope (`llm.py` is Gemini-only) — new **task 0011** created to close it (provider factory + fallback-on-quota). Recommended order: after 0007, before eval-heavy 0008.
-- 2026-07-07: Task 0006 **pending_review** — saved reports library, guarded deletes, version **0.5.0**.
+- 2026-07-07: Task 0006 **done** (user approved) — saved reports library, guarded deletes, version **0.5.0**. Post-review hardening committed alongside: quota-aware CLI/guard error handling, expanded analysis markers, `retail-agent` console script (74 tests green).
 - 2026-07-07: Task 0005 **done** (user approved) — input guard, PII masking, version **0.4.0**.
 - 2026-07-07: Task 0004 **done** — Golden Bucket trio retrieval and candidate capture.

@@ -28,6 +28,9 @@ dev = [
     "pytest>=8.0.0",
 ]
 
+[project.scripts]
+retail-agent = "retail_agent.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 

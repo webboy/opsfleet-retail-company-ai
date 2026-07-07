@@ -41,6 +41,15 @@ def test_classify_schema_question_allowed():
     assert result.route == "schema"
 
 
+def test_classify_typo_sales_question_without_llm():
+    result = classify_input_precheck(
+        "Give me the toal numer of sale sper day in last 7 days."
+    )
+    assert result.decision == "allowed"
+    assert result.route == "analysis"
+    assert result.needs_llm is False
+
+
 def test_mask_dataframe_by_column_name():
     df = pd.DataFrame(
         {

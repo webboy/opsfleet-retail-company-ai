@@ -7,7 +7,13 @@ import logging
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from retail_agent.deps import AgentDeps, resolve_budget
-from retail_agent.llm import BudgetExhaustedError, CallBudget, invoke_with_retry
+from retail_agent.llm import (
+    BudgetExhaustedError,
+    CallBudget,
+    invoke_with_retry,
+    is_quota_exhausted_error,
+    quota_exhausted_message,
+)
 from retail_agent.safety import (
     InputPrecheck,
     classify_input_precheck,
@@ -79,6 +85,12 @@ def _llm_classify(
         route = parse_llm_guard_label(str(response.content))
     except BudgetExhaustedError:
         route = precheck.route
+    except Exception as exc:
+        if is_quota_exhausted_error(exc):
+            logger.warning("Input guard LLM classify skipped: quota exhausted")
+            route = precheck.route
+        else:
+            raise
 
     if route in {"malicious", "off_topic"}:
         return InputPrecheck(

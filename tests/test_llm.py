@@ -7,6 +7,7 @@ from retail_agent.llm import (
     BudgetExhaustedError,
     CallBudget,
     invoke_with_retry,
+    is_quota_exhausted_error,
     is_transient_error,
 )
 
@@ -56,3 +57,12 @@ def test_invoke_with_retry_does_not_retry_non_transient_errors():
 def test_is_transient_error_detects_rate_limits():
     assert is_transient_error(RuntimeError("HTTP 429 Too Many Requests"))
     assert not is_transient_error(ValueError("invalid sql"))
+
+
+def test_is_transient_error_does_not_retry_quota_exhausted():
+    exc = RuntimeError(
+        "429 RESOURCE_EXHAUSTED quota exceeded for "
+        "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+    )
+    assert is_quota_exhausted_error(exc)
+    assert not is_transient_error(exc)
