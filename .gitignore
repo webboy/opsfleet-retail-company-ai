@@ -1,4 +1,20 @@
-# pytest cache
+# WSL / Windows metadata
+*:Zone.Identifier
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local environment & secrets
+.env
+
+# Local runtime artifacts
+logs/
+*.sqlite3
+
+# pytest / coverage
 .pytest_cache/
 htmlcov/
 .coverage
