@@ -4,7 +4,7 @@
 
 Project bootstrap is done (2026-07-07): assignment analyzed, memory bank initialized, task workflow rules adapted into `.cursor/rules/`, and the task backlog created in `memory-bank/tasks/`. The workflow for any implementing agent is fully described by the memory bank plus the rules in `.cursor/rules/` — read the memory bank first, then work through `memory-bank/tasks/INDEX.md` in order.
 
-**Next up: task `0001-docs-hld-architecture`** — the HLD and technical explanation are the highest-weighted deliverable, and writing them first locks the design the code must follow. After that, tasks 0002 → 0009 in order; task 0010 (MCP server) is an optional stretch strictly after 0009 (see `memory-bank/tasks/INDEX.md`).
+**Next up: task `0002-scaffolding-bigquery-foundation`** — project skeleton, config, BigQueryRunner and sql_guard. Task 0001 (HLD + technical explanation) is at `pending_review`. After 0002, tasks 0003 → 0009 in order; task 0010 (MCP server) is an optional stretch strictly after 0009 (see `memory-bank/tasks/INDEX.md`).
 
 ## How work is organized
 
@@ -33,3 +33,4 @@ Project bootstrap is done (2026-07-07): assignment analyzed, memory bank initial
 - 2026-07-07: repo bootstrapped (memory bank, rules, task backlog). No application code yet.
 - 2026-07-07: scope raised to maximum effort — all five optional prototype requirements are in scope as first-class features; task 0008 QA scope expanded accordingly.
 - 2026-07-07: MCP positioned as the production tool-integration mechanism in the HLD (task 0001, systemPatterns extensibility pattern); prototype capabilities stay in-process LangGraph nodes/tools. Optional stretch task 0010 added: expose guarded query + trio retrieval as an MCP server, strictly after 0001–0009 and strictly additive.
+- 2026-07-07: Task 0001 delivered — `docs/ARCHITECTURE.md` (production HLD, 3 Mermaid diagrams, MCP extensibility) and `docs/TECHNICAL_EXPLANATION.md` (choices, fallbacks, all 8 requirements). Awaiting user review.

@@ -2,18 +2,19 @@
 
 ## Status snapshot (2026-07-07)
 
-Bootstrap phase complete. No application code exists yet — the repo contains the assignment PDF, memory bank, workflow rules and the task backlog.
+Bootstrap phase complete. HLD and technical explanation delivered (`docs/ARCHITECTURE.md`, `docs/TECHNICAL_EXPLANATION.md`). No application code yet — next is project scaffolding (task 0002).
 
 ## What works
 
 - Memory bank initialized (6 core files) and adapted task-workflow rules in `.cursor/rules/`.
 - Task backlog defined: 9 core tasks (`0001`–`0009`) plus optional stretch task `0010`, in `memory-bank/tasks/` with INDEX, template and per-task TASK/PLAN files.
+- Production HLD + technical explanation in `docs/` (task 0001, pending_review).
 
 ## What's left to build
 
 In task order (details in each `memory-bank/tasks/<id>-*/TASK.md`):
 
-1. `0001` HLD + architecture diagram + detailed technical explanation (`docs/`)
+1. ~~`0001` HLD + architecture diagram + detailed technical explanation (`docs/`)~~ — delivered, pending_review
 2. `0002` Project scaffolding: pyproject, package layout, config, BigQueryRunner + sql_guard
 3. `0003` Agent core: LangGraph graph, SQL generation, execution, self-heal loop, report composer, CLI
 4. `0004` Hybrid Intelligence: Golden Bucket trio store + retrieval + candidate capture
