@@ -1,0 +1,46 @@
+---
+description: Mandatory lifecycle of every task — docs before and after, tests, commit, verification
+alwaysApply: true
+---
+
+# Task lifecycle — documentation, tests, commit, verification
+
+Applies to **every task** that changes code or system behavior in this repository (both memory-bank tasks and ad-hoc requests).
+
+## 1. Before the task — read the documentation
+
+- Before implementing, check the **existing documentation** relevant to the area you are changing:
+  - repo level: `README.md`, `docs/` (HLD, architecture, setup);
+  - memory bank: `memory-bank/` core files and `memory-bank/tasks/` (tasks, decisions), plus `.cursor/rules/`;
+  - for memory-bank tasks: `TASK.md`, `PLAN.md`, `CONTEXT.md` (per `task-folder-workflow.mdc`).
+- If documentation contradicts the code — the code is the source of truth, but **record the mismatch** and fix the documentation as part of the task.
+
+## 2. After the task — update the documentation
+
+- Every change of behavior, agent graph, tool contract, configuration or setup process **must** be reflected in the documentation the next reader would consult (`README.md`, `docs/*`, memory-bank core files, task `WORKLOG.md`/`HANDOFF.md`).
+- Respect the audience split from `documentation-separation.mdc`: user-visible behavior/setup/usage → `README.md`/`docs/` (human docs, never referencing memory-bank); decisions/status/process → `memory-bank/`.
+- No "code is done, docs later" — documentation is part of the same delivery.
+
+## 3. Tests
+
+- Back the implementation with **tests wherever possible** using this repo's stack (pytest; deterministic unit tests for guards/masking/SQL linting, mocked LLM/BigQuery for graph logic).
+- For bugfixes: a test that **fails on the old behavior** and passes after the fix.
+- Run the relevant test suite before finishing and report the result (passed/failed counts). If something is objectively not testable (e.g. live LLM behavior), briefly explain why.
+
+## 4. Commit
+
+- At the end of the task make **one or more commits** with meaningful messages (English, Conventional Commits per `conventional-commits.mdc`, reference the task ID where one exists, e.g. `feat(agent): add SQL self-heal loop (task 0004)`).
+- Logically separate changes → separate commits; a version bump goes in the same commit as the change that requires it.
+- **Push is not automatic** — the user decides when to push/publish.
+
+## 5. Verification
+
+- Provide a **verifiable way for the user to confirm the task works**, whenever possible:
+  - a command that can be run (pytest, a CLI invocation with an example question);
+  - manual steps (what to type into the chat CLI, what output to expect);
+- Write the verification steps into `HANDOFF.md` (memory-bank task) or state them in the final answer (ad-hoc task).
+
+## Exceptions
+
+- Documentation-only changes: no tests, but the commit still applies.
+- If the user explicitly asks for "no commit" / "just an experiment" — follow the instruction.

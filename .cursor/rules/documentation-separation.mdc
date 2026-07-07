@@ -1,0 +1,38 @@
+---
+description: Strict separation of human-facing documentation (README, docs/) from internal agent documentation (memory-bank/)
+alwaysApply: true
+---
+
+# Documentation separation — human vs. agent
+
+This repository has two documentation spaces with different audiences. Do not mix them.
+
+## Human-facing documentation — `README.md` + `docs/`
+
+- **Audience**: assignment reviewers, users, and developers reading the public repo.
+- **Contents**: project overview, architecture/HLD, technical explanation, setup instructions, usage guides, evaluation guide, example transcripts. This is the assignment's **Documentation deliverable**.
+- **Rules**:
+  - Must be fully self-contained: a reader must understand and run the system from `README.md` + `docs/` alone.
+  - Must **never** reference `memory-bank/`, task IDs, task folders, agent workflow, `.cursor/rules/`, or the architect/engineer process. Those are internal mechanics, invisible to the reader.
+  - Written as product/engineering documentation, not as work narration ("we then implemented…" is out; "the system does X because Y" is in).
+
+## Internal agent documentation — `memory-bank/`
+
+- **Audience**: AI agents (and the project owner) — working memory, decisions, task tracking.
+- **Contents**: core memory files, `memory-bank/tasks/` folders (TASK/PLAN/WORKLOG/HANDOFF), decision records.
+- **Rules**:
+  - **May** freely reference `docs/`, code, and task IDs.
+  - Duplication of human docs is not the goal: memory-bank records *why/status/process*; `docs/` records *what/how to use*. When a design decision matures, its user-visible outcome is documented in `docs/`, while the reasoning trail stays in memory-bank.
+  - Never treated as a substitute for the human docs: "it's described in memory-bank" does not satisfy a documentation requirement.
+
+## Direction of references
+
+- `memory-bank/` → `docs/`, code: **allowed**.
+- `README.md`/`docs/` → `memory-bank/`, `.cursor/rules/`, tasks: **forbidden**.
+- Code comments → either space: avoid; code references neither.
+
+## Checks before finishing any task
+
+- If behavior/setup/usage changed → the **human** docs were updated.
+- If decisions/status/process changed → the **memory-bank** was updated.
+- Grep `README.md` and `docs/` for `memory-bank`, `task 0`, `.cursor` — must return nothing.

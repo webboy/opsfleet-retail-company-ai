@@ -1,0 +1,44 @@
+---
+description: Keeping memory-bank/tasks/INDEX.md in sync with the task folders
+alwaysApply: true
+---
+
+# Task index (`INDEX.md`)
+
+## Role
+
+`memory-bank/tasks/INDEX.md` is the **quick overview** of all tasks: one row per **real** task folder, in sync with `TASK.md` → **Metadata** section.
+
+## When to update
+
+1. **New task folder** — add a row.
+2. **Change in `TASK.md` Metadata** (Status, Owner, Title, Updated) — mirror it in the table.
+3. **Folder rename** or change of Task ID / Title — update the columns.
+4. **Task removed** — remove the row; if the folder remains as an archive with status `done` / `cancelled`, the row may stay while the folder exists.
+
+## Table
+
+Columns:
+
+| ID | Title | Status | Owner | Updated |
+
+- Values come from **`TASK.md` → Metadata** (same meaning as in the task).
+- **Order**: by numeric **ID** (0001, 0002, …).
+
+## Status values
+
+Consistent with `TASK.md`: `todo`, `in_progress`, `blocked`, `pending_review`, `done`, `cancelled`.
+
+- `pending_review` = implementation finished, waiting for user testing/approval.
+- `done` = used **only** after explicit user confirmation that the task is approved.
+
+## What does **not** go into the index
+
+- **`_TEMPLATE/`** (and similar templates) — not tasks, do **not** add them to the table.
+- **Fictional / demo rows** — not required; the focus is on **real** task folders.
+
+## Protocol
+
+- On task creation: after `TASK.md` and the folder — **immediately** add the row to `INDEX.md`.
+- On every status or Metadata change — update `INDEX.md` too (same **Updated** date as `TASK.md` where it makes sense).
+- **`TASK.md`** is the source of truth; `INDEX.md` is the aggregate — on mismatch, align the index with `TASK.md`.

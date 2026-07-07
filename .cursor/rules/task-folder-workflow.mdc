@@ -1,0 +1,71 @@
+---
+description: How to use memory-bank/tasks/ and what the agent must always do in that folder
+alwaysApply: true
+---
+
+# Task folder workflow (mandatory)
+
+## What is `memory-bank/tasks/`
+
+- The **working space** for all implementation tasks in this repository.
+- **Each task** = one subfolder with the work documentation (goal, plan, log, handoff).
+- **`TASK.md`** inside that folder is the **source of truth** for the description, acceptance criteria and **Metadata** (ID, title, status, owner, dates).
+
+## Structure
+
+| Path | Role |
+|------|------|
+| `memory-bank/tasks/INDEX.md` | Quick overview of all tasks (table); **must** stay in sync with the folders and each `TASK.md` (see `task-index-workflow.mdc`). |
+| `memory-bank/tasks/_TEMPLATE/` | Starter file set for a **new** task (copy the folder → new name). Does **not** go into `INDEX.md`. |
+| `memory-bank/tasks/<task-id>-<short-title>/` | One task; folder name: **4 digits** + dash + short **slug** (e.g. `0003-agent-core-bigquery`). |
+
+## Mandatory files per task
+
+- `TASK.md` — goal, scope, acceptance criteria, **Metadata** (Task ID, Title, Status, Owner, Created, Updated).
+- `PLAN.md` — concrete steps before coding (update it before starting implementation).
+- `WORKLOG.md` — what was done during the work.
+- `HANDOFF.md` — delivery summary at the end.
+
+Optional: `CONTEXT.md`, `artifacts/`, `patches/`, `refs/`.
+
+## What the agent must do (protocol)
+
+### When the user opens or resumes a task
+
+1. Locate the task folder (from the message or from `INDEX.md`).
+2. Read **`TASK.md`** (and `CONTEXT.md` if present).
+3. If there is no clear plan, or the plan is stale — **update `PLAN.md`** before larger code changes.
+4. Read `WORKLOG.md` / `HANDOFF.md` as needed for context.
+
+### During the work
+
+1. **`WORKLOG.md`**: record meaningful steps (what changed, where).
+2. **`TASK.md` Metadata**: on any status change (e.g. `todo` → `in_progress` → `pending_review`), owner change or title change — update the fields and the **Updated** date.
+3. **`memory-bank/tasks/INDEX.md`**: always in sync with **Metadata** and the folder list (details in `task-index-workflow.mdc`).
+4. **No secrets** in task files (tokens, passwords, API keys).
+
+### New task (when a new folder is needed)
+
+1. Pick the next **Task ID** (last one in `INDEX.md` + 1, four-digit format `0002`, …).
+2. Create `memory-bank/tasks/<id>-<short-slug>/`.
+3. Fill in the mandatory files — a **copy** of `_TEMPLATE/` into the new folder name works (adapt the content to the task).
+4. Set the **Metadata** in `TASK.md` (Task ID, Title, Status, Owner, dates).
+5. **Immediately** add a row to **`INDEX.md`** and keep it sorted by ID.
+
+### Before a task can be considered finished
+
+1. **Version bump**: if the task changed versioned source code, apply a **minor semver bump** on completion — see `memory-task-minor-version-bump.mdc`.
+2. **`HANDOFF.md`**: summary, changed files, impact on data/env, test steps, risks / rollback.
+3. Walk through the **acceptance criteria** from `TASK.md` and explicitly record what was verified.
+4. When the implementation is ready, set **`TASK.md`** to `pending_review` (or `cancelled` if abandoned), with an updated **Updated** date.
+5. **`INDEX.md`** must show the same status and date as `TASK.md`.
+6. **`done` is allowed only after explicit user confirmation** that the task was tested and approved. Without that message the task stays `pending_review`.
+
+## If something is unclear
+
+- If acceptance criteria are contradictory or unclear — **ask** before large implementations.
+- If the scope changes — record why in `WORKLOG.md`.
+
+## Quality
+
+- Small, verifiable changes; do not extend scope beyond `TASK.md` without recording the agreement in the task documentation.

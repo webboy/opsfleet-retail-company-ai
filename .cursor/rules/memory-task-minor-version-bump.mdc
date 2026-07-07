@@ -1,0 +1,36 @@
+---
+description: Minor semver bump on task completion when the task changed versioned source code
+alwaysApply: true
+---
+
+# Memory-bank task — minor version at the end of a delivery
+
+## Rule
+
+When code changes are made **within one task** from `memory-bank/tasks/<id>-<slug>/` (source of truth: `TASK.md`), upon **completion of the implementation** the agent **bumps the middle (MINOR) semver** of the project — if the task actually changed versioned source code.
+
+- **Moment**: together with the task moving to `pending_review` (implementation done), or right before the final commit set for that task — so the user sees one clear **minor** delivery per task, not just a series of patches.
+- **Format**: `MAJOR.MINOR.PATCH` → increase **MINOR** by 1, reset **PATCH** to **0** (e.g. `0.3.2` → `0.4.0`).
+
+## Where exactly
+
+| Location | What to bump |
+|----------|--------------|
+| `pyproject.toml` | `[project] version` |
+| `src/<package>/__init__.py` | `__version__` (keep identical to `pyproject.toml`) |
+
+If the project layout changes (new packages, different version source), extend this table in the same task that introduces the change.
+
+## Relation to patch bumps
+
+- Small iterations and fixes outside of a memory-bank task may use **patch** bumps.
+- For the **whole delivery of one memory-bank task**: the final version state must reflect a **minor** step for that delivery (one aligned jump).
+
+## Git tag
+
+- Tag `v{version}` on agreement with the user — typically after the commit that already contains the new **minor** version. Not automatic.
+
+## What not to do
+
+- Do not bump when the task changed **only documentation** (`memory-bank/`, `docs/`, `README.md`) without touching versioned source code.
+- Do not use this rule for work without a folder in `memory-bank/tasks/` — normal patch rules apply there.

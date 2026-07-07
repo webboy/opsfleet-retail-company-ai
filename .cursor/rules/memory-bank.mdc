@@ -1,0 +1,80 @@
+---
+description: Memory Bank — mandatory reading and maintenance of memory-bank/ as the agent's persistent project memory
+alwaysApply: true
+---
+
+# Memory Bank
+
+The agent's memory resets completely between sessions. `memory-bank/` is the **only** persistent link to previous work in this repository — it must be read at the start of every task and maintained with precision.
+
+**I MUST read ALL core memory bank files at the start of EVERY task — this is not optional.**
+
+## Structure
+
+Files build on each other in a clear hierarchy:
+
+```mermaid
+flowchart TD
+    PB[projectbrief.md] --> PC[productContext.md]
+    PB --> SP[systemPatterns.md]
+    PB --> TC[techContext.md]
+
+    PC --> AC[activeContext.md]
+    SP --> AC
+    TC --> AC
+
+    AC --> P[progress.md]
+    AC --> T[tasks/]
+```
+
+### Core files (required, in `memory-bank/`)
+
+1. **`projectbrief.md`** — foundation document; core requirements and goals; source of truth for project scope.
+2. **`productContext.md`** — why this project exists, problems it solves, how it should work, UX goals.
+3. **`systemPatterns.md`** — system architecture, key technical decisions (ADRs D1–…), design patterns, component boundaries.
+4. **`techContext.md`** — technologies, development setup, technical constraints, dependencies.
+5. **`activeContext.md`** — current work focus, recent changes, next steps, active decisions, open questions/risks.
+6. **`progress.md`** — what works, what's left to build, current status, known issues.
+
+### Task tracking (required, in `memory-bank/tasks/`)
+
+All implementation work is tracked in **task folders** under `memory-bank/tasks/` — structure, protocol and lifecycle are defined in:
+
+- `task-folder-workflow.mdc` — folder structure, mandatory files (TASK/PLAN/WORKLOG/HANDOFF), status protocol;
+- `task-index-workflow.mdc` — keeping `tasks/INDEX.md` in sync;
+- `task-quality-lifecycle.mdc` — docs/tests/commit/verification per task;
+- `memory-task-minor-version-bump.mdc` — version bump on task completion.
+
+### Additional context
+
+Create additional files/folders inside `memory-bank/` when they help organize complex feature docs, integration specs, testing strategies or deployment procedures.
+
+## Core workflows
+
+### Start of any task (Plan or Act)
+
+1. Read **all** core memory bank files (1–6 above).
+2. Check `memory-bank/tasks/INDEX.md` and the relevant task folder.
+3. If files are incomplete or contradict the code — the code is the source of truth; record the mismatch and fix the documentation as part of the task.
+4. Only then plan or implement.
+
+### During and after work
+
+1. Execute within the task protocol (see task rules above).
+2. Update `activeContext.md` (focus, decisions, recent changes) and `progress.md` (status) after significant changes.
+3. Respect `documentation-separation.mdc`: memory-bank is **internal agent documentation**; human-facing docs live in `README.md` + `docs/` and never reference memory-bank.
+
+## Documentation updates
+
+Memory Bank updates occur when:
+
+1. Discovering new project patterns.
+2. After implementing significant changes.
+3. When the user requests **"update memory bank"** — then I MUST review **every** memory bank file, even those not requiring updates; focus on `activeContext.md` and `progress.md`.
+4. When context needs clarification.
+
+## Project intelligence
+
+Durable, project-specific insights (implementation paths, user preferences, known challenges, evolution of decisions) are captured as rules in `.cursor/rules/` of this repository — validate patterns with the user before writing them down.
+
+REMEMBER: after every memory reset, the agent begins completely fresh. The Memory Bank must be maintained as if the agent's effectiveness depends entirely on its accuracy — because it does.

@@ -1,0 +1,15 @@
+# WSL / Windows metadata
+*:Zone.Identifier
+
+# Python (will grow with the codebase; see task 0002)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local environment & secrets
+.env
+
+# Local runtime artifacts
+logs/
+*.sqlite3
