@@ -23,12 +23,14 @@ Bootstrap + BigQuery foundation complete (0001–0002 done). Agent core done (00
 5. ~~`0005` Safety: input guard + PII masking~~ — **done**
 6. `0006` High-Stakes Oversight: saved reports + interrupt-based delete confirmation — **pending_review**
 7. `0007` Learning loop: user preferences + personas
-8. `0008` Observability + QA eval suite
-9. `0009` Final documentation package and submission polish
-10. `0010` *(optional)* MCP server stretch
+8. `0011` LLM provider fallback: OpenRouter/Ollama (gap from 0003; do before 0008's live evals)
+9. `0008` Observability + QA eval suite
+10. `0009` Final documentation package and submission polish
+11. `0010` *(optional)* MCP server stretch
 
 ## Known issues
 
+- `llm.py` is Gemini-only; OpenRouter/Ollama fallback from task 0003 scope not implemented — tracked as task 0011.
 - Candidate JSONL grows without automatic pruning — curation workflow documented only.
 - Phone regex may miss exotic formats; column-name masking covers named PII fields.
 - Saved reports SQLite file is local-only; no backup/restore UX in prototype.
