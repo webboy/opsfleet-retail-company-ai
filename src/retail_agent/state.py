@@ -13,6 +13,10 @@ class AgentState(TypedDict, total=False):
     user_id: str
     question: str
     turn_mode: Literal["analysis", "schema", "chitchat"]
+    retrieved_trios: list[dict]
+    retrieved_trio_ids: list[str]
+    retrieval_method: str
+    candidate_captured: bool
     sql: str | None
     sql_attempts: int
     max_sql_attempts: int

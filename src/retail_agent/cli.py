@@ -62,6 +62,9 @@ def run_repl(*, user_id: str, thread_id: str | None = None, deps: AgentDeps | No
             if result.get("sql"):
                 attempts = result.get("sql_attempts", 0)
                 print(f"[sql attempts={attempts}]\n")
+            if result.get("retrieved_trio_ids"):
+                method = result.get("retrieval_method", "unknown")
+                print(f"[retrieved trios={result['retrieved_trio_ids']} method={method}]\n")
         except Exception:  # noqa: BLE001 — never leak stack traces in CLI
             logging.exception("CLI turn failed")
             print(

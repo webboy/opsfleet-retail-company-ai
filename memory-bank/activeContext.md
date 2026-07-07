@@ -2,9 +2,7 @@
 
 ## Current focus
 
-Project bootstrap is done (2026-07-07): assignment analyzed, memory bank initialized, task workflow rules adapted into `.cursor/rules/`, and the task backlog created in `memory-bank/tasks/`. The workflow for any implementing agent is fully described by the memory bank plus the rules in `.cursor/rules/` — read the memory bank first, then work through `memory-bank/tasks/INDEX.md` in order.
-
-**Next up: task `0004-golden-bucket-hybrid-intelligence`** — Golden Bucket trio retrieval. Task 0003 (LangGraph agent core) is **done** (user approved 2026-07-07).
+Task **0004** (Golden Bucket trio retrieval) is **pending_review** — implementation complete, awaiting user verification. Next after approval: task **0005** (input guard + PII masking).
 
 ## How work is organized
 
@@ -16,7 +14,7 @@ Project bootstrap is done (2026-07-07): assignment analyzed, memory bank initial
 - LangGraph + Gemini (`gemini-2.5-flash` default, env-configurable), optional OpenRouter/Ollama fallback.
 - Safety is deterministic: sql_guard (SELECT-only, allowed tables, LIMIT, bytes cap) and pii_mask (column deny-list + regex sweep) are code, not prompts.
 - Delete confirmations use LangGraph `interrupt()`; reports are owner-scoped in SQLite.
-- Golden Bucket prototype = local trio files + embedding retrieval with keyword fallback.
+- Golden Bucket prototype = local trio files under `golden_bucket/` + Gemini embedding retrieval with keyword fallback; candidates in `golden_bucket/candidates/candidates.jsonl`.
 - Personas = hot-read text files; user prefs = SQLite; observability = structured JSONL events + optional LangSmith.
 - **Maximum-effort scope (user decision, 2026-07-07)**: the prototype implements **all five** optional requirements as first-class features (PII Masking, High-Stakes Oversight, Resilience, QA, Observability). QA is a full eval suite with intent-correctness scoring (LLM-as-judge on top of property assertions), not just a smoke set.
 - **Documentation separation (user decision, 2026-07-07)**: `README.md` + `docs/` are human-facing and self-contained (the assignment's Documentation deliverable); `memory-bank/` is internal agent documentation. Human docs must never reference memory-bank, tasks or agent workflow — enforced by `.cursor/rules/documentation-separation.mdc` and audited in task 0009.
@@ -30,8 +28,6 @@ Project bootstrap is done (2026-07-07): assignment analyzed, memory bank initial
 
 ## Recent changes
 
-- 2026-07-07: repo bootstrapped (memory bank, rules, task backlog). No application code yet.
-- 2026-07-07: scope raised to maximum effort — all five optional prototype requirements are in scope as first-class features; task 0008 QA scope expanded accordingly.
-- 2026-07-07: MCP positioned as the production tool-integration mechanism in the HLD (task 0001, systemPatterns extensibility pattern); prototype capabilities stay in-process LangGraph nodes/tools. Optional stretch task 0010 added: expose guarded query + trio retrieval as an MCP server, strictly after 0001–0009 and strictly additive.
-- 2026-07-07: Task 0001 **done** (user approved) — `docs/ARCHITECTURE.md` and `docs/TECHNICAL_EXPLANATION.md`.
+- 2026-07-07: Task 0004 **pending_review** — Golden Bucket: 10 seed trios, `golden.py`, retrieve/inject/capture graph nodes, 41 pytest passed, version **0.3.0**.
 - 2026-07-07: Task 0003 **done** (user approved) — LangGraph agent core, CLI REPL, self-heal; follow-up fix for greetings/invalid SQL guard.
+- 2026-07-07: Task 0001 **done** (user approved) — `docs/ARCHITECTURE.md` and `docs/TECHNICAL_EXPLANATION.md`.

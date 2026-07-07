@@ -36,7 +36,7 @@ This document explains **why** the system is built the way it is, how data flows
 
 **Production:** Trios stored as objects in **Google Cloud Storage**; question embeddings indexed in **Vertex AI Vector Search** (or equivalent managed vector DB). Analyst curation pipeline promotes approved candidates.
 
-**Prototype:** Trios as YAML/Markdown files under `golden_bucket/`; embeddings computed at startup (or on demand) with in-memory cosine similarity; **keyword-overlap fallback** when the embedding API is unavailable.
+**Prototype:** Trios as YAML/Markdown files under `golden_bucket/` (one file per trio with YAML front-matter: `id`, `question`, `sql`, `tags`, `report`); embeddings computed on demand with in-memory cosine similarity over question text; **keyword-overlap fallback** when the embedding API is unavailable. Successful turns append to `golden_bucket/candidates/candidates.jsonl`. Override the bucket location with `GOLDEN_BUCKET_DIR` if needed.
 
 **Reasoning:** Vector search scales to thousands of trios with sub-second retrieval. Local files keep the prototype zero-ops while preserving the same retrieval → inject → generate SQL flow.
 

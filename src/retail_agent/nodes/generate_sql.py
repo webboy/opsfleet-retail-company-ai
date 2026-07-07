@@ -6,6 +6,7 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
 from retail_agent.deps import AgentDeps
 from retail_agent.llm import BudgetExhaustedError, CallBudget, invoke_with_retry
+from retail_agent.nodes.retrieve_trios import retrieved_examples_block
 from retail_agent.schema_doc import load_schema_doc
 from retail_agent.sql_utils import extract_sql
 from retail_agent.state import AgentState
@@ -27,6 +28,7 @@ def generate_sql(state: AgentState, deps: AgentDeps) -> dict:
         )
 
     conversation = _conversation_snippet(state)
+    examples = retrieved_examples_block(state)
 
     try:
         response = invoke_with_retry(
@@ -44,6 +46,7 @@ def generate_sql(state: AgentState, deps: AgentDeps) -> dict:
                 HumanMessage(
                     content=(
                         f"Schema:\n{load_schema_doc()}\n\n"
+                        f"Similar historical examples:\n{examples}\n\n"
                         f"Conversation:\n{conversation}\n\n"
                         f"Current question: {question}"
                         f"{retry_context}"

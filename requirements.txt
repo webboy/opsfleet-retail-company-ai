@@ -7,3 +7,4 @@ langchain_core>=0.3.0
 db-dtypes==1.2.0
 sqlglot>=25.0.0
 rich>=13.0.0
+pyyaml>=6.0.0

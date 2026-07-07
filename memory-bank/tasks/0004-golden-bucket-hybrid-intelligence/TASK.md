@@ -4,7 +4,7 @@
 
 - **Task ID**: 0004
 - **Title**: Hybrid Intelligence: Golden Bucket trio retrieval
-- **Status**: todo
+- **Status**: pending_review
 - **Owner**: Engineer
 - **Created**: 2026-07-07
 - **Updated**: 2026-07-07
@@ -27,10 +27,10 @@ Ground SQL generation in expert knowledge: retrieve the most relevant historical
 
 ## Acceptance criteria
 
-- [ ] Asking a question similar to a seed trio demonstrably pulls that trio into the prompt (log/trace shows it) and improves the generated SQL shape.
-- [ ] Embedding API failure degrades to keyword retrieval, not to a crash.
-- [ ] Successful turns produce candidate trio records.
-- [ ] pytest green for retrieval, fallback, capture.
+- [x] Asking a question similar to a seed trio demonstrably pulls that trio into the prompt (log/trace shows it) and improves the generated SQL shape.
+- [x] Embedding API failure degrades to keyword retrieval, not to a crash.
+- [x] Successful turns produce candidate trio records.
+- [x] pytest green for retrieval, fallback, capture.
 
 ## References
 
