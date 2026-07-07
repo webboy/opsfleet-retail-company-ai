@@ -4,7 +4,7 @@
 
 - **Task ID**: 0006
 - **Title**: High-Stakes Oversight: saved reports & delete confirmation
-- **Status**: todo
+- **Status**: pending_review
 - **Owner**: Engineer
 - **Created**: 2026-07-07
 - **Updated**: 2026-07-07

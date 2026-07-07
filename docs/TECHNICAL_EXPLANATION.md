@@ -44,7 +44,7 @@ This document explains **why** the system is built the way it is, how data flows
 
 | Data | Production | Prototype |
 |------|------------|-----------|
-| Saved reports | Cloud SQL or Firestore | SQLite |
+| Saved reports | Cloud SQL or Firestore | SQLite (`RETAIL_AGENT_DB_PATH`, default `./data/reports.sqlite3`) |
 | User preferences | Cloud SQL or Firestore | SQLite |
 | Personas | GCS objects or CMS | Local `personas/` files, hot-read each turn |
 | Conversation threads | Checkpointer + managed store | LangGraph SQLite/in-memory checkpointer |
@@ -175,10 +175,11 @@ Explicit PII requests (e.g. top buyers with emails) may still run as analysis, b
 **Problem:** The agent manages a Saved Reports library. Deletes ("Delete all reports mentioning Client X", "Delete all reports we made today") are destructive and need strict confirmation without breaking conversational UX.
 
 **Design:**
-- Reports stored with `owner`, title, content, timestamps, searchable tags/keywords.
-- Delete request → resolve candidate set **scoped to `owner = current_user`** → present exact list (titles + dates) → **LangGraph `interrupt()`** → only explicit confirmation (`yes` / `confirm`) executes deletion; anything else cancels.
+- Reports stored in SQLite via `ReportStore` (`src/retail_agent/stores.py`) with columns `owner`, title, content, question, sql, timestamps, and tags.
+- Default database path: `./data/reports.sqlite3`; override with `RETAIL_AGENT_DB_PATH`.
+- Delete request → resolve candidate set **scoped to `owner = current_user`** (mention text, “today”, or “all my reports”) → present exact list (titles + dates) → **LangGraph `interrupt()`** → only explicit confirmation (`yes`, `y`, `confirm`, or `delete`) executes deletion; anything else cancels.
 - Empty candidate set → clear message, no interrupt.
-- Save and list are conversational or slash commands; confirmation is one natural chat turn.
+- Save and list are conversational (`save this report`, `show my reports`) or slash commands (`/save`); delete confirmation resumes the graph with the user’s next message via `Command(resume=...)`.
 
 **Prototype:** SQLite + CLI. **Production:** Cloud SQL/Firestore + web client; same graph interrupt semantics.
 

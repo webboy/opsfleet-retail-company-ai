@@ -2,7 +2,7 @@
 
 ## Current focus
 
-Task **0005** (input guard + PII masking) is **done** (user approved 2026-07-07). Next up: task **0006** (saved reports + delete confirmation).
+Task **0006** (saved reports + delete confirmation) is **pending_review** (2026-07-07). Next up after user approval: task **0007** (learning loop / preferences / personas).
 
 ## How work is organized
 
@@ -14,7 +14,7 @@ Task **0005** (input guard + PII masking) is **done** (user approved 2026-07-07)
 - LangGraph + Gemini (`gemini-2.5-flash` default, env-configurable), optional OpenRouter/Ollama fallback.
 - Safety is deterministic: `input_guard` (scope/injection/off-topic), `sql_guard` (SELECT-only, allowed tables, LIMIT, bytes cap), and `pii_mask` + `output_mask` (column deny-list + regex sweep) are code, not prompts.
 - Explicit PII requests may run as analysis but output is always masked with a policy note.
-- Delete confirmations use LangGraph `interrupt()`; reports are owner-scoped in SQLite (task 0006).
+- Saved reports: SQLite `ReportStore` (`RETAIL_AGENT_DB_PATH`, default `./data/reports.sqlite3`); delete uses LangGraph `interrupt()` with owner-scoped selectors.
 - Golden Bucket prototype = local trio files under `golden_bucket/` + Gemini embedding retrieval with keyword fallback.
 - Personas = hot-read text files; user prefs = SQLite; observability = structured JSONL events + optional LangSmith.
 - **Maximum-effort scope (user decision, 2026-07-07)**: the prototype implements **all five** optional requirements as first-class features.
@@ -28,6 +28,6 @@ Task **0005** (input guard + PII masking) is **done** (user approved 2026-07-07)
 
 ## Recent changes
 
+- 2026-07-07: Task 0006 **pending_review** — saved reports library, guarded deletes, version **0.5.0**.
 - 2026-07-07: Task 0005 **done** (user approved) — input guard, PII masking, version **0.4.0**.
 - 2026-07-07: Task 0004 **done** — Golden Bucket trio retrieval and candidate capture.
-- 2026-07-07: Schema doc aligned with live BigQuery (`order_items.id` not `order_item_id`).

@@ -9,6 +9,7 @@ import uuid
 
 from langchain_core.messages import HumanMessage
 from langgraph.checkpoint.memory import MemorySaver
+from langgraph.types import Command
 
 from retail_agent.deps import AgentDeps
 from retail_agent.graph import compile_graph
@@ -16,9 +17,11 @@ from retail_agent.graph import compile_graph
 HELP_TEXT = """
 Commands:
   /help  Show this help
+  /save  Save the most recent report to your library
   /exit  Exit the chat (also /quit)
 
 Ask natural-language questions about retail sales, products, customers, or the database schema.
+Saved report commands include "show my reports" and "delete reports mentioning <term>".
 """.strip()
 
 
@@ -28,6 +31,7 @@ def run_repl(*, user_id: str, thread_id: str | None = None, deps: AgentDeps | No
     graph = compile_graph(deps, checkpointer=checkpointer)
     thread_id = thread_id or f"{user_id}-{uuid.uuid4().hex[:8]}"
     config = {"configurable": {"thread_id": thread_id}}
+    awaiting_interrupt = False
 
     print(f"Retail Agent CLI — user={user_id} thread={thread_id}")
     print("Type /help for commands.\n")
@@ -48,15 +52,29 @@ def run_repl(*, user_id: str, thread_id: str | None = None, deps: AgentDeps | No
             print(HELP_TEXT)
             continue
 
+        question = "save this report" if user_input == "/save" else user_input
+
         try:
-            result = graph.invoke(
-                {
-                    "messages": [HumanMessage(content=user_input)],
-                    "user_id": user_id,
-                    "question": user_input,
-                },
-                config,
-            )
+            if awaiting_interrupt:
+                result = graph.invoke(Command(resume=question), config)
+                awaiting_interrupt = False
+            else:
+                result = graph.invoke(
+                    {
+                        "messages": [HumanMessage(content=question)],
+                        "user_id": user_id,
+                        "question": question,
+                    },
+                    config,
+                )
+
+            snapshot = graph.get_state(config)
+            if snapshot.next:
+                awaiting_interrupt = True
+                if not _print_interrupt_prompt(snapshot):
+                    print("\nAgent: Please confirm or cancel.\n")
+                continue
+
             report = result.get("report") or "I couldn't produce an answer for that question."
             print(f"\nAgent: {report}\n")
             if result.get("sql"):
@@ -67,10 +85,24 @@ def run_repl(*, user_id: str, thread_id: str | None = None, deps: AgentDeps | No
                 print(f"[retrieved trios={result['retrieved_trio_ids']} method={method}]\n")
         except Exception:  # noqa: BLE001 — never leak stack traces in CLI
             logging.exception("CLI turn failed")
+            awaiting_interrupt = False
             print(
                 "\nAgent: Sorry, something went wrong while processing your question. "
                 "Please try again or rephrase your question.\n"
             )
+
+
+def _print_interrupt_prompt(snapshot) -> bool:
+    for task in snapshot.tasks:
+        interrupts = getattr(task, "interrupts", None) or ()
+        for interrupt in interrupts:
+            value = interrupt.value
+            if isinstance(value, dict) and value.get("prompt"):
+                print(f"\nAgent: {value['prompt']}\n")
+                return True
+            print(f"\nAgent: {value}\n")
+            return True
+    return False
 
 
 def main(argv: list[str] | None = None) -> int:

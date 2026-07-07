@@ -33,5 +33,10 @@ class AgentState(TypedDict, total=False):
     query_empty: bool
     result_preview: str | None
     report: str | None
+    report_action: Literal["save", "list", "delete"] | None
+    report_selector_kind: Literal["mention", "today", "all"] | None
+    report_mention: str | None
+    pending_delete_report_ids: list[str] | None
+    pending_delete_summary: str | None
     llm_budget: dict[str, int]
     status: Literal["running", "done", "fallback"]

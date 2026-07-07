@@ -23,6 +23,7 @@ class Settings:
     embedding_model: str
     persona: str
     dataset_id: str
+    reports_db_path: str | None
     max_bytes_billed: int
     default_limit: int
     allowed_tables: frozenset[str] = field(default=DEFAULT_ALLOWED_TABLES)
@@ -46,6 +47,7 @@ def get_settings(*, load_env: bool = True) -> Settings:
         embedding_model=getenv("RETAIL_AGENT_EMBEDDING_MODEL", "gemini-embedding-001"),
         persona=getenv("RETAIL_AGENT_PERSONA", "default"),
         dataset_id=getenv("BQ_DATASET_ID", DEFAULT_DATASET),
+        reports_db_path=_optional_str("RETAIL_AGENT_DB_PATH"),
         max_bytes_billed=_int_env("BQ_MAX_BYTES_BILLED", DEFAULT_MAX_BYTES_BILLED),
         default_limit=_int_env("BQ_DEFAULT_LIMIT", DEFAULT_QUERY_LIMIT),
     )

@@ -10,8 +10,9 @@ import pandas as pd
 
 from retail_agent.sql_utils import is_greeting_or_chitchat, is_schema_question
 
-GuardRoute = Literal["analysis", "schema", "chitchat", "off_topic", "malicious"]
+GuardRoute = Literal["analysis", "schema", "chitchat", "off_topic", "malicious", "reports"]
 GuardDecision = Literal["allowed", "refused"]
+ReportAction = Literal["save", "list", "delete"]
 
 EMAIL_RE = re.compile(
     r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b",
@@ -96,6 +97,32 @@ PII_REQUEST_MARKERS = (
     "contact info",
 )
 
+REPORT_LIST_MARKERS = (
+    "show my reports",
+    "list my reports",
+    "my saved reports",
+    "show saved reports",
+)
+
+REPORT_SAVE_MARKERS = (
+    "/save",
+    "save this report",
+    "save the report",
+    "save report",
+)
+
+_MENTION_DELETE_PATTERNS = (
+    re.compile(r"delete(?:\s+all)?\s+reports?\s+mentioning\s+(.+)", re.IGNORECASE),
+    re.compile(r"delete\s+reports?\s+about\s+(.+)", re.IGNORECASE),
+)
+
+
+@dataclass(frozen=True)
+class ReportCommand:
+    action: ReportAction
+    selector_kind: Literal["mention", "today", "all"] | None = None
+    mention: str | None = None
+
 
 @dataclass(frozen=True)
 class InputPrecheck:
@@ -145,6 +172,13 @@ def classify_input_precheck(question: str) -> InputPrecheck:
             reason="schema question",
         )
 
+    if parse_report_command(text):
+        return InputPrecheck(
+            decision="allowed",
+            route="reports",
+            reason="report management",
+        )
+
     if any(marker in lowered for marker in MALICIOUS_MARKERS):
         return InputPrecheck(
             decision="refused",
@@ -175,6 +209,35 @@ def classify_input_precheck(question: str) -> InputPrecheck:
         needs_llm=True,
         pii_sensitive=pii_sensitive,
     )
+
+
+def parse_report_command(question: str) -> ReportCommand | None:
+    text = (question or "").strip()
+    lowered = text.lower()
+
+    if lowered in REPORT_SAVE_MARKERS:
+        return ReportCommand(action="save")
+
+    if any(marker in lowered for marker in REPORT_LIST_MARKERS):
+        return ReportCommand(action="list")
+
+    if "delete" not in lowered or "report" not in lowered:
+        return None
+
+    if "today" in lowered or "we made today" in lowered:
+        return ReportCommand(action="delete", selector_kind="today")
+
+    if "all my reports" in lowered or lowered.strip() == "delete my reports":
+        return ReportCommand(action="delete", selector_kind="all")
+
+    for pattern in _MENTION_DELETE_PATTERNS:
+        match = pattern.search(text)
+        if match:
+            mention = match.group(1).strip().strip("\"'")
+            if mention:
+                return ReportCommand(action="delete", selector_kind="mention", mention=mention)
+
+    return None
 
 
 def parse_llm_guard_label(text: str) -> GuardRoute:

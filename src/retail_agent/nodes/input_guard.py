@@ -12,6 +12,7 @@ from retail_agent.safety import (
     InputPrecheck,
     classify_input_precheck,
     parse_llm_guard_label,
+    parse_report_command,
     refusal_message,
 )
 from retail_agent.state import AgentState
@@ -35,7 +36,7 @@ def input_guard(state: AgentState, deps: AgentDeps) -> dict:
             return _refused_update(question, precheck)
 
     logger.info("Input guard allowed turn route=%s reason=%s", precheck.route, precheck.reason)
-    return {
+    update: dict = {
         "question": question,
         "guard_decision": "allowed",
         "guard_route": precheck.route,
@@ -44,6 +45,13 @@ def input_guard(state: AgentState, deps: AgentDeps) -> dict:
         "llm_budget": budget.to_dict(),
         "status": "running",
     }
+    if precheck.route == "reports":
+        report_cmd = parse_report_command(question)
+        if report_cmd:
+            update["report_action"] = report_cmd.action
+            update["report_selector_kind"] = report_cmd.selector_kind
+            update["report_mention"] = report_cmd.mention
+    return update
 
 
 def _llm_classify(

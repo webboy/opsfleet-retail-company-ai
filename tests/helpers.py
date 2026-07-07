@@ -11,6 +11,7 @@ def make_settings(**overrides) -> Settings:
         "embedding_model": "gemini-embedding-001",
         "persona": "default",
         "dataset_id": "bigquery-public-data.thelook_ecommerce",
+        "reports_db_path": None,
         "max_bytes_billed": 1_073_741_824,
         "default_limit": 1000,
     }

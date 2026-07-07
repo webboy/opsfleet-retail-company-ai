@@ -10,6 +10,7 @@ from retail_agent.bq import BigQueryRunner
 from retail_agent.config import Settings, get_settings
 from retail_agent.golden import TrioStore
 from retail_agent.llm import CallBudget, create_chat_model
+from retail_agent.stores import ReportStore
 
 
 @dataclass
@@ -18,12 +19,15 @@ class AgentDeps:
     llm: BaseChatModel
     bq_runner: BigQueryRunner
     trio_store: TrioStore | None = None
+    report_store: ReportStore | None = None
     max_sql_attempts: int = 3
     max_llm_calls: int = 8
 
     def __post_init__(self) -> None:
         if self.trio_store is None:
             self.trio_store = TrioStore(settings=self.settings)
+        if self.report_store is None:
+            self.report_store = ReportStore(db_path=self.settings.reports_db_path)
 
     @classmethod
     def create(
@@ -32,6 +36,7 @@ class AgentDeps:
         llm: BaseChatModel | None = None,
         bq_runner: BigQueryRunner | None = None,
         trio_store: TrioStore | None = None,
+        report_store: ReportStore | None = None,
         *,
         max_sql_attempts: int = 3,
         max_llm_calls: int = 8,
@@ -42,6 +47,8 @@ class AgentDeps:
             llm=llm or create_chat_model(settings),
             bq_runner=bq_runner or BigQueryRunner(settings=settings),
             trio_store=trio_store or TrioStore(settings=settings),
+            report_store=report_store
+            or ReportStore(db_path=settings.reports_db_path),
             max_sql_attempts=max_sql_attempts,
             max_llm_calls=max_llm_calls,
         )
