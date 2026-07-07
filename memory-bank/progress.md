@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-07)
 
-Tasks 0001–0006 **done** (user approved). Task 0007 **pending_review**. Next: LLM provider fallback (0011), then observability/QA evals (0008).
+Tasks 0001–0007 **done** (user approved). Next: LLM provider fallback (0011), then observability/QA evals (0008).
 
 ## What works
 
@@ -12,7 +12,7 @@ Tasks 0001–0006 **done** (user approved). Task 0007 **pending_review**. Next: 
 - Golden Bucket: trio retrieval, prompt injection, candidate capture (task 0004, **done**).
 - Safety: input guard, DataFrame PII mask, output sweep + policy note (task 0005, **done**).
 - Saved reports: SQLite store, save/list/delete with interrupt confirmation (task 0006, **done**).
-- User preferences + personas: SQLite prefs, deterministic routing, hot-reload persona files, `/prefs` and `/persona` (task 0007, **pending_review**).
+- User preferences + personas: SQLite prefs, deterministic routing, hot-reload persona files, `/prefs` and `/persona` (task 0007, **done**).
 - `pytest` **88 passed**.
 
 ## What's left to build
@@ -23,7 +23,7 @@ Tasks 0001–0006 **done** (user approved). Task 0007 **pending_review**. Next: 
 4. ~~`0004` Golden Bucket~~ — **done**
 5. ~~`0005` Safety: input guard + PII masking~~ — **done**
 6. ~~`0006` High-Stakes Oversight: saved reports + interrupt-based delete confirmation~~ — **done**
-7. `0007` Learning loop: user preferences + personas — **pending_review**
+7. ~~`0007` Learning loop: user preferences + personas~~ — **done**
 8. `0011` LLM provider fallback: OpenRouter/Ollama (gap from 0003; do before 0008's live evals)
 9. `0008` Observability + QA eval suite
 10. `0009` Final documentation package and submission polish

@@ -2,7 +2,7 @@
 
 ## Current focus
 
-Task **0007** (user preferences + personas) is **pending_review** (2026-07-07). Next up after user approval: task **0011** (LLM provider fallback), then **0008** (observability/QA evals).
+Task **0007** (user preferences + personas) is **done** (user approved 2026-07-07). Next up: task **0011** (LLM provider fallback), then **0008** (observability/QA evals).
 
 ## How work is organized
 
@@ -27,6 +27,6 @@ Task **0007** (user preferences + personas) is **pending_review** (2026-07-07). 
 
 ## Recent changes
 
-- 2026-07-07: Task 0007 **pending_review** — user preferences, hot-reload personas, version **0.6.0** (88 tests green).
+- 2026-07-07: Task 0007 **done** (user approved) — user preferences, hot-reload personas, version **0.6.0**.
 - 2026-07-07: Tasks 0001–0006 **done** (user approved).
 - 2026-07-07: Task 0011 created for OpenRouter/Ollama fallback gap from task 0003.
