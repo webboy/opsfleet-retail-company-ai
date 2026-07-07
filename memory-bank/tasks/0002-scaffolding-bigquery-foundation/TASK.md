@@ -4,7 +4,7 @@
 
 - **Task ID**: 0002
 - **Title**: Project scaffolding, config & BigQuery foundation
-- **Status**: pending_review
+- **Status**: done
 - **Owner**: Engineer
 - **Created**: 2026-07-07
 - **Updated**: 2026-07-07

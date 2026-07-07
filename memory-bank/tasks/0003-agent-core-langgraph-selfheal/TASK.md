@@ -4,7 +4,7 @@
 
 - **Task ID**: 0003
 - **Title**: Agent core: LangGraph, SQL generation, self-heal, CLI
-- **Status**: todo
+- **Status**: pending_review
 - **Owner**: Engineer
 - **Created**: 2026-07-07
 - **Updated**: 2026-07-07

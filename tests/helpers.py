@@ -6,7 +6,7 @@ from retail_agent.config import Settings
 def make_settings(**overrides) -> Settings:
     defaults = {
         "gcp_project_id": "test-project",
-        "google_api_key": None,
+        "google_api_key": "test-key",
         "model": "gemini-2.5-flash",
         "persona": "default",
         "dataset_id": "bigquery-public-data.thelook_ecommerce",

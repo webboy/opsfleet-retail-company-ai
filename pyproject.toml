@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "retail-agent"
-version = "0.1.0"
+version = "0.2.0"
 description = "Retail company data analysis chat assistant (Opsfleet AI assignment prototype)"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -19,6 +19,7 @@ dependencies = [
     "langchain_core>=0.3.0",
     "db-dtypes==1.2.0",
     "sqlglot>=25.0.0",
+    "rich>=13.0.0",
 ]
 
 [project.optional-dependencies]
@@ -28,6 +29,9 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+retail_agent = ["assets/*.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
