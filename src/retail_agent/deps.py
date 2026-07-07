@@ -49,3 +49,10 @@ class AgentDeps:
 
 def fresh_budget(deps: AgentDeps) -> CallBudget:
     return CallBudget(max_calls=deps.max_llm_calls)
+
+
+def resolve_budget(state: dict, deps: AgentDeps) -> CallBudget:
+    data = state.get("llm_budget")
+    if data is None:
+        return fresh_budget(deps)
+    return CallBudget.from_dict(data)

@@ -8,6 +8,16 @@ from retail_agent.state import AgentState
 
 
 def fallback_answer(state: AgentState) -> dict:
+    if state.get("guard_decision") == "refused":
+        report = state.get("report") or (
+            "I'm focused on retail sales, product, and customer analytics."
+        )
+        return {
+            "report": report,
+            "status": "fallback",
+            "messages": [AIMessage(content=report)],
+        }
+
     question = state.get("question") or "your question"
     last_error = state.get("last_error")
     detail = ""

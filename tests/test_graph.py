@@ -157,7 +157,7 @@ def test_invalid_sql_prose_self_heals_without_crashing(settings):
 
     assert result["status"] == "done"
     assert bq.calls == 2
-    assert llm.calls == 3
+    assert llm.calls == 4
 
 
 def test_budget_exhaustion_returns_controlled_fallback(settings):

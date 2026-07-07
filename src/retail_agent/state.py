@@ -13,6 +13,14 @@ class AgentState(TypedDict, total=False):
     user_id: str
     question: str
     turn_mode: Literal["analysis", "schema", "chitchat"]
+    guard_decision: Literal["allowed", "refused"]
+    guard_route: str
+    guard_reason: str | None
+    pii_masked: bool
+    pii_mask_hits: int
+    pii_masked_columns: list[str]
+    pii_note_required: bool
+    result_rows: list[dict] | None
     retrieved_trios: list[dict]
     retrieved_trio_ids: list[str]
     retrieval_method: str

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from retail_agent.deps import AgentDeps
-from retail_agent.preview import dataframe_preview
 from retail_agent.state import AgentState
 
 
@@ -32,5 +31,6 @@ def execute_bq(state: AgentState, deps: AgentDeps) -> dict:
         "query_ok": True,
         "query_empty": False,
         "last_error": None,
-        "result_preview": dataframe_preview(result.dataframe),
+        "result_rows": result.dataframe.to_dict(orient="records"),
+        "result_preview": None,
     }

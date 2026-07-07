@@ -15,6 +15,9 @@ from retail_agent.nodes.compose_report import compose_report
 from retail_agent.nodes.execute_bq import execute_bq
 from retail_agent.nodes.fallback_answer import fallback_answer
 from retail_agent.nodes.generate_sql import generate_sql
+from retail_agent.nodes.input_guard import input_guard
+from retail_agent.nodes.output_mask import output_mask
+from retail_agent.nodes.pii_mask import pii_mask
 from retail_agent.nodes.retrieve_trios import retrieve_trios
 from retail_agent.nodes.route_turn import route_turn
 from retail_agent.state import AgentState
@@ -23,17 +26,25 @@ from retail_agent.state import AgentState
 def build_graph(deps: AgentDeps):
     graph = StateGraph(AgentState)
 
+    graph.add_node("input_guard", lambda state: input_guard(state, deps))
     graph.add_node("route_turn", lambda state: route_turn(state, deps))
     graph.add_node("answer_chitchat", answer_chitchat)
     graph.add_node("answer_schema", lambda state: answer_schema(state, deps))
     graph.add_node("retrieve_trios", lambda state: retrieve_trios(state, deps))
     graph.add_node("generate_sql", lambda state: generate_sql(state, deps))
     graph.add_node("execute_bq", lambda state: execute_bq(state, deps))
+    graph.add_node("pii_mask", lambda state: pii_mask(state, deps))
     graph.add_node("compose_report", lambda state: compose_report(state, deps))
+    graph.add_node("output_mask", lambda state: output_mask(state, deps))
     graph.add_node("capture_candidate", lambda state: capture_candidate(state, deps))
     graph.add_node("fallback_answer", fallback_answer)
 
-    graph.add_edge(START, "route_turn")
+    graph.add_edge(START, "input_guard")
+    graph.add_conditional_edges(
+        "input_guard",
+        _route_after_guard,
+        {"allowed": "route_turn", "refused": "fallback_answer"},
+    )
     graph.add_conditional_edges(
         "route_turn",
         _route_after_turn,
@@ -51,12 +62,14 @@ def build_graph(deps: AgentDeps):
         "execute_bq",
         _route_after_execute,
         {
-            "report": "compose_report",
+            "report": "pii_mask",
             "retry": "generate_sql",
             "fallback": "fallback_answer",
         },
     )
-    graph.add_edge("compose_report", "capture_candidate")
+    graph.add_edge("pii_mask", "compose_report")
+    graph.add_edge("compose_report", "output_mask")
+    graph.add_edge("output_mask", "capture_candidate")
     graph.add_edge("capture_candidate", END)
     graph.add_edge("fallback_answer", END)
 
@@ -67,6 +80,12 @@ def compile_graph(deps: AgentDeps | None = None, *, checkpointer: MemorySaver | 
     deps = deps or AgentDeps.create()
     checkpointer = checkpointer or MemorySaver()
     return build_graph(deps).compile(checkpointer=checkpointer)
+
+
+def _route_after_guard(state: AgentState) -> Literal["allowed", "refused"]:
+    if state.get("guard_decision") == "refused":
+        return "refused"
+    return "allowed"
 
 
 def _route_after_turn(state: AgentState) -> Literal["schema", "analysis", "chitchat"]:

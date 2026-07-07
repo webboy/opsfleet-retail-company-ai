@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 
 from retail_agent.deps import AgentDeps
 from retail_agent.llm import BudgetExhaustedError, CallBudget, invoke_with_retry
@@ -25,6 +25,8 @@ def compose_report(state: AgentState, deps: AgentDeps) -> dict:
                         "You are a retail data analyst writing for a non-technical executive. "
                         "Write a concise, clear answer grounded in the SQL results. "
                         "Do not mention SQL errors or internal retries. "
+                        "Never include raw customer emails or phone numbers in the report. "
+                        "The result sample may already contain masked contact details. "
                         "Use short paragraphs or bullet points when helpful."
                     )
                 ),
@@ -51,7 +53,6 @@ def compose_report(state: AgentState, deps: AgentDeps) -> dict:
         "report": report,
         "status": "done",
         "llm_budget": budget.to_dict(),
-        "messages": [AIMessage(content=report)],
     }
 
 

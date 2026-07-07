@@ -158,13 +158,13 @@ Optional: set `LANGSMITH_TRACING=true` and `LANGSMITH_API_KEY` for full trace ex
 
 **Problem:** Raw logs contain customer emails and phones; the agent must answer analysis questions only and never display PII, even if SQL retrieves it.
 
-**Input guard:** First graph node classifies analysis vs report-mgmt vs off-topic vs malicious (prompt injection, "dump all emails"). Refusals exit early with polite message — no BigQuery.
+**Input guard:** First graph node (`input_guard`) applies deterministic rules for obvious prompt injection, destructive SQL language, and off-topic requests, then uses a small LLM fallback only for ambiguous turns. Refusals exit early with a polite message — no Golden Bucket retrieval or BigQuery.
 
 **PII masking (deterministic, two layers):**
-1. **DataFrame layer:** Detect email/phone columns by name (`email`, `phone`, …) and by content sampling; mask values (`j***@***.com`, `***-***-1234`) **before** rows reach the report LLM.
-2. **Output layer:** Regex sweep on final report text for email/phone shapes.
+1. **DataFrame layer (`pii_mask`):** Detect email/phone columns by name (`email`, `phone`, …) and by content sampling; mask values (`j***@***.***`, `***-***-1234`) **before** rows reach the report LLM.
+2. **Output layer (`output_mask`):** Regex sweep on final report text for email/phone shapes; append a short PII policy note when masking occurred.
 
-System prompts discourage requesting PII columns, but prompts are advisory — code is the guarantee.
+Explicit PII requests (e.g. top buyers with emails) may still run as analysis, but masked output is mandatory.
 
 **Prototype:** Full implementation as first-class feature. **Production:** Same logic; optional DLP API scan as additional layer.
 
