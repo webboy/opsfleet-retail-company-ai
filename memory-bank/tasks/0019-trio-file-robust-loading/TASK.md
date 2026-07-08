@@ -4,7 +4,7 @@
 
 - **Task ID**: 0019
 - **Title**: Golden Bucket robustness: one malformed trio file crashes the CLI
-- **Status**: pending_review
+- **Status**: done
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08

@@ -11,3 +11,4 @@
 - Updated `docs/USAGE.md` with malformed-file skip behavior.
 - Verification: golden/MCP tests 17 passed; full pytest 175 passed; eval dry-run 16/16.
 - Version bumped to **0.17.0**; task set to `pending_review`.
+- User approved 2026-07-08 — task marked **done**.
