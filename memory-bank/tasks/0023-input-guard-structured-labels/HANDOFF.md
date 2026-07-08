@@ -2,27 +2,33 @@
 
 ## Summary
 
-Not started. Task created to harden input guard label parsing.
+Hardened LLM-assisted input guard classification by replacing substring label parsing with an exact structured contract. The parser accepts only a first-line canonical label or minimal JSON `{"label": ...}`; negated/mixed/malformed responses fall back to `analysis`.
 
 ## Changed files
 
-- TBD
+- `src/retail_agent/safety.py` — `LLM_GUARD_LABELS`, structured `parse_llm_guard_label()`, JSON helper
+- `src/retail_agent/nodes/input_guard.py` — stricter classifier prompt
+- `tests/test_safety.py` — parser + ambiguous precheck regressions
+- `tests/test_safety_graph.py` — ambiguous LLM classify graph regressions
+- `docs/TECHNICAL_EXPLANATION.md`, `docs/EVALUATION.md`
+- `pyproject.toml`, `src/retail_agent/__init__.py` — version **0.21.0**
 
 ## Impact
 
-- Expected behavior impact: fewer false refusals and safer handling of ambiguous LLM classifier output.
-- Expected version impact: minor version bump if versioned source code changes.
+- **Behavior:** Responses like `not malicious; analysis` no longer misroute to refusal via substring match.
+- **Safety:** Exact `off_topic` / `malicious` labels still refuse before BigQuery.
+- **Fallback:** Unknown classifier output defaults to `analysis` for ambiguous turns (same safest intent as before, but without substring false positives).
 
 ## How to verify
 
-1. `pytest -q`
-2. `python -m retail_agent.evals --layer safety`
-3. Targeted parser regression for negated labels.
+1. `pytest tests/test_safety.py tests/test_safety_graph.py -q`
+2. `pytest -q`
+3. `python -m retail_agent.evals --layer safety`
 
 ## Risks / rollback
 
-- Parser must stay tolerant enough for real LLM responses while avoiding substring ambiguity.
+- Overly strict parsing could ignore valid prose explanations from the classifier; mitigated by first-line-only acceptance and `analysis` fallback.
 
 ## Acceptance criteria check
 
-- [ ] Pending implementation.
+- [x] All criteria verified during implementation; awaiting user approval for `done`.

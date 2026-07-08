@@ -28,7 +28,7 @@ The `tests/` directory covers deterministic logic without live APIs:
 
 - SQL guard (`sql_guard`) — SELECT-only, table whitelist, LIMIT injection/clamping
 - PII masking — column detection and output regex
-- Input guard — injection/off-topic classification
+- Input guard — injection/off-topic classification with exact structured LLM label parsing
 - Graph routing — self-heal retries, delete interrupt, preferences
 - Golden retrieval — embedding and keyword fallback
 - Eval assertion engine and baseline comparison

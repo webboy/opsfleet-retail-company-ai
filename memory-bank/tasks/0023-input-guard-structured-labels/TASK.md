@@ -4,7 +4,7 @@
 
 - **Task ID**: 0023
 - **Title**: Input guard structured labels
-- **Status**: todo
+- **Status**: pending_review
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08
@@ -28,12 +28,12 @@ Make LLM-assisted input classification deterministic and robust. The guard must 
 
 ## Acceptance criteria
 
-- [ ] LLM guard output must resolve only to one of the allowed labels: `analysis`, `schema`, `chitchat`, `off_topic`, `malicious`.
-- [ ] Negated labels do not win because of substring ordering.
-- [ ] Unknown/malformed classifier output falls back to the safest intended default documented in the code/tests.
-- [ ] Unit tests cover valid labels, mixed/negated labels, and malformed responses.
-- [ ] Existing safety graph tests and eval safety cases still pass.
-- [ ] `pytest -q` and `python -m retail_agent.evals --layer safety` pass.
+- [x] LLM guard output must resolve only to one of the allowed labels: `analysis`, `schema`, `chitchat`, `off_topic`, `malicious`.
+- [x] Negated labels do not win because of substring ordering.
+- [x] Unknown/malformed classifier output falls back to the safest intended default documented in the code/tests.
+- [x] Unit tests cover valid labels, mixed/negated labels, and malformed responses.
+- [x] Existing safety graph tests and eval safety cases still pass.
+- [x] `pytest -q` and `python -m retail_agent.evals --layer safety` pass.
 
 ## References
 

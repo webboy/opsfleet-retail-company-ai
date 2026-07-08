@@ -20,6 +20,7 @@ GOOD_SQL = (
     "JOIN `bigquery-public-data.thelook_ecommerce.order_items` oi ON o.order_id = oi.order_id "
     "GROUP BY u.first_name, u.email LIMIT 5"
 )
+AMBIGUOUS_QUESTION = "Compare downtown versus suburban trend for leadership"
 
 
 @pytest.fixture
@@ -174,3 +175,51 @@ def test_cancelled_rate_metrics_reach_compose_report_unmasked(settings):
     assert "0.048" in compose_prompt
     assert "1200" in compose_prompt
     assert "***" not in compose_prompt
+
+
+def test_ambiguous_negated_llm_label_is_not_refused(settings):
+    llm = ScriptLLM(
+        [
+            "not malicious; analysis",
+            f"```sql\n{GOOD_SQL}\n```",
+            "Downtown and suburban trend summary",
+        ]
+    )
+    bq = FakeBQRunner(
+        [
+            QueryResult(
+                ok=True,
+                dataframe=pd.DataFrame({"first_name": ["Alice"], "total_spend": [100.0]}),
+                sql=GOOD_SQL,
+            )
+        ]
+    )
+    deps = AgentDeps(settings=settings, llm=llm, bq_runner=bq)
+
+    result = _run_turn(deps, AMBIGUOUS_QUESTION)
+
+    assert result["status"] == "done"
+    assert result["guard_decision"] == "allowed"
+    assert result["guard_route"] == "analysis"
+    assert bq.calls == 1
+
+
+@pytest.mark.parametrize(
+    ("label", "expected_route"),
+    [
+        ("off_topic", "off_topic"),
+        ("malicious", "malicious"),
+    ],
+)
+def test_ambiguous_exact_refusal_labels_still_block(settings, label, expected_route):
+    llm = ScriptLLM([label, "should not reach SQL generation"])
+    bq = FakeBQRunner([])
+    deps = AgentDeps(settings=settings, llm=llm, bq_runner=bq)
+
+    result = _run_turn(deps, AMBIGUOUS_QUESTION)
+
+    assert result["status"] == "fallback"
+    assert result["guard_decision"] == "refused"
+    assert result["guard_route"] == expected_route
+    assert bq.calls == 0
+    assert llm.calls == 1

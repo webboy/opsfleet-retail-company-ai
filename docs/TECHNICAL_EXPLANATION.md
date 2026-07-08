@@ -174,7 +174,7 @@ See [Usage Guide](./USAGE.md) for all CLI flags and commands.
 
 **Problem:** Raw logs contain customer emails and phones; the agent must answer analysis questions only and never display PII, even if SQL retrieves it.
 
-**Input guard:** First graph node (`input_guard`) applies deterministic rules for obvious prompt injection, destructive SQL language, and off-topic requests, then uses a small LLM fallback only for ambiguous turns. Refusals exit early with a polite message — no Golden Bucket retrieval or BigQuery.
+**Input guard:** First graph node (`input_guard`) applies deterministic rules for obvious prompt injection, destructive SQL language, and off-topic requests, then uses a small LLM fallback only for ambiguous turns. The LLM classifier must return one canonical label (`analysis`, `schema`, `chitchat`, `off_topic`, `malicious`) on the first line or as minimal JSON; negated/mixed prose falls back to `analysis` rather than substring matching. Refusals exit early with a polite message — no Golden Bucket retrieval or BigQuery.
 
 **PII masking (deterministic, two layers):**
 1. **DataFrame layer (`pii_mask`):** Detect email/phone columns by name (`email`, `phone`, …) and by content sampling; mask values (`j***@***.***`, `***-***-1234`) **before** rows reach the report LLM.

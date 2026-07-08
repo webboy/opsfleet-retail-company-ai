@@ -11,6 +11,7 @@ import pandas as pd
 from retail_agent.sql_utils import is_greeting_or_chitchat, is_schema_question
 from retail_agent.stores import OutputFormat
 
+LLM_GUARD_LABELS = frozenset({"analysis", "schema", "chitchat", "off_topic", "malicious"})
 GuardRoute = Literal["analysis", "schema", "chitchat", "off_topic", "malicious", "reports", "preferences"]
 GuardDecision = Literal["allowed", "refused"]
 ReportAction = Literal["save", "list", "delete"]
@@ -340,13 +341,56 @@ def _references_database_table(text: str) -> bool:
 
 
 def parse_llm_guard_label(text: str) -> GuardRoute:
-    normalized = text.strip().lower()
-    for label in ("malicious", "off_topic", "analysis", "schema", "chitchat"):
-        if label in normalized:
-            return label  # type: ignore[return-value]
-    if "refuse" in normalized or "decline" in normalized:
-        return "off_topic"
+    """Parse LLM classifier output into one canonical guard route.
+
+    Accepts only structured outputs:
+    - first non-empty line exactly matching an allowed label, or
+    - minimal JSON such as ``{"label": "analysis"}``.
+
+    Ambiguous, negated, mixed, or malformed responses fall back to ``analysis``
+    because this path runs only after deterministic precheck for ambiguous turns.
+    """
+
+    raw = (text or "").strip()
+    if not raw:
+        return "analysis"
+
+    json_label = _parse_json_guard_label(raw)
+    if json_label is not None:
+        return json_label
+
+    first_line = next((line.strip().lower() for line in raw.splitlines() if line.strip()), "")
+    if first_line in LLM_GUARD_LABELS:
+        return first_line  # type: ignore[return-value]
+
     return "analysis"
+
+
+def _parse_json_guard_label(text: str) -> GuardRoute | None:
+    """Return a label from minimal JSON payloads, or None when not structured."""
+
+    import json
+
+    if not text.startswith("{"):
+        return None
+
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError:
+        return None
+
+    if not isinstance(payload, dict):
+        return None
+
+    label = payload.get("label")
+    if not isinstance(label, str):
+        return None
+
+    normalized = label.strip().lower()
+    if normalized in LLM_GUARD_LABELS:
+        return normalized  # type: ignore[return-value]
+
+    return None
 
 
 def refusal_message(route: GuardRoute) -> str:

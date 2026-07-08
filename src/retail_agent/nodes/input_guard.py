@@ -79,8 +79,9 @@ def _llm_classify(
                 SystemMessage(
                     content=(
                         "Classify the user message for a retail analytics assistant. "
-                        "Reply with exactly one label: analysis, schema, chitchat, "
-                        "off_topic, or malicious."
+                        "Reply with exactly one label on the first line and nothing else "
+                        "unless you also return valid JSON with a single \"label\" field. "
+                        "Allowed labels: analysis, schema, chitchat, off_topic, malicious."
                     )
                 ),
                 HumanMessage(content=question),

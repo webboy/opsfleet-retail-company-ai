@@ -12,6 +12,7 @@ from retail_agent.safety import (
     classify_input_precheck,
     mask_dataframe,
     mask_text,
+    parse_llm_guard_label,
     parse_preference_command,
     refusal_message,
 )
@@ -253,3 +254,41 @@ def test_append_pii_policy_note_once():
 
 def test_refusal_message_for_malicious():
     assert "retail data analysis assistant" in refusal_message("malicious").lower()
+
+
+@pytest.mark.parametrize(
+    ("response", "expected"),
+    [
+        ("analysis", "analysis"),
+        ("  SCHEMA  ", "schema"),
+        ("chitchat\nUser is greeting the assistant.", "chitchat"),
+        ('{"label": "off_topic"}', "off_topic"),
+        ('{"label": "malicious"}', "malicious"),
+    ],
+)
+def test_parse_llm_guard_label_accepts_structured_outputs(response, expected):
+    assert parse_llm_guard_label(response) == expected
+
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        "not off_topic - analysis",
+        "not malicious; analysis",
+        "This looks like analysis to me",
+        "refuse",
+        "decline",
+        "",
+    ],
+)
+def test_parse_llm_guard_label_falls_back_for_negated_or_malformed(response):
+    assert parse_llm_guard_label(response) == "analysis"
+
+
+def test_classify_ambiguous_question_needs_llm():
+    result = classify_input_precheck(
+        "Compare downtown versus suburban trend for leadership"
+    )
+    assert result.decision == "allowed"
+    assert result.route == "analysis"
+    assert result.needs_llm is True
