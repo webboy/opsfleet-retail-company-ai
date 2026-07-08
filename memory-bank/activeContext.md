@@ -2,11 +2,11 @@
 
 ## Current focus
 
-Full assignment review pass (2026-07-08, reviewer stance against `docs/AI Technical Assignment - Retail Company.pdf`) produced new backlog tasks **0022–0027**. Tasks **0016** through **0021** are **done** (user approved 2026-07-08); task **0022** is **pending_review**; tasks **0023–0027** are **todo**.
+Full assignment review pass (2026-07-08, reviewer stance against `docs/AI Technical Assignment - Retail Company.pdf`) produced new backlog tasks **0022–0027**. Tasks **0016** through **0022** are **done** (user approved 2026-07-08); tasks **0023–0027** are **todo**.
 
 Review backlog (created 2026-07-08):
 
-1. **0022 (high)** — ~~SQL cost controls and MCP payload caps~~ — **pending_review**: clamp oversized explicit `LIMIT`, cap MCP rows.
+1. **0022 (high)** — ~~SQL cost controls and MCP payload caps~~ — **done** (user approved 2026-07-08): clamp oversized explicit `LIMIT`, cap MCP rows.
 2. **0023 (high)** — input guard structured labels: replace brittle substring label parsing.
 3. **0024 (high)** — empty results and live eval regression: avoid full retry loops on valid empty results; investigate `cancelled-order-rate` live fallback.
 4. **0025 (medium/high)** — CI and eval gate hardening: add enforceable local/CI gate and clarify dry-run vs live eval.
@@ -52,6 +52,7 @@ First-pass status: ~~0012~~ ~~0013~~ ~~0014~~ ~~0015~~ ~~0016~~ ~~0017~~ ~~0018~
 
 ## Recent changes
 
+- 2026-07-08: Task 0022 **done** (user approved) — SQL LIMIT clamping + MCP response row cap (`MCP_MAX_RESPONSE_ROWS`); version **0.20.0**.
 - 2026-07-08: Task 0022 **pending_review** — SQL LIMIT clamping + MCP response row cap (`MCP_MAX_RESPONSE_ROWS`); version **0.20.0**.
 - 2026-07-08: Task 0021 **done** (user approved) — eval layer baseline filter, per-turn self-heal metric, trace snapshot guard, env precedence; version **0.19.0**.
 - 2026-07-08: Task 0021 **pending_review** — eval layer baseline filter, per-turn self-heal metric, trace snapshot guard, env precedence; version **0.19.0**; pytest 189, dry-run eval 16/16, safety subset 5/5.

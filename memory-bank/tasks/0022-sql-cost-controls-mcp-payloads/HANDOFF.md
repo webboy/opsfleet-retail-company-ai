@@ -43,9 +43,4 @@ Implemented SQL cost controls and MCP payload caps. `sql_guard` now clamps expli
 
 ## Acceptance criteria check
 
-- [x] `sql_guard` preserves small explicit limits but clamps oversized explicit limits.
-- [x] Queries without a limit still receive the default limit.
-- [x] MCP `query_retail_data` returns at most the configured/documented response row cap and reports truncation clearly.
-- [x] Unit tests cover SQL limit injection/clamping and MCP payload truncation.
-- [x] Relevant docs mention the practical result-row and cost controls.
-- [x] `pytest -q` and `python -m retail_agent.evals` pass (see verification output in commit message / final report).
+- [x] All criteria verified during implementation; user approved 2026-07-08.

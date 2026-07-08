@@ -4,7 +4,7 @@
 
 - **Task ID**: 0022
 - **Title**: SQL cost controls and MCP payload caps
-- **Status**: pending_review
+- **Status**: done
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08

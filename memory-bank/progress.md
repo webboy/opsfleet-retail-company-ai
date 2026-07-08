@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, **0020**, and **0021** **done** (user approved). Task **0022** is **pending_review**; tasks **0023–0027** are **todo**.
+Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, **0020**, **0021**, and **0022** **done** (user approved). Tasks **0023–0027** are **todo**.
 
 ## What works
 
@@ -18,7 +18,8 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - QA eval suite: 16 cases, dry-run default, judge scoring, baseline regression (task 0008, **done**).
 - **Human docs package**: README, USAGE, EVALUATION, drift-corrected architecture/technical (task 0009, **done**).
 - **Optional MCP server**: `retail-agent-mcp`, guarded `query_retail_data` + `retrieve_trios` (task 0010, **done**).
-- `pytest` **189 passed**; eval dry-run **16/16 passed**; safety subset **5/5 passed**.
+- `pytest` **192 passed**; eval dry-run **16/16 passed**; safety subset **5/5 passed**.
+- **SQL LIMIT clamping and MCP payload caps** (task 0022, **done**): explicit oversized limits clamped; MCP responses capped via `MCP_MAX_RESPONSE_ROWS`.
 - **LLM budget per-turn reset** (task 0013, **done**): `input_guard` uses `fresh_budget`; 6-turn regression test; live CLI verified.
 - **CTE support in sql_guard** (task 0012, **done**): bare CTE aliases allowed; 4 regression tests; live BQ verified.
 - **Name-flagged PII column masking** (task 0014, **done**): unformatted phones and arbitrary strings masked in PII-named columns; content-detected path unchanged.
@@ -43,7 +44,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 10. ~~`0019` Golden Bucket robust loading~~ — **done**
 11. ~~`0020` preference regex tightening~~ — **done**
 12. ~~`0021` tooling polish~~ — **done**
-13. `0022` SQL cost controls and MCP payload caps — **pending_review**
+13. ~~`0022` SQL cost controls and MCP payload caps~~ — **done**
 14. `0023` Input guard structured labels — **todo**
 15. `0024` Empty results and live eval regression — **todo**
 16. `0025` CI and eval gate hardening — **todo**
@@ -63,7 +64,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - ~~**Preference regex hijacks analysis questions**~~ — fixed in task 0020 (**done**).
 - ~~**Tooling polish**~~ — fixed in task 0021 (**done**).
 - Candidate JSONL grows without automatic pruning — curation workflow documented only.
-- ~~Explicit oversized SQL `LIMIT` values are not clamped yet; MCP query payloads are not independently row-capped~~ — fixed in task 0022 (**pending_review**).
+- ~~Explicit oversized SQL `LIMIT` values are not clamped yet; MCP query payloads are not independently row-capped~~ — fixed in task 0022 (**done**).
 - LLM guard label parser uses substring matching and can misread negated/mixed labels (task 0023).
 - Valid empty query results currently take the same retry path as failures; recorded live eval has `cancelled-order-rate` fallback (task 0024).
 - Dry-run eval is strong for orchestration but not live NL-to-SQL quality; no CI gate exists yet (task 0025).
