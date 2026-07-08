@@ -27,7 +27,7 @@ Quick overview of all tasks. Source of truth for each row is the task's `TASK.md
 | 0021 | Polish: eval --layer phantom regressions, inflated self-heal metric, stale trace fields, .env precedence | done | Engineer | 2026-07-08 |
 | 0022 | SQL cost controls and MCP payload caps | done | Engineer | 2026-07-08 |
 | 0023 | Input guard structured labels | done | Engineer | 2026-07-08 |
-| 0024 | Empty results and live eval regression | todo | Engineer | 2026-07-08 |
+| 0024 | Empty results and live eval regression | pending_review | Engineer | 2026-07-08 |
 | 0025 | CI and eval gate hardening | todo | Engineer | 2026-07-08 |
 | 0026 | Submission docs alignment | todo | Engineer | 2026-07-08 |
 | 0027 | Golden Bucket and learning-loop hardening | todo | Engineer | 2026-07-08 |

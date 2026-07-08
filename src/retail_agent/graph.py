@@ -135,7 +135,7 @@ def _route_after_execute(state: AgentState) -> Literal["report", "retry", "fallb
     attempts = state.get("sql_attempts", 0)
     max_attempts = state.get("max_sql_attempts", 3)
 
-    if state.get("query_ok") and not state.get("query_empty"):
+    if state.get("query_ok"):
         return "report"
 
     if attempts < max_attempts:

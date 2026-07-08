@@ -36,6 +36,14 @@ def query_result_from_spec(spec: dict) -> QueryResult:
     if not spec.get("ok", True):
         return QueryResult(ok=False, error=spec.get("error", "query failed"), sql=spec.get("sql", ""))
     columns = spec.get("columns") or ["value"]
-    rows = spec.get("rows") or [[1]]
+    if "rows" in spec:
+        rows = spec["rows"]
+    else:
+        rows = [[1]]
     dataframe = pd.DataFrame(rows, columns=columns)
-    return QueryResult(ok=True, dataframe=dataframe, sql=spec.get("sql", ""))
+    return QueryResult(
+        ok=True,
+        dataframe=dataframe,
+        sql=spec.get("sql", ""),
+        empty=dataframe.empty,
+    )

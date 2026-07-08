@@ -62,7 +62,7 @@ After each answer the CLI may print diagnostic lines (not part of the report):
 [retrieved trios=['monthly-revenue'] method=embedding]
 ```
 
-- **sql attempts** — how many SQL generation/execution cycles ran (up to 3 on errors or empty results).
+- **sql attempts** — how many SQL generation/execution cycles ran (up to 3 on SQL or guard errors).
 - **retrieved trios** — golden bucket examples injected into the SQL prompt.
 
 ## Personas

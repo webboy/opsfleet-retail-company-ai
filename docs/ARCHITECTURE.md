@@ -112,8 +112,8 @@ flowchart TB
 | **retrieve_trios** | Top-k similarity search over Golden Bucket question embeddings; keyword fallback if embedding API is down. |
 | **generate_sql** | LLM generates SQL using schema context + retrieved trios + conversation history. |
 | **sql_guard** | Deterministic pre-execution checks inside `BigQueryRunner.execute()`: single statement, SELECT-only, allowed tables only, LIMIT injection/clamping to `BQ_DEFAULT_LIMIT`, `maximum_bytes_billed` cap. Not a separate LangGraph node in the prototype. |
-| **execute_bq** | Graph node that calls `BigQueryRunner` (sql_guard + BigQuery client); returns rows or typed errors that trigger the self-heal loop. |
-| **self_heal** | On SQL error, guard block, or empty result, feeds error + prior SQL back to LLM; max N retries (default **3**); then graceful fallback message. Implemented as conditional routing from `execute_bq` → `generate_sql`, not a separate graph node. |
+| **execute_bq** | Graph node that calls `BigQueryRunner` (sql_guard + BigQuery client); returns rows, typed errors that trigger the self-heal loop, or valid empty results that proceed to reporting. |
+| **self_heal** | On SQL error or guard block, feeds error + prior SQL back to LLM; max N retries (default **3**); then graceful fallback message. Valid empty results do not enter this loop. Implemented as conditional routing from `execute_bq` → `generate_sql`, not a separate graph node. |
 | **pii_mask** | Deterministic masking on DataFrame columns and final report text — never trust the LLM for PII. |
 | **compose_report** | LLM composes analyst-style answer using masked rows, persona file, and user format preferences. |
 | **Golden Bucket + vector index** | Stores curated Trios; embeddings indexed for query-time retrieval; curation pipeline promotes analyst-approved candidates. |
@@ -251,7 +251,7 @@ The prototype demonstrates this pattern with a thin MCP wrapper over `bq.py` and
 3. **Grounding:** `retrieve_trios` fetches top-k expert Trios from vector index (GCS-backed).
 4. **Generation:** LLM produces SQL using schema + trios + conversation context.
 5. **Safety gate:** `sql_guard` validates SQL before any BigQuery job is submitted.
-6. **Execution:** BigQuery returns rows; errors trigger self-heal loop (bounded).
+6. **Execution:** BigQuery returns rows or a valid empty result; SQL/guard errors trigger the self-heal loop (bounded).
 7. **PII:** `pii_mask` scrubs DataFrame and final text deterministically.
 8. **Composition:** LLM writes report using persona + user prefs; offer to save.
 9. **Egress:** Response to client; structured observability event emitted per node.

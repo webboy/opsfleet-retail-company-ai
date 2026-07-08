@@ -83,7 +83,7 @@ A single analysis turn proceeds as follows:
 2. **input_guard** classifies intent. Malicious/off-topic → polite refusal (no BigQuery, minimal LLM).
 3. **retrieve_trios** embeds the question, searches the Golden Bucket index, returns top-k Trios.
 4. **generate_sql** calls the LLM with: table schemas, retrieved trios, conversation history, and safety instructions.
-5. **execute_bq** runs `sql_guard` (inside `BigQueryRunner`) then submits the job. Guard violations, syntax errors, permission errors, or empty results → **self_heal** loop (feed error + prior SQL to LLM, retry up to N times, default **3**).
+5. **execute_bq** runs `sql_guard` (inside `BigQueryRunner`) then submits the job. Guard violations, syntax errors, and permission errors → **self_heal** loop (feed error + prior SQL to LLM, retry up to N times, default **3**). Valid empty result sets are treated as successful queries and go straight to report composition.
 6. **pii_mask** scrubs email/phone columns in the DataFrame.
 7. **compose_report** calls the LLM with masked rows, active persona, and user format preference.
 8. **output_mask** regex-sweeps the final report text for residual PII.
@@ -102,7 +102,7 @@ Report-management turns skip steps 3–8 and route through **reports_router** (s
 | **LLM rate limit (429)** | HTTP status from provider | Exponential backoff; optional fallback provider; if exhausted → graceful "try again shortly" | Per-turn LLM call budget |
 | **LLM outage (5xx)** | Provider errors | Retry; fallback provider; graceful apology if all fail | Same budget |
 | **Bad SQL syntax** | BigQuery error message | Self-heal: LLM regenerates SQL with error context (max N retries) | Retries bounded; bytes cap on each attempt |
-| **Empty result set** | Zero rows returned | Self-heal: LLM revises query (e.g. wrong filter/date); then fallback suggestion | Same |
+| **Empty result set** | Zero rows returned | Report composition with an empty sample; the LLM explains that no rows matched | Same |
 | **sql_guard violation** | Static linter in `BigQueryRunner` | No BigQuery job; error fed into self-heal retry loop (up to 3 attempts), then graceful fallback | Zero query cost per blocked attempt |
 | **BigQuery timeout / quota** | Job API error | User-facing retry suggestion; log error class | `maximum_bytes_billed` prevents runaway scans |
 | **Embedding API down** | Embed call failure | Keyword overlap retrieval over local trios | Degraded but functional |

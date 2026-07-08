@@ -96,6 +96,62 @@ def test_self_heal_retries_after_query_error(settings):
     assert llm.calls == 3
 
 
+def test_valid_empty_result_composes_report_without_retry(settings):
+    llm = ScriptLLM([f"```sql\n{GOOD_SQL}\n```", "No matching orders in that period."])
+    bq = FakeBQRunner(
+        [QueryResult(ok=True, dataframe=pd.DataFrame(), sql=GOOD_SQL, empty=True)]
+    )
+    deps = AgentDeps(settings=settings, llm=llm, bq_runner=bq, max_sql_attempts=3)
+
+    result = _run_turn(deps, "Show orders from Antarctica")
+
+    assert result["status"] == "done"
+    assert result["query_ok"] is True
+    assert result["query_empty"] is True
+    assert result.get("last_error") is None
+    assert "No matching orders in that period." in result["report"]
+    assert bq.calls == 1
+    assert llm.calls == 2
+
+
+def test_cancelled_rate_recovers_after_failed_sql_attempt(settings):
+    cancelled_sql = (
+        "SELECT COUNTIF(status = 'Cancelled') / COUNT(*) AS cancelled_rate, "
+        "COUNTIF(u.email IS NOT NULL) AS email_count "
+        "FROM `bigquery-public-data.thelook_ecommerce.orders` o "
+        "JOIN `bigquery-public-data.thelook_ecommerce.users` u ON o.user_id = u.id"
+    )
+    bad_sql = "SELECT bad FROM `bigquery-public-data.thelook_ecommerce.orders`"
+
+    llm = ScriptLLM(
+        [
+            f"```sql\n{bad_sql}\n```",
+            f"```sql\n{cancelled_sql}\n```",
+            "Cancelled share is 4.8%.",
+        ]
+    )
+    bq = FakeBQRunner(
+        [
+            QueryResult(ok=False, error="Unrecognized name: bad", sql=bad_sql),
+            QueryResult(
+                ok=True,
+                dataframe=pd.DataFrame({"cancelled_rate": [0.048], "email_count": [1200]}),
+                sql=cancelled_sql,
+            ),
+        ]
+    )
+    deps = AgentDeps(settings=settings, llm=llm, bq_runner=bq, max_sql_attempts=3)
+
+    result = _run_turn(deps, "What share of orders are cancelled?")
+
+    assert result["status"] == "done"
+    assert result["query_ok"] is True
+    assert result.get("query_empty") is False
+    assert "4.8" in result["report"]
+    assert bq.calls == 2
+    assert llm.calls == 3
+
+
 def test_self_heal_exhaustion_returns_fallback(settings):
     llm = ScriptLLM([f"```sql\n{BAD_SQL}\n```"] * 3)
     bq = FakeBQRunner(

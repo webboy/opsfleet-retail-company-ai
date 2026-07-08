@@ -29,7 +29,7 @@ The `tests/` directory covers deterministic logic without live APIs:
 - SQL guard (`sql_guard`) — SELECT-only, table whitelist, LIMIT injection/clamping
 - PII masking — column detection and output regex
 - Input guard — injection/off-topic classification with exact structured LLM label parsing
-- Graph routing — self-heal retries, delete interrupt, preferences
+- Graph routing — self-heal retries on SQL/guard failures, empty-result reporting, delete interrupt, preferences
 - Golden retrieval — embedding and keyword fallback
 - Eval assertion engine and baseline comparison
 
@@ -61,7 +61,9 @@ Capability cases use **property assertions**, not exact numeric values — the p
 | **Dry-run** | (default) | `ScriptLLM` with canned SQL/report per case | `FakeBQRunner` with fixture rows | CI, offline verification, regression |
 | **Live** | `--live` | Real Gemini (or configured provider) | Real BigQuery | Pre-deploy gate with credentials |
 
-Dry-run is the **default** so reviewers can verify the suite without API keys.
+Dry-run is the **default** so reviewers can verify the suite without API keys. It is deterministic: scripted LLM/BQ fixtures replay the same outcomes on every run and are the CI regression gate.
+
+Live mode (`--live`) is optional for pre-deploy checks with real credentials. Use `--no-compare` when running live so baseline comparison does not fail on model nondeterminism. Failed cases in saved JSONL runs now include a `diagnostics` object with `status`, `sql`, `sql_attempts`, `last_error`, `query_ok`, `query_empty`, and `retrieved_trio_ids` to explain regressions without a separate trace log.
 
 ### CLI flags
 
@@ -102,7 +104,7 @@ Judge runs only on capability layer cases where `judge: true` in `cases.yaml`.
 | Failed | 0 |
 | Avg judge score (capability) | 4.0 |
 
-Each line records `case_id`, `layer`, `passed`, and `judge_score` (capability only).
+Each line records `case_id`, `layer`, `passed`, and `judge_score` (capability only). Failed runs may also include a `diagnostics` object with safe query/routing fields for root-cause analysis.
 
 ### Regression check
 

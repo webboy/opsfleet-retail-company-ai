@@ -22,7 +22,7 @@ def execute_bq(state: AgentState, deps: AgentDeps) -> dict:
         return {
             "query_ok": True,
             "query_empty": True,
-            "last_error": "Query returned no rows.",
+            "last_error": None,
             "result_preview": "(empty result set)",
         }
 

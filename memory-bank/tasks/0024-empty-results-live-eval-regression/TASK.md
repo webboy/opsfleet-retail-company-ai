@@ -4,7 +4,7 @@
 
 - **Task ID**: 0024
 - **Title**: Empty results and live eval regression
-- **Status**: todo
+- **Status**: pending_review
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08
@@ -29,11 +29,11 @@ Improve self-heal behavior for valid empty results and close the recorded live e
 
 ## Acceptance criteria
 
-- [ ] Correct empty result sets do not automatically consume all SQL self-heal attempts.
-- [ ] SQL errors and invalid SQL still retry up to the configured bound.
-- [ ] `cancelled-order-rate` has a targeted regression test or eval case adjustment based on the live failure root cause.
-- [ ] Live eval instructions clearly distinguish deterministic dry-run checks from optional live checks.
-- [ ] `pytest -q` and `python -m retail_agent.evals` pass.
+- [x] Correct empty result sets do not automatically consume all SQL self-heal attempts.
+- [x] SQL errors and invalid SQL still retry up to the configured bound.
+- [x] `cancelled-order-rate` has a targeted regression test or eval case adjustment based on the live failure root cause.
+- [x] Live eval instructions clearly distinguish deterministic dry-run checks from optional live checks.
+- [x] `pytest -q` and `python -m retail_agent.evals` pass.
 - [ ] If credentials are available, `python -m retail_agent.evals --live --no-compare` is run and the result recorded in `HANDOFF.md`.
 
 ## References

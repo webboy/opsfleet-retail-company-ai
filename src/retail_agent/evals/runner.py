@@ -40,6 +40,7 @@ class CaseResult:
     judge_score: int | None = None
     judge_rationale: str = ""
     turn_id: str | None = None
+    diagnostics: dict | None = None
 
 
 @dataclass
@@ -124,8 +125,20 @@ def _summarize(results: list[CaseResult], *, mode: str) -> EvalSummary:
     )
 
 
-def _result_record(item: CaseResult) -> dict:
+def _failure_diagnostics(state: dict) -> dict:
     return {
+        "status": state.get("status"),
+        "sql": state.get("sql"),
+        "sql_attempts": state.get("sql_attempts"),
+        "last_error": state.get("last_error"),
+        "query_ok": state.get("query_ok"),
+        "query_empty": state.get("query_empty"),
+        "retrieved_trio_ids": state.get("retrieved_trio_ids") or [],
+    }
+
+
+def _result_record(item: CaseResult) -> dict:
+    record = {
         "case_id": item.case_id,
         "layer": item.layer,
         "passed": item.passed,
@@ -134,6 +147,9 @@ def _result_record(item: CaseResult) -> dict:
         "judge_rationale": item.judge_rationale,
         "turn_id": item.turn_id,
     }
+    if item.diagnostics:
+        record["diagnostics"] = item.diagnostics
+    return record
 
 
 def _load_baseline_map(path: Path) -> dict[str, dict]:
@@ -234,12 +250,17 @@ def _run_case(case: EvalCase, deps: AgentDeps) -> _InternalCaseResult:
         bq_calls=getattr(deps.bq_runner, "calls", 0),
         llm_calls=getattr(deps.llm, "calls", 0),
     )
+    diagnostics = None
+    if not assertion.passed:
+        diagnostics = _failure_diagnostics(state)
+
     return _InternalCaseResult(
         case_id=case.id,
         layer=case.layer,
         passed=assertion.passed,
         failures=assertion.failures,
         turn_id=turn_id,
+        diagnostics=diagnostics,
         state=state,
     )
 
@@ -287,12 +308,17 @@ def _run_steps_case(case: EvalCase, graph, deps: AgentDeps, config: dict, turn_i
     if not interrupted:
         deps.tracer.emit_turn_end(status=final_state.get("status"), report=final_state.get("report"))
 
+    diagnostics = None
+    if failures:
+        diagnostics = _failure_diagnostics(final_state)
+
     return _InternalCaseResult(
         case_id=case.id,
         layer=case.layer,
         passed=not failures,
         failures=failures,
         turn_id=turn_id,
+        diagnostics=diagnostics,
         state=final_state,
     )
 
