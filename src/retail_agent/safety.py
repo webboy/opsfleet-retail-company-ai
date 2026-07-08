@@ -137,20 +137,37 @@ PREFERENCE_SHOW_MARKERS = (
 )
 
 _TABLE_PREFERENCE_PATTERNS = (
-    re.compile(r"\b(?:i prefer|prefer|use)\b.*\btables?\b", re.IGNORECASE),
+    re.compile(r"\bi prefer\s+tables?\b", re.IGNORECASE),
+    re.compile(r"\bprefer\s+tables?\s+from now on\b", re.IGNORECASE),
+    re.compile(r"\btables?\s+from now on\b", re.IGNORECASE),
     re.compile(r"\btable format\b", re.IGNORECASE),
-    re.compile(r"\bformat.*\btables?\b", re.IGNORECASE),
+    re.compile(r"\bformat\b.*\b(?:as|in)\s+tables?\b", re.IGNORECASE),
+    re.compile(r"\bas a table\b", re.IGNORECASE),
+    re.compile(r"\bin table form\b", re.IGNORECASE),
 )
 
 _BULLET_PREFERENCE_PATTERNS = (
-    re.compile(r"\b(?:i prefer|prefer|use)\b.*\bbullet points?\b", re.IGNORECASE),
+    re.compile(r"\bi prefer\s+bullet points?\b", re.IGNORECASE),
+    re.compile(r"\bprefer\s+bullet points?\b.*\bfrom now on\b", re.IGNORECASE),
     re.compile(r"\bbullet points?\b.*\bfrom now on\b", re.IGNORECASE),
     re.compile(r"\bgive me bullet points\b", re.IGNORECASE),
+    re.compile(r"\buse bullet points\b.*\bfrom now on\b", re.IGNORECASE),
 )
 
 _PROSE_PREFERENCE_PATTERNS = (
-    re.compile(r"\b(?:i prefer|prefer|use)\b.*\b(?:prose|paragraphs?)\b", re.IGNORECASE),
+    re.compile(r"\bi prefer\s+(?:prose|paragraphs?)\b", re.IGNORECASE),
+    re.compile(r"\bprefer\s+(?:prose|paragraphs?)\b.*\bfrom now on\b", re.IGNORECASE),
     re.compile(r"\b(?:prose|paragraphs?)\b.*\bfrom now on\b", re.IGNORECASE),
+    re.compile(r"\buse\s+(?:prose|paragraphs?)\b.*\bfrom now on\b", re.IGNORECASE),
+)
+
+_DB_TABLE_REFERENCE_PATTERNS = (
+    re.compile(r"\b(?:which|what)\s+table\b", re.IGNORECASE),
+    re.compile(
+        r"\b(?:the\s+)?(?:orders?|order_items|products?|users?|customers?)\s+table\b",
+        re.IGNORECASE,
+    ),
+    re.compile(r"\buse\s+the\s+\w+\s+table\b", re.IGNORECASE),
 )
 
 
@@ -298,6 +315,9 @@ def parse_preference_command(question: str) -> PreferenceCommand | None:
     if lowered in PREFERENCE_SHOW_MARKERS:
         return PreferenceCommand(action="show")
 
+    if _references_database_table(text):
+        return None
+
     for pattern in _TABLE_PREFERENCE_PATTERNS:
         if pattern.search(text):
             return PreferenceCommand(action="set", output_format="table")
@@ -311,6 +331,12 @@ def parse_preference_command(question: str) -> PreferenceCommand | None:
             return PreferenceCommand(action="set", output_format="prose")
 
     return None
+
+
+def _references_database_table(text: str) -> bool:
+    """True when 'table' refers to a warehouse relation, not report formatting."""
+
+    return any(pattern.search(text) for pattern in _DB_TABLE_REFERENCE_PATTERNS)
 
 
 def parse_llm_guard_label(text: str) -> GuardRoute:

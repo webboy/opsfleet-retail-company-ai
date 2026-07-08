@@ -2,14 +2,14 @@
 
 ## Current focus
 
-Second deep-review pass (2026-07-08, strict edge-case testing) produced five new tasks **0017–0021**. Tasks **0016**, **0017**, **0018**, and **0019** are **done** (user approved 2026-07-08).
+Second deep-review pass (2026-07-08, strict edge-case testing) produced five new tasks **0017–0021**. Tasks **0016** through **0019** are **done** (user approved 2026-07-08). Task **0020** preference regex tightening is **pending_review** (implementation complete 2026-07-08).
 
 Second-pass confirmed bugs (each reproduced; details in the task folders):
 
 1. **0017 (high)** — ~~PII marker over-match~~ — **done** (user approved 2026-07-08): token-boundary matching + numeric metric exemption; live CLI verified (`Masked PII columns=[]`).
 2. **0018 (medium)** — ~~`/save` persists non-analysis output~~ — **done** (user approved 2026-07-08): `last_analysis_*` state + graph regression tests.
 3. **0019 (medium)** — ~~malformed trio file crashes CLI~~ — **done** (user approved 2026-07-08): skip-and-warn in `load_trios`.
-4. **0020 (medium)** — preference regex hijacks analysis questions like "Can I use the orders table to compute revenue?" and corrupts the stored preference.
+4. **0020 (medium)** — ~~preference regex hijacks analysis~~ — **pending_review**: formatting-intent patterns + DB-table guard.
 5. **0021 (low)** — eval `--layer` subsets exit 1 with phantom baseline regressions; `self_heal_events` inflated (counts node events, not turns); node events carry stale cross-turn SQL/trios; `.env` overrides shell env vars (`override=True`).
 
 First-pass status: ~~0012~~ ~~0013~~ ~~0014~~ ~~0015~~ ~~0016~~ ~~0017~~ ~~0018~~ ~~0019~~ — **done** (user approved 2026-07-08).
@@ -41,6 +41,7 @@ First-pass status: ~~0012~~ ~~0013~~ ~~0014~~ ~~0015~~ ~~0016~~ ~~0017~~ ~~0018~
 
 ## Recent changes
 
+- 2026-07-08: Task 0020 **pending_review** — preference detection requires formatting intent; version **0.18.0**; pytest 183, dry-run eval 16/16.
 - 2026-07-08: Task 0019 **done** (user approved) — skip malformed trio files with warning; version **0.17.0**.
 - 2026-07-08: Task 0019 **pending_review** — skip malformed trio files with warning; version **0.17.0**; pytest 175, dry-run eval 16/16.
 - 2026-07-08: Task 0018 **done** (user approved) — `/save` uses `last_analysis_*` fields; version **0.16.0**.

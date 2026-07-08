@@ -4,7 +4,7 @@
 
 - **Task ID**: 0020
 - **Title**: Preference regex hijacks analysis questions mentioning "table"
-- **Status**: todo
+- **Status**: pending_review
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08
@@ -45,9 +45,9 @@ an answer, and their stored preference is corrupted as a side effect.
 
 ## Acceptance criteria
 
-- [ ] Both reproduction sentences route to `analysis` and do not touch stored preferences.
-- [ ] Genuine preference phrases keep working: "I prefer tables from now on", "table format please", "give me bullet points from now on", "/prefs".
-- [ ] Existing preference tests green; new false-positive regression tests added.
+- [x] Both reproduction sentences route to `analysis` and do not touch stored preferences.
+- [x] Genuine preference phrases keep working: "I prefer tables from now on", "table format please", "give me bullet points from now on", "/prefs".
+- [x] Existing preference tests green; new false-positive regression tests added.
 
 ## References
 

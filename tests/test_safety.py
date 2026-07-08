@@ -12,6 +12,7 @@ from retail_agent.safety import (
     classify_input_precheck,
     mask_dataframe,
     mask_text,
+    parse_preference_command,
     refusal_message,
 )
 
@@ -62,6 +63,38 @@ def test_classify_show_preferences_command():
     result = classify_input_precheck("/prefs")
     assert result.decision == "allowed"
     assert result.route == "preferences"
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "Can I use the orders table to compute revenue?",
+        "use the users table to find top customers",
+        "which table should I use for monthly revenue?",
+    ],
+)
+def test_classify_database_table_questions_are_not_preferences(question):
+    result = classify_input_precheck(question)
+
+    assert result.route != "preferences"
+    assert parse_preference_command(question) is None
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "I prefer tables from now on",
+        "table format please",
+        "give me bullet points from now on",
+        "/prefs",
+    ],
+)
+def test_classify_genuine_preference_phrases_still_work(question):
+    result = classify_input_precheck(question)
+
+    assert result.decision == "allowed"
+    assert result.route == "preferences"
+    assert parse_preference_command(question) is not None
 
 
 def test_mask_dataframe_by_column_name():

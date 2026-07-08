@@ -106,6 +106,39 @@ def test_bob_preferences_unaffected_by_alice(deps):
     assert bob_prefs is None
 
 
+def test_database_table_question_does_not_overwrite_preferences(deps):
+    deps.report_store.set_output_format("alice", "bullets")
+    llm = ScriptLLM([f"```sql\n{GOOD_SQL}\n```", "Revenue summary"])
+    bq = FakeBQRunner(
+        [QueryResult(ok=True, dataframe=pd.DataFrame({"order_id": [1]}), sql=GOOD_SQL)]
+    )
+    graph = compile_graph(
+        AgentDeps(
+            settings=deps.settings,
+            llm=llm,
+            bq_runner=bq,
+            report_store=deps.report_store,
+        )
+    )
+
+    result = graph.invoke(
+        {
+            "messages": [
+                HumanMessage(content="Can I use the orders table to compute revenue?")
+            ],
+            "user_id": "alice",
+            "question": "Can I use the orders table to compute revenue?",
+        },
+        _thread_config("table-analysis-not-pref"),
+    )
+
+    prefs = deps.report_store.get_preferences("alice")
+    assert prefs is not None
+    assert prefs.output_format == "bullets"
+    assert result["guard_route"] == "analysis"
+    assert "Saved your preference" not in result["report"]
+
+
 def test_compose_report_injects_table_preference(settings):
     llm = CapturingLLM()
     store = ReportStore(db_path=settings.reports_db_path)
