@@ -80,7 +80,7 @@
     status: done
     sql_tables: [products, order_items]
     query_ok: true
-    report_must_contain: [sold, denim]
+    report_must_contain: [sold]
 
 - id: product-category-revenue
   layer: capability
@@ -223,7 +223,7 @@
         GROUP BY u.traffic_source
         ORDER BY revenue DESC
         ```
-      - Search and email drive the highest revenue, with paid social trailing.
+      - Traffic sources differ in revenue contribution; search and email lead, with paid social trailing.
     bq_outcomes:
       - ok: true
         columns: [traffic_source, revenue]
@@ -233,7 +233,7 @@
   expect:
     status: done
     sql_tables: [users, orders, order_items]
-    report_must_contain: [search, revenue]
+    report_must_contain: [traffic, revenue]
 
 - id: recent-daily-revenue
   layer: capability

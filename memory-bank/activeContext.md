@@ -2,7 +2,7 @@
 
 ## Current focus
 
-Full-code review (2026-07-08) against the assignment PDF produced five new bug-fix tasks **0012–0016**. Tasks **0010**–**0015** are **done**. Bug-fix task **0016** remains **todo**.
+Full-code review bug-fix tasks **0012–0016** are complete or in final review. Task **0016** polish is **pending_review**.
 
 Review-confirmed bugs (each reproduced; details in the task folders):
 
@@ -10,7 +10,7 @@ Review-confirmed bugs (each reproduced; details in the task folders):
 2. ~~**0013**~~ — per-turn LLM budget reset — **done** (user approved 2026-07-08).
 3. ~~**0014**~~ — name-flagged PII columns leak unformatted values — **done** (user approved 2026-07-08).
 4. ~~**0015**~~ — connection-level LLM outages bypass retry/fallback — **done** (user approved 2026-07-08).
-5. **0016** — CLI prints stale `[sql attempts]`/`[retrieved trios]` after save/list/prefs turns; docs test-count drift (120/131 vs actual 132); brittle live eval token (`denim`).
+5. **0016** — stale CLI diagnostics, docs test-count drift, brittle live eval — **pending_review**.
 
 ## How work is organized
 
@@ -39,6 +39,8 @@ Review-confirmed bugs (each reproduced; details in the task folders):
 
 ## Recent changes
 
+- 2026-07-08: Task 0016 **pending_review** — CLI diagnostics gated to analysis turns; eval/docs polish; version **0.14.0**.
+- 2026-07-08: Task 0015 **done** (user approved) — connection-level LLM outage classification + immediate fallback; live Ollama CLI verified; version **0.13.0**.
 - 2026-07-08: Task 0015 **pending_review** — connection-level LLM outage classification + immediate fallback; version **0.13.0**.
 - 2026-07-08: Task 0014 **done** (user approved) — strict name-flagged PII column masking; version **0.12.0**.
 - 2026-07-08: Task 0014 **pending_review** — strict name-flagged PII column masking; unformatted phones masked; version **0.12.0**.

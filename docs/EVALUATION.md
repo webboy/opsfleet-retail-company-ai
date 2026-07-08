@@ -38,7 +38,7 @@ pytest -q                    # quiet summary
 pytest tests/test_bq.py -v   # single module
 ```
 
-As of v0.8.0 the suite contains **120 tests**, all passing in CI-style dry runs.
+Run `pytest -q` for the current passing count; the summary line is the source of truth and is not hard-coded here to avoid documentation drift.
 
 ## QA eval suite architecture
 
