@@ -31,4 +31,4 @@ Hardened LLM-assisted input guard classification by replacing substring label pa
 
 ## Acceptance criteria check
 
-- [x] All criteria verified during implementation; awaiting user approval for `done`.
+- [x] All criteria verified during implementation; user approved 2026-07-08.

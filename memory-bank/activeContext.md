@@ -2,12 +2,12 @@
 
 ## Current focus
 
-Full assignment review pass (2026-07-08, reviewer stance against `docs/AI Technical Assignment - Retail Company.pdf`) produced new backlog tasks **0022–0027**. Tasks **0016** through **0022** are **done** (user approved 2026-07-08); task **0023** is **pending_review**; tasks **0024–0027** are **todo**.
+Full assignment review pass (2026-07-08, reviewer stance against `docs/AI Technical Assignment - Retail Company.pdf`) produced new backlog tasks **0022–0027**. Tasks **0016** through **0023** are **done** (user approved 2026-07-08); tasks **0024–0027** are **todo**.
 
 Review backlog (created 2026-07-08):
 
 1. **0022 (high)** — ~~SQL cost controls and MCP payload caps~~ — **done** (user approved 2026-07-08): clamp oversized explicit `LIMIT`, cap MCP rows.
-2. **0023 (high)** — ~~input guard structured labels~~ — **pending_review**: replace brittle substring label parsing.
+2. **0023 (high)** — ~~input guard structured labels~~ — **done** (user approved 2026-07-08): replace brittle substring label parsing.
 3. **0024 (high)** — empty results and live eval regression: avoid full retry loops on valid empty results; investigate `cancelled-order-rate` live fallback.
 4. **0025 (medium/high)** — CI and eval gate hardening: add enforceable local/CI gate and clarify dry-run vs live eval.
 5. **0026 (medium)** — submission docs alignment: remove dataset/docs overclaims and improve reviewer-facing capability/schema/eval docs.
@@ -52,6 +52,7 @@ First-pass status: ~~0012~~ ~~0013~~ ~~0014~~ ~~0015~~ ~~0016~~ ~~0017~~ ~~0018~
 
 ## Recent changes
 
+- 2026-07-08: Task 0023 **done** (user approved) — exact LLM guard label parsing + regressions; version **0.21.0**.
 - 2026-07-08: Task 0023 **pending_review** — exact LLM guard label parsing + regressions; version **0.21.0**.
 - 2026-07-08: Task 0022 **done** (user approved) — SQL LIMIT clamping + MCP response row cap (`MCP_MAX_RESPONSE_ROWS`); version **0.20.0**.
 - 2026-07-08: Task 0022 **pending_review** — SQL LIMIT clamping + MCP response row cap (`MCP_MAX_RESPONSE_ROWS`); version **0.20.0**.
