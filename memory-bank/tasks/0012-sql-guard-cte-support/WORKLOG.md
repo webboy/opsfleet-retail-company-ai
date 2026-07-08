@@ -9,3 +9,4 @@
 - Implemented `_collect_cte_names` and updated `_table_allowed` in `bq.py`.
 - Added 4 CTE tests to `tests/test_sql_guard.py`.
 - Verification: pytest **137 passed**; eval **16/16**; live BQ CTE sanity returns 5 rows; version **0.11.0**.
+- User approved 2026-07-08.

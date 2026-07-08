@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009, **0011**, and **0013** **done** (user approved). **0010** MCP **pending_review**. **0012** CTE fix **pending_review**. Bug-fix tasks **0014–0016** **todo**.
+Tasks 0001–0009, **0011**, **0012**, and **0013** **done** (user approved). **0010** MCP **pending_review**. Bug-fix tasks **0014–0016** **todo**.
 
 ## What works
 
@@ -20,13 +20,13 @@ Tasks 0001–0009, **0011**, and **0013** **done** (user approved). **0010** MCP
 - **Optional MCP server**: `retail-agent-mcp`, guarded `query_retail_data` + `retrieve_trios` (task 0010, **pending_review**).
 - `pytest` **137 passed**; eval dry-run **16/16 passed**; live eval (Ollama) **14/16** on 2026-07-08 (failures documented in task 0016).
 - **LLM budget per-turn reset** (task 0013, **done**): `input_guard` uses `fresh_budget`; 6-turn regression test; live CLI verified.
-- **CTE support in sql_guard** (task 0012, **pending_review**): bare CTE aliases allowed; 4 regression tests; live BQ verified.
+- **CTE support in sql_guard** (task 0012, **done**): bare CTE aliases allowed; 4 regression tests; live BQ verified.
 
 ## What's left to build
 
 1. ~~`0001`–`0009`, `0011`~~ — **done**
 2. `0010` *(optional)* MCP server — **pending_review** (awaiting user approval)
-3. ~~`0012` CTE sql_guard~~ — **pending_review**
+3. ~~`0012` CTE sql_guard~~ — **done**
 4. `0014`–`0016` bug fixes — **todo**
 5. ~~`0013` LLM budget reset~~ — **done**
 

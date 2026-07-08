@@ -4,7 +4,7 @@
 
 - **Task ID**: 0012
 - **Title**: Fix sql_guard: allow CTE (WITH) queries
-- **Status**: pending_review
+- **Status**: done
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08
