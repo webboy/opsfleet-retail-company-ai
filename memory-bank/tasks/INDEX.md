@@ -30,4 +30,4 @@ Quick overview of all tasks. Source of truth for each row is the task's `TASK.md
 | 0024 | Empty results and live eval regression | done | Engineer | 2026-07-08 |
 | 0025 | CI and eval gate hardening | done | Engineer | 2026-07-08 |
 | 0026 | Submission docs alignment | done | Engineer | 2026-07-08 |
-| 0027 | Golden Bucket and learning-loop hardening | todo | Engineer | 2026-07-08 |
+| 0027 | Golden Bucket and learning-loop hardening | pending_review | Engineer | 2026-07-08 |

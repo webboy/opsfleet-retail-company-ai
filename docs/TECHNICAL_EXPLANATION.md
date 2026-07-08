@@ -36,7 +36,7 @@ This document explains **why** the system is built the way it is, how data flows
 
 **Production:** Trios stored as objects in **Google Cloud Storage**; question embeddings indexed in **Vertex AI Vector Search** (or equivalent managed vector DB). Analyst curation pipeline promotes approved candidates.
 
-**Prototype:** Trios as YAML/Markdown files under `golden_bucket/` (one file per trio with YAML front-matter: `id`, `question`, `sql`, `tags`, `report`); question embeddings via Gemini (`gemini-embedding-001` by default, overridable with `RETAIL_AGENT_EMBEDDING_MODEL`) with in-memory cosine similarity; **keyword-overlap fallback** when the embedding API is unavailable. Successful turns append to `golden_bucket/candidates/candidates.jsonl`. Override the bucket location with `GOLDEN_BUCKET_DIR` if needed.
+**Prototype:** Trios as YAML/Markdown files under `golden_bucket/` (one file per trio with YAML front-matter: `id`, `question`, `sql`, `tags`, `report`); question embeddings via Gemini (`gemini-embedding-001` by default, overridable with `RETAIL_AGENT_EMBEDDING_MODEL`) with in-memory cosine similarity; **keyword-overlap fallback** when the embedding API is unavailable — if no trio shares tokens with the question, retrieval returns no examples instead of arbitrary top-k matches. Embedding retrieval is best-effort and separate from the per-turn LLM generation/composition call budget. Complete successful analysis turns append to `golden_bucket/candidates/candidates.jsonl`. Override the bucket location with `GOLDEN_BUCKET_DIR` if needed.
 
 **Reasoning:** Vector search scales to thousands of trios with sub-second retrieval. Local files keep the prototype zero-ops while preserving the same retrieval → inject → generate SQL flow.
 
@@ -87,7 +87,7 @@ A single analysis turn proceeds as follows:
 6. **pii_mask** scrubs email/phone columns in the DataFrame.
 7. **compose_report** calls the LLM with masked rows, active persona, and user format preference.
 8. **output_mask** regex-sweeps the final report text for residual PII.
-9. **capture_candidate** automatically appends a candidate trio when the turn completes with `status=done`, SQL, and a report (analysis path only).
+9. **capture_candidate** automatically appends a candidate trio when the turn completes with `status=done`, `report_complete=True`, SQL, and a fully composed report (analysis path only).
 10. **Response** returned to client; optional prompt to save report.
 11. **Observability** emits one structured event per node (latency, SQL text, error class, retry count, mask hits).
 
@@ -164,7 +164,7 @@ See [Usage Guide](./USAGE.md) for all CLI flags and commands.
 
 **Query-time retrieval:** Embed the user question → vector search top-k Trios → inject as few-shot examples in the SQL-generation prompt. Keyword fallback if embeddings fail.
 
-**Update over time:** Successful SQL analysis turns automatically write **candidate** trios (question, SQL, report) to a review queue — not directly into golden. Analysts approve, edit, or reject. Approved trios are written to GCS, re-embedded, and indexed. Rejected candidates are archived. Schema, chitchat, and refused turns are not captured.
+**Update over time:** Successful SQL analysis turns with fully composed reports automatically write **candidate** trios (question, SQL, report) to a review queue — not directly into golden. Analysts approve, edit, or reject. Approved trios are written to GCS, re-embedded, and indexed. Rejected candidates are archived. Budget-exhausted compose messages, fallback turns, schema answers, chitchat, and refused turns are not captured.
 
 **Prototype:** Local seed trios + `golden_bucket/candidates/` capture; curation UI documented only. **Production:** GCS + Vertex AI Vector Search + analyst review workflow.
 
@@ -205,7 +205,7 @@ Explicit PII requests (e.g. top buyers with emails) may still run as analysis, b
 
 **4a — User level:** Per-manager format preferences (`table`, `bullets`, `prose`) are detected deterministically from phrases like "I prefer tables" or `/prefs`, persisted in the shared SQLite store (`preferences` table, keyed by `user_id`), and injected into every `compose_report` system prompt. Survives CLI restart; scoped per user.
 
-**4b — System level:** Successful SQL analysis turns automatically capture candidate trios (see Requirement 1). Interaction logs feed eval baselines and analyst review. Over time, approved trios improve retrieval quality for all users.
+**4b — System level:** Successful SQL analysis turns with complete reports automatically capture candidate trios (see Requirement 1). Interaction logs feed eval baselines and analyst review. Over time, approved trios improve retrieval quality for all users.
 
 **Prototype:** SQLite preferences in `src/retail_agent/stores.py` + local candidate capture. **Production:** Managed DB + GCS curation pipeline.
 

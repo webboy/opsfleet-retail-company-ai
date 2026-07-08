@@ -263,7 +263,7 @@ def _retrieve_by_keywords(question: str, trios: list[Trio], k: int) -> list[Trio
         for trio in trios
     ]
     scored.sort(key=lambda item: item[0], reverse=True)
-    return [trio for score, trio in scored[:k] if score > 0] or [trio for _, trio in scored[:k]]
+    return [trio for score, trio in scored[:k] if score > 0]
 
 
 def _keyword_score(left: str, right: str) -> float:

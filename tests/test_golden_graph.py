@@ -131,3 +131,35 @@ def test_successful_graph_turn_captures_candidate(bucket_dir: Path):
     assert record["question"] == "Who are our top customers by total spend?"
     assert record["report"] == "Top customers report"
     assert record["retrieved_trio_ids"] == ["top-customers-spend"]
+
+
+def test_compose_budget_exhaustion_skips_candidate_capture(bucket_dir: Path):
+    llm = ScriptLLM([f"```sql\n{GOOD_SQL}\n```"])
+    bq = FakeBQRunner(
+        [QueryResult(ok=True, dataframe=pd.DataFrame({"order_id": [1]}), sql=GOOD_SQL)]
+    )
+    deps = AgentDeps(
+        settings=make_settings(),
+        llm=llm,
+        bq_runner=bq,
+        trio_store=_trio_store(bucket_dir),
+        max_llm_calls=1,
+    )
+    graph = compile_graph(deps)
+
+    result = graph.invoke(
+        {
+            "messages": [HumanMessage(content="Who are our top customers by total spend?")],
+            "user_id": "alice",
+            "question": "Who are our top customers by total spend?",
+        },
+        {"configurable": {"thread_id": "golden-no-capture-budget"}},
+    )
+
+    assert result["status"] == "done"
+    assert result.get("report_complete") is False
+    assert result.get("candidate_captured") is not True
+    assert "couldn't finish composing the report" in result["report"].lower()
+
+    candidate_path = bucket_dir / "candidates" / "candidates.jsonl"
+    assert not candidate_path.exists()

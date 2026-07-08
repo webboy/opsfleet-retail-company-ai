@@ -33,6 +33,7 @@ class AgentState(TypedDict, total=False):
     query_empty: bool
     result_preview: str | None
     report: str | None
+    report_complete: bool
     last_analysis_report: str | None
     last_analysis_question: str | None
     last_analysis_sql: str | None

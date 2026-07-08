@@ -4,7 +4,7 @@
 
 - **Task ID**: 0027
 - **Title**: Golden Bucket and learning-loop hardening
-- **Status**: todo
+- **Status**: pending_review
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08
@@ -30,12 +30,12 @@ Reduce misleading Golden Bucket retrieval and prevent low-quality candidate trio
 
 ## Acceptance criteria
 
-- [ ] Keyword fallback returns an empty retrieval result when all candidate scores are zero.
-- [ ] SQL generation prompt handles no retrieved trios cleanly.
-- [ ] Candidate capture is skipped for budget-exhausted, fallback, or incomplete report states.
-- [ ] Tests cover zero-overlap retrieval and capture gating.
-- [ ] Docs distinguish automatic candidate capture from manual promotion into the Golden Bucket.
-- [ ] `pytest -q` and `python -m retail_agent.evals` pass.
+- [x] Keyword fallback returns an empty retrieval result when all candidate scores are zero.
+- [x] SQL generation prompt handles no retrieved trios cleanly.
+- [x] Candidate capture is skipped for budget-exhausted, fallback, or incomplete report states.
+- [x] Tests cover zero-overlap retrieval and capture gating.
+- [x] Docs distinguish automatic candidate capture from manual promotion into the Golden Bucket.
+- [x] `pytest -q` and `python -m retail_agent.evals` pass.
 
 ## References
 

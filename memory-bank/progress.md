@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, **0020**, **0021**, **0022**, **0023**, **0024**, **0025**, and **0026** **done** (user approved). Task **0027** is **todo**.
+Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, **0020**, **0021**, **0022**, **0023**, **0024**, **0025**, and **0026** **done** (user approved). Task **0027** is **pending_review**.
 
 ## What works
 
@@ -33,6 +33,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - **Preference formatting intent** (task 0020, **done**): DB-table analysis questions no longer hijack preference routing.
 - **CI gate** (task 0025, **done**): GitHub Actions runs `pytest -q` + dry-run eval; docs clarify dry-run vs live.
 - **Submission docs alignment** (task 0026, **done**): `docs/SCHEMA.md`, supported-question matrix, dataset boundaries, eval/setup drift fixes.
+- **Golden Bucket hardening** (task 0027, **pending_review**): zero-overlap keyword fallback, `report_complete` capture gating; version **0.23.0**.
 
 1. ~~`0001`–`0009`, `0011`~~ — **done**
 2. ~~`0010` *(optional)* MCP server~~ — **done**
@@ -51,7 +52,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 15. ~~`0024` Empty results and live eval regression~~ — **done**
 16. ~~`0025` CI and eval gate hardening~~ — **done**
 17. ~~`0026` Submission docs alignment~~ — **done**
-18. `0027` Golden Bucket and learning-loop hardening — **todo**
+18. `0027` Golden Bucket and learning-loop hardening — **pending_review**
 
 ## Known issues
 
@@ -71,11 +72,11 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - ~~Valid empty query results currently take the same retry path as failures~~ — fixed in task 0024 (**done**).
 - ~~Dry-run eval is strong for orchestration but not live NL-to-SQL quality; no CI gate exists yet~~ — fixed in task 0025 (**done**): `.github/workflows/ci.yml`.
 - ~~Human docs need final assignment/dataset alignment to remove overclaims and clarify schema/eval/setup details~~ — fixed in task 0026 (**done**): `docs/SCHEMA.md` + README/docs drift fixes.
-- Golden Bucket keyword fallback can inject arbitrary no-overlap trios; incomplete reports can be captured as candidates (task 0027).
+- **Golden Bucket hardening** (task 0027, **pending_review**): zero-overlap keyword fallback, `report_complete` capture gating; version **0.23.0**.
 - Preference phrase detection is deterministic and may miss unusual phrasing.
 - Live eval gate requires LLM + BigQuery credentials; dry-run is CI-default.
 - llama3.2 (local) SQL quality: complex questions (e.g. cancelled-order share) can exhaust 3 self-heal attempts; Gemini fallback or a larger local model handles them.
 
 ## Version
 
-- Project version **0.22.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (task 0024 empty-result routing).
+- Project version **0.23.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (task 0027 Golden Bucket hardening).

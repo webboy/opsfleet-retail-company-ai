@@ -69,6 +69,12 @@ def compose_report(state: AgentState, deps: AgentDeps) -> dict:
             "I retrieved the data but couldn't finish composing the report within the "
             "LLM call limit for this turn. Please try a simpler question."
         )
+        return {
+            "report": report,
+            "status": "done",
+            "report_complete": False,
+            "llm_budget": budget.to_dict(),
+        }
     except Exception as exc:
         if is_llm_unavailable_error(exc):
             if is_quota_exhausted_error(exc):
@@ -89,6 +95,7 @@ def compose_report(state: AgentState, deps: AgentDeps) -> dict:
     return {
         "report": report,
         "status": "done",
+        "report_complete": True,
         "llm_budget": budget.to_dict(),
     }
 

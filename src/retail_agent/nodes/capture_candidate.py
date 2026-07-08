@@ -14,6 +14,9 @@ def capture_candidate(state: AgentState, deps: AgentDeps) -> dict:
     if state.get("status") != "done":
         return {}
 
+    if not state.get("report_complete"):
+        return {}
+
     question = state.get("question") or ""
     sql = state.get("sql") or ""
     report = state.get("report") or ""

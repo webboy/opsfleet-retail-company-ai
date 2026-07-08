@@ -109,7 +109,7 @@ flowchart TB
 | **LangGraph Orchestrator** | Explicit state machine: nodes, conditional edges (self-heal loop), `interrupt()` for delete confirmation, checkpointer for conversation memory. |
 | **input_guard** | Classifies turns: analysis question, report management, off-topic, malicious (injection, PII fishing). Refusals exit early without BigQuery cost. |
 | **reports_router** | Save, list, delete saved reports. Delete resolves candidates scoped to `owner = current_user`, lists exact matches, then pauses for confirmation. |
-| **retrieve_trios** | Top-k similarity search over Golden Bucket question embeddings; keyword fallback if embedding API is down. |
+| **retrieve_trios** | Top-k similarity search over Golden Bucket question embeddings; keyword-overlap fallback when embedding API is down (returns no trios when there is zero overlap) |
 | **generate_sql** | LLM generates SQL using schema context + retrieved trios + conversation history. |
 | **sql_guard** | Deterministic pre-execution checks inside `BigQueryRunner.execute()`: single statement, SELECT-only, allowed tables only, LIMIT injection/clamping to `BQ_DEFAULT_LIMIT`, `maximum_bytes_billed` cap. Not a separate LangGraph node in the prototype. |
 | **execute_bq** | Graph node that calls `BigQueryRunner` (sql_guard + BigQuery client); returns rows, typed errors that trigger the self-heal loop, or valid empty results that proceed to reporting. |
@@ -188,7 +188,7 @@ flowchart LR
 
 **Query-time retrieval:** When a manager asks a question, the system embeds the question, retrieves the top-k most similar curated Trios from the vector index, and injects them as few-shot examples into the SQL-generation prompt. This teaches the model how analysts previously interpreted similar questions.
 
-**Update over time:** After a successful **SQL analysis turn** (`status=done` with question, SQL, and report), the graph automatically captures a **candidate trio** to a review queue — not directly into golden. Data analysts curate candidates: approve (promote to golden, re-index), edit-then-approve, or reject. Schema answers, refusals, and chitchat turns are not captured.
+**Update over time:** After a successful **SQL analysis turn** with a fully composed report (`status=done`, `report_complete=True`, question, SQL, and report), the graph automatically captures a **candidate trio** to a review queue — not directly into golden. Budget-exhausted compose messages, fallback turns, schema answers, refusals, and chitchat are not captured. Data analysts curate candidates: approve (promote to golden, re-index), edit-then-approve, or reject.
 
 **Prototype vs production:** The prototype stores seed trios as local files, embeds at startup, and appends candidates to a local folder/JSONL. The production pipeline uses GCS, Vertex AI Vector Search, and an analyst review UI or ticket queue.
 
@@ -260,7 +260,7 @@ The prototype demonstrates this pattern with a thin MCP wrapper over `bq.py` and
 7. **PII:** `pii_mask` scrubs DataFrame and final text deterministically.
 8. **Composition:** LLM writes report using persona + user prefs; offer to save.
 9. **Egress:** Response to client; structured observability event emitted per node.
-10. **Learning:** Successful SQL analysis turns automatically capture candidate trios for analyst curation.
+10. **Learning:** Successful SQL analysis turns with complete reports automatically capture candidate trios for analyst curation.
 
 ## Security and compliance notes
 

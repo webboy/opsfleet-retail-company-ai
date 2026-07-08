@@ -124,7 +124,7 @@ Malformed trio files (missing required keys, invalid YAML, or missing front matt
 
 ### Candidate capture
 
-After a successful **SQL analysis turn** (`status=done` with question, SQL, and report), the graph **automatically** appends a candidate to `golden_bucket/candidates/candidates.jsonl`. This is not user-controlled — schema answers, refusals, and chitchat are not captured. Promote approved candidates into new seed files manually (prototype has no analyst UI).
+After a successful **SQL analysis turn** with a fully composed report (`status=done`, `report_complete=True`, question, SQL, and report), the graph **automatically** appends a candidate to `golden_bucket/candidates/candidates.jsonl`. This is not user-controlled — budget-exhausted compose messages, fallback turns, schema answers, refusals, and chitchat are not captured. Promote approved candidates into new seed files manually (prototype has no analyst UI).
 
 ### Custom bucket path
 
