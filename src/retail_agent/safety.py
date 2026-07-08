@@ -351,7 +351,7 @@ def mask_dataframe(df: pd.DataFrame) -> MaskDataframeResult:
 
     for column in masked.columns:
         series = masked[column]
-        name_flagged = _column_is_pii(column)
+        name_flagged = _column_is_pii(column) and not pd.api.types.is_numeric_dtype(series.dtype)
         content_flagged = not name_flagged and _series_contains_pii(series)
         if name_flagged or content_flagged:
             masked_columns.append(str(column))
@@ -402,8 +402,35 @@ def append_pii_policy_note(report: str, *, note_required: bool) -> str:
 
 
 def _column_is_pii(column: object) -> bool:
-    name = str(column).lower()
-    return any(marker in name for marker in PII_COLUMN_MARKERS)
+    """True when a PII marker appears as a whole token in the column name."""
+
+    tokens = _column_name_tokens(str(column))
+    if not tokens:
+        return False
+
+    token_set = set(tokens)
+    for marker in PII_COLUMN_MARKERS:
+        if marker in token_set:
+            return True
+        if marker == "email" and {"e", "mail"}.issubset(token_set):
+            return True
+    return False
+
+
+def _column_name_tokens(name: str) -> list[str]:
+    """Split column names into lowercase tokens (snake_case and camelCase)."""
+
+    normalized = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", name)
+    normalized = normalized.replace("-", "_")
+    parts = re.split(r"[^a-zA-Z0-9]+", normalized)
+    tokens: list[str] = []
+    for part in parts:
+        if not part:
+            continue
+        for sub in part.split("_"):
+            if sub:
+                tokens.append(sub.lower())
+    return tokens
 
 
 def _series_contains_pii(series: pd.Series, *, sample_size: int = 25) -> bool:

@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, and **0016** **done** (user approved). Second deep-review pass (2026-07-08) created bug-fix tasks **0017–0021** — all **todo**.
+Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, and **0016** **done** (user approved). Second deep-review pass (2026-07-08) created bug-fix tasks **0017–0021**; **0017** is **pending_review**, **0018–0021** remain **todo**.
 
 ## What works
 
@@ -18,12 +18,13 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, a
 - QA eval suite: 16 cases, dry-run default, judge scoring, baseline regression (task 0008, **done**).
 - **Human docs package**: README, USAGE, EVALUATION, drift-corrected architecture/technical (task 0009, **done**).
 - **Optional MCP server**: `retail-agent-mcp`, guarded `query_retail_data` + `retrieve_trios` (task 0010, **done**).
-- `pytest` **157 passed**; eval dry-run **16/16 passed**.
+- `pytest` **167 passed**; eval dry-run **16/16 passed**.
 - **LLM budget per-turn reset** (task 0013, **done**): `input_guard` uses `fresh_budget`; 6-turn regression test; live CLI verified.
 - **CTE support in sql_guard** (task 0012, **done**): bare CTE aliases allowed; 4 regression tests; live BQ verified.
 - **Name-flagged PII column masking** (task 0014, **done**): unformatted phones and arbitrary strings masked in PII-named columns; content-detected path unchanged.
 - **LLM connection-outage resilience** (task 0015, **done**): connection errors classify as transient; immediate fallback when configured.
 - **CLI/docs/eval polish** (task 0016, **done**): analysis-only diagnostics; property-based live eval tokens; docs count drift removed.
+- **PII marker token matching** (task 0017, **pending_review**): metric columns like `cancelled_rate`/`email_count` no longer falsely masked; string PII columns still strictly masked.
 
 ## What's left to build
 
@@ -34,7 +35,8 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, a
 5. ~~`0015` LLM connection resilience~~ — **done**
 6. ~~`0016` CLI/docs/eval polish~~ — **done**
 7. ~~`0013` LLM budget reset~~ — **done**
-8. `0017`–`0021` bug fixes from the 2026-07-08 second review pass — **todo** (see `tasks/INDEX.md`)
+8. `0017` PII marker over-match — **pending_review**
+9. `0018`–`0021` bug fixes from the 2026-07-08 second review pass — **todo** (see `tasks/INDEX.md`)
 
 ## Known issues
 
@@ -43,7 +45,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, a
 - ~~**Unformatted phone values leak through name-flagged PII columns**~~ — fixed in task 0014 (**done**).
 - ~~**Connection-level LLM outages skip the fallback provider**~~ — fixed in task 0015 (**done**).
 - ~~**Stale CLI diagnostics after non-analysis turns; docs test-count drift; brittle live eval token**~~ — fixed in task 0016 (**done**).
-- **PII markers over-match** (task 0017, **todo**) — `cancelled_rate`/`email_count` masked to `***` before the report LLM; regression amplified by 0014; dry-run evals blind to it.
+- ~~**PII markers over-match**~~ — fixed in task 0017 (**pending_review**): token-boundary matching + numeric exemption; graph regression test added.
 - **/save persists non-analysis output** (task 0018, **todo**) — preference confirmations, list output and refusals get saved as "reports".
 - **Malformed trio file crashes CLI startup** (task 0019, **todo**) — raw traceback; loader should skip-and-warn.
 - **Preference regex hijacks analysis questions** (task 0020, **todo**) — "use the orders table…" silently rewrites saved preferences.
@@ -55,4 +57,4 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, a
 
 ## Version
 
-- Project version **0.14.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (task 0016 polish).
+- Project version **0.15.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (task 0017 PII marker fix).

@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import pandas as pd
+import pytest
 
 from retail_agent.safety import (
     PII_POLICY_NOTE,
+    _column_is_pii,
     append_pii_policy_note,
     classify_input_precheck,
     mask_dataframe,
@@ -142,6 +144,54 @@ def test_mask_dataframe_does_not_mask_float_revenue_from_bigquery():
 
     assert masked.masked_columns == ()
     assert masked.dataframe.loc[0, "revenue"] == 51664.79010748863
+
+
+@pytest.mark.parametrize(
+    "column",
+    ["cancelled_rate", "excellent_score", "miscellaneous"],
+)
+def test_column_is_pii_does_not_match_substring_false_positives(column):
+    assert _column_is_pii(column) is False
+
+
+def test_mask_dataframe_leaves_metric_columns_unmasked():
+    df = pd.DataFrame(
+        {
+            "cancelled_rate": [0.048],
+            "excellent_score": [92.5],
+            "miscellaneous": ["other"],
+            "email_count": [12],
+            "phone_orders": [7],
+        }
+    )
+
+    masked = mask_dataframe(df)
+
+    assert masked.masked_columns == ()
+    assert masked.pii_note_required is False
+    assert masked.dataframe.loc[0, "cancelled_rate"] == 0.048
+    assert masked.dataframe.loc[0, "email_count"] == 12
+    assert masked.dataframe.loc[0, "phone_orders"] == 7
+
+
+@pytest.mark.parametrize(
+    ("column", "value", "expected"),
+    [
+        ("email", "alice@example.com", "a***@***.***"),
+        ("customer_email", "bob@example.com", "b***@***.***"),
+        ("phone_number", "5551234567", "***-***-4567"),
+        ("mobile", "call me", "***"),
+        ("contact_info", "N/A", "***"),
+    ],
+)
+def test_mask_dataframe_still_masks_true_pii_string_columns(column, value, expected):
+    df = pd.DataFrame({column: [value]})
+
+    masked = mask_dataframe(df)
+
+    assert column in masked.masked_columns
+    assert masked.dataframe.loc[0, column] == expected
+    assert masked.pii_note_required is True
 
 
 def test_mask_text_ignores_plain_long_numbers():

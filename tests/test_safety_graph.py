@@ -124,3 +124,53 @@ def test_masked_preview_reaches_compose_report_prompt(settings):
     compose_prompt = str(llm.last_messages[1].content)
     assert "secret@example.com" not in compose_prompt
     assert "@***.***" in compose_prompt or "***@***.***" in compose_prompt
+
+
+def test_cancelled_rate_metrics_reach_compose_report_unmasked(settings):
+    cancelled_sql = (
+        "SELECT COUNTIF(status = 'Cancelled') / COUNT(*) AS cancelled_rate, "
+        "COUNTIF(u.email IS NOT NULL) AS email_count "
+        "FROM `bigquery-public-data.thelook_ecommerce.orders` o "
+        "JOIN `bigquery-public-data.thelook_ecommerce.users` u ON o.user_id = u.id"
+    )
+
+    class RecordingLLM:
+        def __init__(self, responses: list[str]):
+            self._responses = list(responses)
+            self.calls = 0
+            self.last_messages = None
+
+        def invoke(self, messages):
+            self.last_messages = messages
+            content = self._responses[min(self.calls, len(self._responses) - 1)]
+            self.calls += 1
+            return AIMessage(content=content)
+
+    llm = RecordingLLM([f"```sql\n{cancelled_sql}\n```", "Cancelled share is 4.8%."])
+    bq = FakeBQRunner(
+        [
+            QueryResult(
+                ok=True,
+                dataframe=pd.DataFrame({"cancelled_rate": [0.048], "email_count": [1200]}),
+                sql=cancelled_sql,
+            )
+        ]
+    )
+    deps = AgentDeps(settings=settings, llm=llm, bq_runner=bq)
+    graph = compile_graph(deps)
+    result = graph.invoke(
+        {
+            "messages": [HumanMessage(content="What share of orders are cancelled?")],
+            "user_id": "alice",
+            "question": "What share of orders are cancelled?",
+        },
+        {"configurable": {"thread_id": "cancelled-rate-thread"}},
+    )
+
+    compose_prompt = str(llm.last_messages[1].content)
+    assert result["pii_masked"] is False
+    assert result.get("pii_masked_columns") == []
+    assert PII_POLICY_NOTE not in result["report"]
+    assert "0.048" in compose_prompt
+    assert "1200" in compose_prompt
+    assert "***" not in compose_prompt

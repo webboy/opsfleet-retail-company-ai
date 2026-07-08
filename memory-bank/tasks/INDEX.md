@@ -20,7 +20,7 @@ Quick overview of all tasks. Source of truth for each row is the task's `TASK.md
 | 0014 | PII mask: fully mask name-flagged columns (unformatted phones leak) | done | Engineer | 2026-07-08 |
 | 0015 | LLM resilience: retry/fallback on connection-level outages | done | Engineer | 2026-07-08 |
 | 0016 | Polish: stale CLI diagnostics, docs test-count drift, brittle live eval assertion | done | Engineer | 2026-07-08 |
-| 0017 | PII column markers over-match: legit metrics masked to `***` (regression of 0014) | todo | Engineer | 2026-07-08 |
+| 0017 | PII column markers over-match: legit metrics masked to `***` (regression of 0014) | pending_review | Engineer | 2026-07-08 |
 | 0018 | /save persists non-analysis output as a "report" | todo | Engineer | 2026-07-08 |
 | 0019 | Golden Bucket robustness: one malformed trio file crashes the CLI | todo | Engineer | 2026-07-08 |
 | 0020 | Preference regex hijacks analysis questions mentioning "table" | todo | Engineer | 2026-07-08 |
