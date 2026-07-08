@@ -47,21 +47,21 @@ def _list_reports(deps: AgentDeps, user_id: str) -> dict:
 
 
 def _save_report(state: AgentState, deps: AgentDeps, user_id: str) -> dict:
-    report = state.get("report")
+    report = state.get("last_analysis_report")
     if not report:
         return _done(
             "There is no recent report to save yet. Ask an analytics question first, "
             "then say \"save this report\" or use /save."
         )
 
-    source_question = _latest_analysis_question(state)
+    source_question = state.get("last_analysis_question") or ""
     title = _title_from_question(source_question or "Saved report")
     saved = deps.report_store.save_report(
         owner=user_id,
         title=title,
         content=report,
         question=source_question or None,
-        sql=state.get("sql"),
+        sql=state.get("last_analysis_sql"),
     )
     logger.info("Saved report id=%s owner=%s", saved.id, user_id)
     return _done(f"Saved report \"{saved.title}\" to your library.")
@@ -115,17 +115,6 @@ def _title_from_question(question: str) -> str:
     if len(cleaned) <= 80:
         return cleaned
     return cleaned[:77] + "..."
-
-
-def _latest_analysis_question(state: AgentState) -> str:
-    messages = state.get("messages") or []
-    for message in reversed(messages):
-        if getattr(message, "type", "") != "human":
-            continue
-        content = str(message.content)
-        if parse_report_command(content) is None:
-            return content
-    return ""
 
 
 def _done(report: str) -> dict:

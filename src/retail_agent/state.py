@@ -33,6 +33,9 @@ class AgentState(TypedDict, total=False):
     query_empty: bool
     result_preview: str | None
     report: str | None
+    last_analysis_report: str | None
+    last_analysis_question: str | None
+    last_analysis_sql: str | None
     report_action: Literal["save", "list", "delete"] | None
     report_selector_kind: Literal["mention", "today", "all"] | None
     report_mention: str | None

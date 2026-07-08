@@ -25,6 +25,9 @@ def output_mask(state: AgentState, deps: AgentDeps) -> dict:
 
     return {
         "report": final_report,
+        "last_analysis_report": final_report,
+        "last_analysis_question": state.get("question") or None,
+        "last_analysis_sql": state.get("sql"),
         "pii_note_required": note_required,
         "pii_mask_hits": total_hits,
         "messages": [AIMessage(content=final_report)],

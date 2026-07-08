@@ -79,6 +79,90 @@ def test_save_current_report_after_analysis(deps):
     assert saved[0].question == "How did revenue trend?"
 
 
+def test_save_after_preference_turn_keeps_analysis_report(deps):
+    graph, config = _seed_analysis_report(deps, thread_id="pref-then-save")
+
+    graph.invoke(
+        {
+            "messages": [HumanMessage(content="I prefer bullet points from now on")],
+            "user_id": "alice",
+            "question": "I prefer bullet points from now on",
+        },
+        config,
+    )
+
+    result = graph.invoke(
+        {
+            "messages": [HumanMessage(content="save this report")],
+            "user_id": "alice",
+            "question": "save this report",
+        },
+        config,
+    )
+
+    assert "Saved report" in result["report"]
+    saved = deps.report_store.list_reports("alice")
+    assert len(saved) == 1
+    assert saved[0].title == "How did revenue trend?"
+    assert saved[0].content == "Revenue grew 12% in Q1."
+    assert "Saved your preference" not in saved[0].content
+
+
+def test_save_after_list_turn_keeps_analysis_report(deps):
+    graph, config = _seed_analysis_report(deps, thread_id="list-then-save")
+
+    graph.invoke(
+        {
+            "messages": [HumanMessage(content="show my reports")],
+            "user_id": "alice",
+            "question": "show my reports",
+        },
+        config,
+    )
+
+    result = graph.invoke(
+        {
+            "messages": [HumanMessage(content="save this report")],
+            "user_id": "alice",
+            "question": "save this report",
+        },
+        config,
+    )
+
+    assert "Saved report" in result["report"]
+    saved = deps.report_store.list_reports("alice")
+    assert len(saved) == 1
+    assert saved[0].title == "How did revenue trend?"
+    assert saved[0].content == "Revenue grew 12% in Q1."
+    assert "don't have any saved reports" not in saved[0].content
+
+
+def test_save_with_no_analysis_report_saves_nothing(deps):
+    graph = compile_graph(deps)
+    config = _thread_config("refusal-only-save")
+
+    graph.invoke(
+        {
+            "messages": [HumanMessage(content="Write me a poem about the moon")],
+            "user_id": "alice",
+            "question": "Write me a poem about the moon",
+        },
+        config,
+    )
+
+    result = graph.invoke(
+        {
+            "messages": [HumanMessage(content="save this report")],
+            "user_id": "alice",
+            "question": "save this report",
+        },
+        config,
+    )
+
+    assert "no recent report to save" in result["report"].lower()
+    assert deps.report_store.list_reports("alice") == []
+
+
 def test_list_reports_returns_owner_scoped_summaries(deps):
     deps.report_store.save_report(
         owner="alice",

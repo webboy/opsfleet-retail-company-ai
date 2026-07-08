@@ -4,7 +4,7 @@
 
 - **Task ID**: 0018
 - **Title**: /save persists non-analysis output as a "report"
-- **Status**: todo
+- **Status**: pending_review
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08
@@ -52,10 +52,10 @@ Graph-level scenarios confirmed:
 
 ## Acceptance criteria
 
-- [ ] analysis → preference → `/save` saves the analysis report with the analysis question as title.
-- [ ] analysis → list → `/save` saves the analysis report.
-- [ ] refusal-only thread → `/save` responds "no recent report" and saves nothing.
-- [ ] Existing save/list/delete tests stay green; new graph tests cover the three scenarios.
+- [x] analysis → preference → `/save` saves the analysis report with the analysis question as title.
+- [x] analysis → list → `/save` saves the analysis report.
+- [x] refusal-only thread → `/save` responds "no recent report" and saves nothing.
+- [x] Existing save/list/delete tests stay green; new graph tests cover the three scenarios.
 
 ## References
 
