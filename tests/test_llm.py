@@ -12,6 +12,8 @@ from retail_agent.llm import (
     get_fallback_metadata,
     invoke_with_retry,
     is_connection_error,
+    is_llm_credentials_error,
+    is_llm_unavailable_error,
     is_quota_exhausted_error,
     is_transient_error,
     quota_exhausted_message,
@@ -281,6 +283,18 @@ def test_budget_exhaustion_blocks_fallback():
         invoke_with_retry(llm, [HumanMessage(content="hi")], CallBudget(max_calls=1))
 
     assert llm.fallback_count == 0
+
+
+def test_is_llm_credentials_error_detects_missing_auth():
+    exc = RuntimeError("401 Missing Authentication header")
+    assert is_llm_credentials_error(exc)
+
+
+def test_is_llm_unavailable_error_covers_quota_and_auth():
+    assert is_llm_unavailable_error(
+        RuntimeError("429 RESOURCE_EXHAUSTED quota exceeded")
+    )
+    assert is_llm_unavailable_error(RuntimeError("401 Missing Authentication header"))
 
 
 def test_quota_message_mentions_fallback_when_configured():

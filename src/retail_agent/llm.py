@@ -262,6 +262,26 @@ def is_quota_exhausted_error(exc: Exception) -> bool:
     )
 
 
+def is_llm_credentials_error(exc: Exception) -> bool:
+    message = str(exc).lower()
+    type_name = type(exc).__name__.lower()
+    return type_name == "authenticationerror" or any(
+        marker in message
+        for marker in (
+            "401",
+            "403",
+            "missing authentication",
+            "invalid api key",
+            "incorrect api key",
+            "unauthorized",
+        )
+    )
+
+
+def is_llm_unavailable_error(exc: Exception) -> bool:
+    return is_quota_exhausted_error(exc) or is_llm_credentials_error(exc)
+
+
 def quota_exhausted_message(
     *,
     model: str | None = None,

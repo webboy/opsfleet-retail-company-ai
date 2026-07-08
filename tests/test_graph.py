@@ -299,3 +299,31 @@ def test_llm_budget_resets_each_turn_in_same_thread(settings):
         assert f"Answer {i + 1}" in result["report"]
 
     assert llm.calls == num_turns * 2
+
+
+def test_generate_sql_quota_exhaustion_returns_fallback_without_crashing(settings):
+    quota_error = RuntimeError(
+        "429 RESOURCE_EXHAUSTED quota exceeded for generate_content_free_tier_requests"
+    )
+
+    class QuotaLLM:
+        calls = 0
+
+        def invoke(self, messages):
+            QuotaLLM.calls += 1
+            raise quota_error
+
+    deps = AgentDeps(settings=settings, llm=QuotaLLM(), bq_runner=FakeBQRunner([]))
+    graph = compile_graph(deps)
+
+    result = graph.invoke(
+        {
+            "messages": [HumanMessage(content="Show me recent orders")],
+            "user_id": "alice",
+            "question": "Show me recent orders",
+        },
+        {"configurable": {"thread_id": "quota-thread"}},
+    )
+
+    assert result["status"] == "fallback"
+    assert "quota" in (result.get("last_error") or result["report"]).lower()

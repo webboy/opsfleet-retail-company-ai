@@ -67,6 +67,8 @@ def run_suite(
     temp_dir = tempfile.TemporaryDirectory()
     work_dir = Path(temp_dir.name)
     settings = _build_settings(work_dir, live=live)
+    if live:
+        _validate_live_llm_settings(settings)
     results: list[CaseResult] = []
 
     for case in cases:
@@ -158,6 +160,26 @@ def _load_baseline_map(path: Path) -> dict[str, dict]:
     return load_baseline(path)
 
 
+def _validate_live_llm_settings(settings: Settings) -> None:
+    problems: list[str] = []
+    for label, provider in (
+        ("primary", settings.provider),
+        ("fallback", settings.fallback_provider),
+    ):
+        if not provider:
+            continue
+        normalized = provider.strip().lower()
+        if normalized == "gemini" and not settings.google_api_key:
+            problems.append(f"{label} is gemini but GOOGLE_API_KEY is missing.")
+        elif normalized == "openrouter" and not settings.openrouter_api_key:
+            problems.append(f"{label} is openrouter but OPENROUTER_API_KEY is missing.")
+    if problems:
+        raise ValueError(
+            "Live eval cannot start due to LLM configuration problems:\n"
+            + "\n".join(f"  - {item}" for item in problems)
+        )
+
+
 def _build_settings(work_dir: Path, *, live: bool) -> Settings:
     if live:
         return get_settings()
@@ -217,6 +239,21 @@ class _InternalCaseResult(CaseResult):
     state: dict = field(default_factory=dict)
 
 
+def _error_case_result(case: EvalCase, turn_id: str, exc: Exception) -> _InternalCaseResult:
+    return _InternalCaseResult(
+        case_id=case.id,
+        layer=case.layer,
+        passed=False,
+        failures=[f"agent error: {type(exc).__name__}: {exc}"],
+        turn_id=turn_id,
+        diagnostics={
+            "error_type": type(exc).__name__,
+            "error": str(exc),
+        },
+        state={},
+    )
+
+
 def _run_case(case: EvalCase, deps: AgentDeps) -> _InternalCaseResult:
     graph = compile_graph(deps)
     thread_id = f"eval-{case.id}-{uuid.uuid4().hex[:8]}"
@@ -235,14 +272,18 @@ def _run_case(case: EvalCase, deps: AgentDeps) -> _InternalCaseResult:
 
     question = case.question or ""
     deps.tracer.emit_turn_start(question)
-    state = graph.invoke(
-        {
-            "messages": [HumanMessage(content=question)],
-            "user_id": "alice",
-            "question": question,
-        },
-        config,
-    )
+    try:
+        state = graph.invoke(
+            {
+                "messages": [HumanMessage(content=question)],
+                "user_id": "alice",
+                "question": question,
+            },
+            config,
+        )
+    except Exception as exc:
+        return _error_case_result(case, turn_id, exc)
+
     deps.tracer.emit_turn_end(status=state.get("status"), report=state.get("report"))
     assertion = evaluate_expectations(
         state,
@@ -282,17 +323,20 @@ def _run_steps_case(case: EvalCase, graph, deps: AgentDeps, config: dict, turn_i
         if index == 0 and step.question:
             deps.tracer.emit_turn_start(step.question)
 
-        if step.resume:
-            final_state = graph.invoke(Command(resume=step.resume), config)
-        else:
-            final_state = graph.invoke(
-                {
-                    "messages": [HumanMessage(content=step.question or "")],
-                    "user_id": "alice",
-                    "question": step.question or "",
-                },
-                config,
-            )
+        try:
+            if step.resume:
+                final_state = graph.invoke(Command(resume=step.resume), config)
+            else:
+                final_state = graph.invoke(
+                    {
+                        "messages": [HumanMessage(content=step.question or "")],
+                        "user_id": "alice",
+                        "question": step.question or "",
+                    },
+                    config,
+                )
+        except Exception as exc:
+            return _error_case_result(case, turn_id, exc)
 
         interrupted = bool(graph.get_state(config).next)
         assertion = evaluate_expectations(

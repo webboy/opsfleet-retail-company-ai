@@ -5,7 +5,14 @@ from __future__ import annotations
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
 from retail_agent.deps import AgentDeps
-from retail_agent.llm import BudgetExhaustedError, CallBudget, invoke_with_retry
+from retail_agent.llm import (
+    BudgetExhaustedError,
+    CallBudget,
+    invoke_with_retry,
+    is_llm_unavailable_error,
+    is_quota_exhausted_error,
+    quota_exhausted_message,
+)
 from retail_agent.nodes.retrieve_trios import retrieved_examples_block
 from retail_agent.schema_doc import load_schema_doc
 from retail_agent.sql_utils import extract_sql
@@ -63,6 +70,10 @@ def generate_sql(state: AgentState, deps: AgentDeps) -> dict:
             "last_error": "LLM call budget exhausted",
             "llm_budget": budget.to_dict(),
         }
+    except Exception as exc:
+        if is_llm_unavailable_error(exc):
+            return _llm_unavailable_update(deps, budget, attempts, exc)
+        raise
 
     return {
         "sql": sql,
@@ -79,3 +90,20 @@ def _conversation_snippet(state: AgentState, *, limit: int = 6) -> str:
         role = getattr(message, "type", "message")
         lines.append(f"{role}: {message.content}")
     return "\n".join(lines) if lines else "(no prior conversation)"
+
+
+def _llm_unavailable_update(deps: AgentDeps, budget: CallBudget, attempts: int, exc: Exception) -> dict:
+    if is_quota_exhausted_error(exc):
+        message = quota_exhausted_message(
+            model=deps.settings.model,
+            provider=deps.settings.provider,
+            fallback_provider=deps.settings.fallback_provider,
+        )
+    else:
+        message = str(exc) or "LLM authentication failed."
+    return {
+        "sql_attempts": attempts,
+        "status": "fallback",
+        "last_error": message,
+        "llm_budget": budget.to_dict(),
+    }
