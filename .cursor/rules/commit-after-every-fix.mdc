@@ -1,0 +1,58 @@
+---
+description: Commit immediately after every code fix — do not leave changes uncommitted
+alwaysApply: true
+---
+
+# Commit after every code fix
+
+In this repository, **every code fix must be committed before the work is considered done** for that fix. Do not wait for the user to ask, and do not defer commits to "later" or "at handoff".
+
+Applies to:
+
+- bugfixes and regressions
+- refactors and small improvements
+- new features (including partial slices of a larger task)
+- test-only fixes that lock in behavior
+- config/build changes tied to the fix
+
+Also commit related docs and memory-bank updates **in the same delivery** (same commit or a immediately following commit), not as a separate uncommitted follow-up.
+
+## Required workflow
+
+After changing code (or tests/config/docs for that change):
+
+1. Run the **relevant** verification (at minimum: targeted pytest for the touched area when tests exist).
+2. Stage and **commit** all deliverable files for that fix.
+3. Run `git status` and confirm the working tree is clean for those deliverables.
+4. Only then tell the user the fix is done or move on to unrelated work.
+
+Use **Conventional Commits** (`conventional-commits.mdc`). Reference a task ID when one exists, e.g. `fix(llm): handle quota errors in generate_sql (task 0024)`.
+
+Prefer **one logical fix → one commit**. Split into multiple commits only when changes are genuinely independent and easier to review separately.
+
+## Do not
+
+- End a turn with fixes still unstaged or untracked.
+- Say "the fix is in your working tree" or "say if you want me to commit".
+- Batch unrelated fixes into one session without committing each logical unit.
+- Commit secrets (`.env`, credentials); warn if the user asks to commit them.
+
+## Exceptions (explicit user opt-out only)
+
+Skip the commit only when the user **explicitly** asks for:
+
+- "no commit"
+- "just an experiment" / "don't commit"
+- read-only exploration with no file changes
+
+If unclear, **commit**.
+
+## Push
+
+Push is **not** automatic — the user decides when to publish.
+
+## Related rules
+
+- Format and scope: `conventional-commits.mdc`
+- Task handoff gate: `task-execution-commit-required.mdc`
+- Full lifecycle: `task-quality-lifecycle.mdc`

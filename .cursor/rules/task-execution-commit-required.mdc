@@ -7,6 +7,8 @@ alwaysApply: true
 
 A task execution is **not finished** until its changes are committed to git.
 
+**Also:** commit **immediately after each code fix**, not only at session end — see `commit-after-every-fix.mdc`.
+
 Applies to **every** implementation task in this repository:
 
 - memory-bank tasks under `memory-bank/tasks/<id>-*/`

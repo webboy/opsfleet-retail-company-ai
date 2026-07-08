@@ -27,8 +27,9 @@ Applies to **every task** that changes code or system behavior in this repositor
 - For bugfixes: a test that **fails on the old behavior** and passes after the fix.
 - Run the relevant test suite before finishing and report the result (passed/failed counts). If something is objectively not testable (e.g. live LLM behavior), briefly explain why.
 
-## 4. Commit (required — see `task-execution-commit-required.mdc`)
+## 4. Commit (required — see `commit-after-every-fix.mdc` and `task-execution-commit-required.mdc`)
 
+- **Commit immediately after each code fix** — do not leave changes uncommitted until handoff or until the user asks.
 - A task execution is **not complete** without **one or more commits** containing all deliverable changes.
 - Use meaningful messages in English, Conventional Commits per `conventional-commits.mdc`, reference the task ID where one exists, e.g. `feat(agent): add SQL self-heal loop (task 0004)`.
 - Logically separate changes → separate commits; a version bump goes in the same commit as the change that requires it.
