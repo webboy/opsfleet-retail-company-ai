@@ -32,7 +32,7 @@ Tasks 0001–0009, **0011**, **0012**, and **0013** **done** (user approved). **
 
 ## Known issues
 
-- ~~**sql_guard rejects CTE queries**~~ — fixed in task 0012 (**pending_review**).
+- ~~**sql_guard rejects CTE queries**~~ — fixed in task 0012 (**done**).
 - ~~**LLM budget not reset per turn**~~ — fixed in task 0013 (**done**).
 - **Unformatted phone values leak through name-flagged PII columns** (task 0014).
 - **Connection-level LLM outages skip the fallback provider** (task 0015).
