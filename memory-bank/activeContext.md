@@ -8,7 +8,7 @@ Review-confirmed bugs (each reproduced; details in the task folders):
 
 1. ~~**0012**~~ — CTE support in `sql_guard` — **done** (user approved 2026-07-08).
 2. ~~**0013**~~ — per-turn LLM budget reset — **done** (user approved 2026-07-08).
-3. **0014** — name-flagged PII columns leak unformatted values (`phone` = `5551234567` passes unmasked).
+3. **0014** — name-flagged PII columns leak unformatted values (`phone` = `5551234567` passes unmasked) — **pending_review**.
 4. **0015** — connection-level LLM outages (refused/DNS/timeout) bypass retry and never reach the configured fallback provider.
 5. **0016** — CLI prints stale `[sql attempts]`/`[retrieved trios]` after save/list/prefs turns; docs test-count drift (120/131 vs actual 132); brittle live eval token (`denim`).
 
@@ -39,6 +39,7 @@ Review-confirmed bugs (each reproduced; details in the task folders):
 
 ## Recent changes
 
+- 2026-07-08: Task 0014 **pending_review** — strict name-flagged PII column masking; unformatted phones masked; version **0.12.0**.
 - 2026-07-08: Task 0012 **done** (user approved) — CTE aliases in `sql_guard`; live BQ verified.
 - 2026-07-08: Task 0012 **pending_review** — CTE aliases allowed in `sql_guard`; 4 regression tests; live BQ verified; version **0.11.0**.
 - 2026-07-08: Task 0013 **pending_review** — `input_guard` resets LLM budget per turn; regression test; version **0.10.0**.

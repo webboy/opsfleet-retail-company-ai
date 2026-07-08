@@ -78,14 +78,38 @@ def test_mask_dataframe_by_column_name():
     assert masked.pii_note_required is True
 
 
-def test_mask_dataframe_by_content_sampling():
-    df = pd.DataFrame({"contact_value": ["alice@example.com", "555-123-4567"]})
+def test_mask_dataframe_name_flagged_phone_masks_unformatted_digits():
+    df = pd.DataFrame({"phone": ["5551234567", "+1 415 555 2671"]})
 
     masked = mask_dataframe(df)
 
-    assert "contact_value" in masked.masked_columns
-    assert "@***.***" in masked.dataframe.loc[0, "contact_value"]
-    assert "***-***-" in masked.dataframe.loc[1, "contact_value"]
+    assert "phone" in masked.masked_columns
+    assert masked.dataframe.loc[0, "phone"] == "***-***-4567"
+    assert masked.dataframe.loc[1, "phone"] == "***-***-2671"
+    assert "5551234567" not in masked.dataframe["phone"].astype(str).tolist()
+
+
+def test_mask_dataframe_name_flagged_column_masks_arbitrary_strings():
+    df = pd.DataFrame({"mobile": ["unknown", "N/A", "call me"]})
+
+    masked = mask_dataframe(df)
+
+    assert "mobile" in masked.masked_columns
+    assert masked.dataframe.loc[0, "mobile"] == "***"
+    assert masked.dataframe.loc[1, "mobile"] == "***"
+    assert masked.dataframe.loc[2, "mobile"] == "***"
+
+
+def test_mask_dataframe_by_content_sampling():
+    df = pd.DataFrame({"notes": ["alice@example.com", "555-123-4567", "1234567890"]})
+
+    masked = mask_dataframe(df)
+
+    assert "notes" in masked.masked_columns
+    assert "@***.***" in masked.dataframe.loc[0, "notes"]
+    assert "***-***-" in masked.dataframe.loc[1, "notes"]
+    # Content-flagged path keeps shape-based masking; bare digits stay unchanged.
+    assert masked.dataframe.loc[2, "notes"] == "1234567890"
 
 
 def test_mask_dataframe_does_not_mask_plain_revenue_amounts():

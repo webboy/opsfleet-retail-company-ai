@@ -351,9 +351,14 @@ def mask_dataframe(df: pd.DataFrame) -> MaskDataframeResult:
 
     for column in masked.columns:
         series = masked[column]
-        if _column_is_pii(column) or _series_contains_pii(series):
+        name_flagged = _column_is_pii(column)
+        content_flagged = not name_flagged and _series_contains_pii(series)
+        if name_flagged or content_flagged:
             masked_columns.append(str(column))
-            masked[column] = series.map(_mask_cell_value)
+            if name_flagged:
+                masked[column] = series.map(_mask_pii_named_cell_value)
+            else:
+                masked[column] = series.map(_mask_cell_value)
             mask_hits += int(series.notna().sum())
 
     return MaskDataframeResult(
@@ -456,9 +461,21 @@ def _mask_cell_value(value: object) -> object:
         return _mask_email_value(text)
     if _value_looks_like_phone(text):
         return _mask_phone_value(text)
-    if _column_is_pii(text):
-        return "***"
     return text
+
+
+def _mask_pii_named_cell_value(value: object) -> object:
+    """Unconditionally mask non-null values in name-flagged PII columns."""
+
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return value
+    text = str(value)
+    if EMAIL_RE.fullmatch(text) or EMAIL_RE.search(text):
+        return _mask_email_value(text)
+    digits = re.sub(r"\D", "", text)
+    if len(digits) >= 7:
+        return _mask_phone_value(text)
+    return "***"
 
 
 def _mask_email_value(email: str) -> str:
