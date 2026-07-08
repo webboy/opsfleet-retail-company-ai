@@ -195,7 +195,9 @@ Explicit PII requests (e.g. top buyers with emails) may still run as analysis, b
 - Default database path: `./data/reports.sqlite3`; override with `RETAIL_AGENT_DB_PATH`.
 - Delete request → resolve candidate set **scoped to `owner = current_user`** (mention text, “today”, or “all my reports”) → present exact list (titles + dates) → **LangGraph `interrupt()`** → only explicit confirmation (`yes`, `y`, `confirm`, or `delete`) executes deletion; anything else cancels.
 - Empty candidate set → clear message, no interrupt.
-- Save and list are conversational (`save this report`, `show my reports`) or slash commands (`/save`); delete confirmation resumes the graph with the user’s next message via `Command(resume=...)`.
+- Save and list are **user-initiated** — conversational (`save this report`, `show my reports`) or slash commands (`/save`). The CLI does not auto-save or append an “offer to save” prompt after analysis answers.
+- **Complete-report gating:** `/save` persists only when `last_analysis_complete` is true — i.e. the last successful analysis pipeline produced a full composed report (`status=done`, `report_complete=True`, `query_ok=True`). Incomplete compose output (LLM budget exhaustion), SQL self-heal fallbacks, schema answers, refusals, and chitchat do not populate saveable state. If a complete analysis is followed by a failed turn, the prior complete report remains saveable.
+- Delete confirmation resumes the graph with the user’s next message via `Command(resume=...)`.
 
 **Prototype:** SQLite + CLI. **Production:** Cloud SQL/Firestore + web client; same graph interrupt semantics.
 

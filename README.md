@@ -2,7 +2,7 @@
 
 A retail data-analysis chat assistant for non-technical executives. A Store Manager asks *"How did monthly revenue trend last year?"* five minutes before a call — and gets an analyst-style answer backed by live SQL, not a data dump.
 
-This repository is the **Opsfleet AI Technical Assignment** prototype: LangGraph agent, BigQuery (`thelook_ecommerce`), Golden Bucket retrieval, safety guards, saved reports, observability, and a QA eval suite.
+This repository is the **Opsfleet AI Technical Assignment** prototype: LangGraph agent, BigQuery (`thelook_ecommerce`), Golden Bucket retrieval, safety guards, saved reports, observability, and a QA eval suite. It answers customer behavior, product performance, time-based metrics (including **monthly revenue** and **up-to-date revenue by product**), and schema questions — see the [supported-question matrix](docs/SCHEMA.md#supported-question-matrix).
 
 ## Documentation map
 

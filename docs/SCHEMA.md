@@ -48,8 +48,8 @@ The eval suite (`evals/cases.yaml`) maps prototype capabilities to the assignmen
 | Assignment category | Example questions | Primary tables | Eval case ID |
 |--------------------|-------------------|----------------|--------------|
 | **Customer behavior** | Who are our top customers by spend? What share of orders are cancelled? How does revenue compare across traffic sources? | `users`, `orders`, `order_items` | `top-customers-spend`, `cancelled-order-rate`, `revenue-by-traffic-source` |
-| **Product performance** | Which products sold the most? Top categories or departments by revenue? | `products`, `order_items` | `top-products-sales`, `product-category-revenue`, `revenue-by-department` |
-| **Time metrics** | Monthly revenue last year? Daily revenue over the last 30 days? New customers by month? Average order value? | `orders`, `order_items`, `users` | `monthly-revenue`, `recent-daily-revenue`, `new-customers-by-month`, `average-order-value` |
+| **Product performance** | Which products sold the most? Top categories or departments by revenue? What is up-to-date revenue by product? | `products`, `order_items` | `top-products-sales`, `product-category-revenue`, `revenue-by-department` |
+| **Time metrics** | Monthly revenue last year? Up-to-date revenue by product? Daily revenue over the last 30 days? New customers by month? Average order value? | `orders`, `order_items`, `users`, `products` | `monthly-revenue`, `top-products-sales`, `product-category-revenue`, `recent-daily-revenue`, `new-customers-by-month`, `average-order-value` |
 | **Schema questions** | What tables and columns do you have? | *(none — static docs only)* | `schema-tables` |
 
 **Safety cases** (injection, off-topic, PII masking, guarded delete, destructive SQL) are documented in the [Evaluation Guide](./EVALUATION.md).

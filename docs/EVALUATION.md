@@ -190,6 +190,19 @@ Deterministic regression evidence (no credentials):
 
 Failed live runs include `diagnostics` in saved JSONL (`status`, `sql`, `sql_attempts`, `last_error`, `query_ok`, `query_empty`, `retrieved_trio_ids`) for root-cause analysis.
 
+## Recorded live smoke evidence (sanitized)
+
+Optional live runs require credentials and vary by model/quota. The table below summarizes one **sanitized manual run** (2026-07-08, Ollama-primary, `--live --no-compare`) — no secrets, no committed JSONL artifacts. Re-run locally for current numbers after model or case changes.
+
+| Gate | Result | Notes |
+|------|--------|-------|
+| Dry-run CI (`python -m retail_agent.evals`) | **17/17 passed** | Deterministic; committed baseline |
+| Live smoke (same date, 16-case suite then) | **14/16 passed** | Failures: `cancelled-order-rate` (SQL self-heal exhausted), `product-category-revenue` (live NL-to-SQL) |
+| Known live weakness today | `cancelled-order-rate` | Documented above; dry-run + unit tests cover routing |
+| Embedding API | 429 during run | Keyword fallback used (`method=keyword` in diagnostics) |
+
+The suite now has **17** cases (added `valid-empty-result` in a later release). Live pass rates are not CI-enforced — use dry-run for regression gates and live for optional pre-demo smoke only.
+
 ## Adding eval cases
 
 1. Add an entry to `evals/cases.yaml` with `id`, `layer`, `question`, `expect` assertions, and optional `dry_run` fixtures for scripted LLM/BQ responses.

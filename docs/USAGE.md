@@ -39,7 +39,7 @@ Type these at the `You:` prompt:
 | Command / phrase | Action |
 |------------------|--------|
 | `/help` | Show built-in help |
-| `/save` | Save the most recent report to your library |
+| `/save` | Save the last **complete** analysis report to your library (see [Saved reports](#saved-reports)) |
 | `/prefs` | Show saved output format preferences |
 | `/persona <name>` | Switch report tone for this session (`default`, `formal`, `punchy`) |
 | `/exit`, `/quit` | End the session |
@@ -156,9 +156,26 @@ After a successful **SQL analysis turn** with a fully composed report (`status=d
 
 Set `GOLDEN_BUCKET_DIR` in `.env` to point at an alternate directory.
 
+### Retrieval relevance thresholds
+
+Tune how strict Golden Bucket retrieval must be before injecting few-shot examples:
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `GOLDEN_EMBEDDING_MIN_SIMILARITY` | `0.35` | Minimum cosine similarity for embedding retrieval; below this threshold returns **no** trios (avoids weak matches on unrelated questions) |
+| `GOLDEN_KEYWORD_MIN_OVERLAP` | `2` | Minimum shared tokens between question and trio when the embedding API is unavailable and keyword fallback runs |
+
+See also [Architecture — retrieve_trios](./ARCHITECTURE.md#agent-turn-flow) and [Technical Explanation §1](./TECHNICAL_EXPLANATION.md#1-hybrid-intelligence-golden-bucket).
+
 ## Saved reports
 
 Reports are stored in SQLite (default: `./data/reports.sqlite3`). Override with `RETAIL_AGENT_DB_PATH`.
+
+**User-initiated save:** After a complete analysis answer, the manager saves explicitly with `/save` or phrases like `save this report`. The CLI does **not** automatically persist reports or append an “offer to save” prompt.
+
+**Complete-report gating:** `/save` persists only when the graph marked the last analysis as complete (`last_analysis_complete`). Incomplete compose output (for example LLM budget exhaustion), SQL self-heal fallbacks, schema answers, refusals, and chitchat cannot be saved. If you received a full analysis and a later turn fails, the prior complete report remains saveable.
+
+If there is nothing complete to save, the agent replies: *“There is no complete analysis report to save yet…”* — ask an analytics question and wait for a full answer first.
 
 Each report record includes owner, title, content, originating question, SQL, timestamps, and tags. Only the owning user can list or delete their reports.
 
@@ -256,4 +273,4 @@ Copy `.env.example` → `.env`. Minimum for live chat:
 - `GCP_PROJECT_ID` — **your** Google Cloud project used for BigQuery **job billing** when querying the public `thelook_ecommerce` dataset (storage stays in `bigquery-public-data`)
 - `gcloud auth application-default login` — Application Default Credentials (ADC) for the BigQuery client
 
-See `.env.example` for optional overrides: model IDs, embedding model, persona, dataset, bytes billed, provider fallback, DB path, personas dir, golden bucket dir, LangSmith.
+See `.env.example` for optional overrides: model IDs, embedding model, persona, dataset, bytes billed, provider fallback, DB path, personas dir, golden bucket dir, golden retrieval thresholds (`GOLDEN_EMBEDDING_MIN_SIMILARITY`, `GOLDEN_KEYWORD_MIN_OVERLAP`), LangSmith.

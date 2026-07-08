@@ -150,7 +150,7 @@ flowchart TD
     Heal -->|exhausted| Apology[fallback_answer]
     Exec -->|rows or valid empty result| Mask[pii_mask column deny-list plus regex]
     Mask --> Report[compose_report persona plus prefs]
-    Report --> Out[Answer plus offer to save]
+    Report --> Out[Answer user may save via slash or phrase]
 ```
 
 ### Design principles
@@ -260,7 +260,7 @@ The prototype demonstrates this pattern with a thin MCP wrapper over `bq.py` and
 5. **Safety gate:** `sql_guard` validates SQL before any BigQuery job is submitted.
 6. **Execution:** BigQuery returns rows or a valid empty result; SQL/guard errors trigger the self-heal loop (bounded).
 7. **PII:** `pii_mask` scrubs DataFrame and final text deterministically.
-8. **Composition:** LLM writes report using persona + user prefs; offer to save.
+8. **Composition:** LLM writes report using persona + user prefs; the user saves explicitly with `/save` or natural language (no automatic persist).
 9. **Egress:** Response to client; structured observability event emitted per node.
 10. **Learning:** Successful SQL analysis turns with complete reports automatically capture candidate trios for analyst curation.
 
