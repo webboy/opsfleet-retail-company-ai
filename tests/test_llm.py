@@ -11,6 +11,7 @@ from retail_agent.llm import (
     format_llm_startup_line,
     get_fallback_metadata,
     invoke_with_retry,
+    is_connection_error,
     is_quota_exhausted_error,
     is_transient_error,
     quota_exhausted_message,
@@ -72,6 +73,71 @@ def test_is_transient_error_does_not_retry_quota_exhausted():
     )
     assert is_quota_exhausted_error(exc)
     assert not is_transient_error(exc)
+
+
+@pytest.mark.parametrize(
+    "message",
+    [
+        "All connection attempts failed",
+        "Connection refused",
+        "[Errno -2] Name or service not known",
+        "timed out",
+        "Connection reset by peer",
+        "Host unreachable",
+    ],
+)
+def test_is_connection_error_detects_outage_messages(message):
+    assert is_connection_error(RuntimeError(message))
+    assert is_transient_error(RuntimeError(message))
+
+
+def test_is_connection_error_detects_builtin_types():
+    assert is_connection_error(ConnectionError("refused"))
+    assert is_connection_error(TimeoutError("timed out"))
+
+
+def test_is_connection_error_detects_chained_exceptions():
+    root = ConnectionError("connection refused")
+    wrapped = RuntimeError("LLM provider failed")
+    wrapped.__cause__ = root
+    assert is_connection_error(wrapped)
+
+
+def test_fallback_triggers_immediately_on_connection_error(monkeypatch):
+    monkeypatch.setattr("langchain_google_genai.ChatGoogleGenerativeAI", lambda **kwargs: object())
+    monkeypatch.setattr("langchain_ollama.ChatOllama", lambda **kwargs: object())
+
+    settings = make_settings(
+        provider="gemini",
+        fallback_provider="ollama",
+        google_api_key="key",
+        openrouter_api_key=None,
+    )
+    llm = create_chat_model(settings)
+    assert isinstance(llm, FallbackChatModel)
+
+    connect_error = RuntimeError("All connection attempts failed")
+    llm.primary = _FakeLLM([connect_error])
+    llm.fallback = _FakeLLM([AIMessage(content="fallback after outage")])
+
+    result = invoke_with_retry(llm, [HumanMessage(content="hi")], CallBudget(max_calls=3))
+
+    assert result.content == "fallback after outage"
+    assert llm.primary.calls == 1
+    assert llm.fallback.calls == 1
+    assert llm.fallback_count == 1
+    assert llm.last_fallback_provider == "ollama"
+
+
+def test_connection_error_without_fallback_retries_then_raises():
+    budget = CallBudget(max_calls=5)
+    llm = _FakeLLM([RuntimeError("Connection refused")] * 4)
+
+    with pytest.raises(RuntimeError, match="Connection refused"):
+        invoke_with_retry(llm, [HumanMessage(content="hi")], budget, max_retries=3, initial_backoff=0)
+
+    assert llm.calls == 4
+    assert budget.used == 4
 
 
 def test_normalize_provider_rejects_unknown_name():

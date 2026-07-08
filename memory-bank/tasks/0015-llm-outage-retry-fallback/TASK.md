@@ -4,7 +4,7 @@
 
 - **Task ID**: 0015
 - **Title**: LLM resilience: retry/fallback on connection-level outages
-- **Status**: todo
+- **Status**: pending_review
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08

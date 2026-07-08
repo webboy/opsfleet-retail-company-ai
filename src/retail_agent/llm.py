@@ -140,7 +140,9 @@ def invoke_with_retry(
             return primary.invoke(messages)
         except Exception as exc:  # noqa: BLE001 — classify transient provider errors
             last_exc = exc
-            if fallback is not None and is_quota_exhausted_error(exc):
+            if fallback is not None and (
+                is_quota_exhausted_error(exc) or is_connection_error(exc)
+            ):
                 return _invoke_fallback(fallback_wrapper, fallback, messages, budget, exc)
             if not is_transient_error(exc) or attempt >= max_retries:
                 if fallback is not None and attempt >= max_retries:
@@ -192,6 +194,8 @@ def _normalize_provider(provider: str) -> str:
 def is_transient_error(exc: Exception) -> bool:
     if is_quota_exhausted_error(exc):
         return False
+    if is_connection_error(exc):
+        return True
     message = str(exc).lower()
     markers = (
         "429",
@@ -204,6 +208,45 @@ def is_transient_error(exc: Exception) -> bool:
         "unavailable",
     )
     return any(marker in message for marker in markers)
+
+
+_CONNECTION_ERROR_TYPE_MARKERS = (
+    "connectionerror",
+    "connecterror",
+    "connecttimeout",
+    "readtimeout",
+    "timeout",
+)
+_CONNECTION_ERROR_MESSAGE_MARKERS = (
+    "connection refused",
+    "all connection attempts failed",
+    "name or service not known",
+    "timed out",
+    "connection reset",
+    "unreachable",
+    "failed to establish a new connection",
+    "errno -2",
+    "errno 111",
+)
+
+
+def is_connection_error(exc: Exception) -> bool:
+    """Detect connection-level provider outages (refused, DNS, timeout, unreachable)."""
+
+    seen: set[int] = set()
+    current: BaseException | None = exc
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        if isinstance(current, (ConnectionError, TimeoutError)):
+            return True
+        type_name = type(current).__name__.lower()
+        if any(marker in type_name for marker in _CONNECTION_ERROR_TYPE_MARKERS):
+            return True
+        message = str(current).lower()
+        if any(marker in message for marker in _CONNECTION_ERROR_MESSAGE_MARKERS):
+            return True
+        current = current.__cause__ or current.__context__
+    return False
 
 
 def is_quota_exhausted_error(exc: Exception) -> bool:

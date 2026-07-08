@@ -18,5 +18,5 @@ Quick overview of all tasks. Source of truth for each row is the task's `TASK.md
 | 0012 | Fix sql_guard: allow CTE (WITH) queries | done | Engineer | 2026-07-08 |
 | 0013 | Fix LLM call budget: reset per turn, not per thread | done | Engineer | 2026-07-08 |
 | 0014 | PII mask: fully mask name-flagged columns (unformatted phones leak) | done | Engineer | 2026-07-08 |
-| 0015 | LLM resilience: retry/fallback on connection-level outages | todo | Engineer | 2026-07-08 |
+| 0015 | LLM resilience: retry/fallback on connection-level outages | pending_review | Engineer | 2026-07-08 |
 | 0016 | Polish: stale CLI diagnostics, docs test-count drift, brittle live eval assertion | todo | Engineer | 2026-07-08 |
