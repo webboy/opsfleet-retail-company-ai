@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, and **0020** **done** (user approved). Second deep-review pass task **0021** remains **todo**.
+Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, and **0020** **done** (user approved). Second deep-review pass task **0021** is **pending_review**.
 
 ## What works
 
@@ -18,7 +18,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - QA eval suite: 16 cases, dry-run default, judge scoring, baseline regression (task 0008, **done**).
 - **Human docs package**: README, USAGE, EVALUATION, drift-corrected architecture/technical (task 0009, **done**).
 - **Optional MCP server**: `retail-agent-mcp`, guarded `query_retail_data` + `retrieve_trios` (task 0010, **done**).
-- `pytest` **183 passed**; eval dry-run **16/16 passed**.
+- `pytest` **189 passed**; eval dry-run **16/16 passed**; safety subset **5/5 passed**.
 - **LLM budget per-turn reset** (task 0013, **done**): `input_guard` uses `fresh_budget`; 6-turn regression test; live CLI verified.
 - **CTE support in sql_guard** (task 0012, **done**): bare CTE aliases allowed; 4 regression tests; live BQ verified.
 - **Name-flagged PII column masking** (task 0014, **done**): unformatted phones and arbitrary strings masked in PII-named columns; content-detected path unchanged.
@@ -42,7 +42,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 9. ~~`0018` `/save` scope fix~~ — **done**
 10. ~~`0019` Golden Bucket robust loading~~ — **done**
 11. ~~`0020` preference regex tightening~~ — **done**
-12. `0021` tooling polish — **todo** (see `tasks/INDEX.md`)
+12. `0021` tooling polish — **pending_review**
 
 ## Known issues
 
@@ -55,7 +55,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - ~~**/save persists non-analysis output**~~ — fixed in task 0018 (**done**).
 - ~~**Malformed trio file crashes CLI startup**~~ — fixed in task 0019 (**done**).
 - ~~**Preference regex hijacks analysis questions**~~ — fixed in task 0020 (**done**).
-- **Tooling polish** (task 0021, **todo**) — eval `--layer` phantom regressions (exit 1); `self_heal_events` ~6x inflated; stale SQL/trios in node events; `.env` overrides shell env.
+- **Tooling polish** (task 0021, **pending_review**): eval `--layer` baseline scoped; per-turn self-heal metric; trace suppresses stale analysis fields; shell env beats `.env`.
 - Candidate JSONL grows without automatic pruning — curation workflow documented only.
 - Preference phrase detection is deterministic and may miss unusual phrasing.
 - Live eval gate requires LLM + BigQuery credentials; dry-run is CI-default.
@@ -63,4 +63,4 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 
 ## Version
 
-- Project version **0.18.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (task 0020 preference regex fix).
+- Project version **0.19.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (task 0021 tooling polish).

@@ -10,6 +10,7 @@ import pytest
 from langchain_core.messages import HumanMessage
 
 from retail_agent.deps import AgentDeps
+from retail_agent.graph import compile_graph
 from retail_agent.observability import (
     TurnTracer,
     classify_error,
@@ -19,6 +20,7 @@ from retail_agent.observability import (
     traced_node,
 )
 from retail_agent.bq import QueryResult
+from retail_agent.stores import ReportStore
 from tests.helpers import make_settings
 from tests.test_graph import FakeBQRunner, ScriptLLM, _run_turn
 
@@ -40,6 +42,76 @@ def test_snapshot_state_excludes_large_fields():
     assert "result_rows" not in snapshot
     assert "messages" not in snapshot
     assert snapshot["report_excerpt"].startswith("Revenue grew")
+
+
+def test_snapshot_state_excludes_analysis_fields_for_non_analysis_routes():
+    state = {
+        "user_id": "alice",
+        "guard_route": "reports",
+        "sql": "SELECT 1",
+        "sql_attempts": 2,
+        "retrieved_trio_ids": ["monthly-revenue"],
+        "retrieval_method": "embedding",
+    }
+    snapshot = snapshot_state(state)
+    assert snapshot["guard_route"] == "reports"
+    assert "sql" not in snapshot
+    assert "sql_attempts" not in snapshot
+    assert "retrieved_trio_ids" not in snapshot
+    assert "retrieval_method" not in snapshot
+
+
+def test_reports_turn_trace_excludes_stale_analysis_fields(tmp_path):
+    settings = make_settings(google_api_key="test-key")
+    llm = ScriptLLM([f"```sql\n{GOOD_SQL}\n```", "Top orders report"])
+    bq = FakeBQRunner(
+        [QueryResult(ok=True, dataframe=pd.DataFrame({"order_id": [1]}), sql=GOOD_SQL)]
+    )
+    report_store = ReportStore(db_path=str(tmp_path / "reports.sqlite3"))
+    deps = AgentDeps(
+        settings=settings,
+        llm=llm,
+        bq_runner=bq,
+        report_store=report_store,
+    )
+    graph = compile_graph(deps)
+    config = {"configurable": {"thread_id": "thread-trace"}}
+
+    graph.invoke(
+        {
+            "messages": [HumanMessage(content="Show me recent orders")],
+            "user_id": "alice",
+            "question": "Show me recent orders",
+        },
+        config,
+    )
+
+    tracer = TurnTracer(
+        turn_id="reports-turn",
+        user_id="alice",
+        thread_id="thread-trace",
+        log_path=tmp_path / "events.jsonl",
+    )
+    deps.tracer = tracer
+    tracer.emit_turn_start("show my reports")
+    graph.invoke(
+        {
+            "messages": [HumanMessage(content="show my reports")],
+            "user_id": "alice",
+            "question": "show my reports",
+        },
+        config,
+    )
+    tracer.emit_turn_end(status="done", report="Your saved reports")
+
+    events = events_for_turn("reports-turn", log_path=tmp_path / "events.jsonl")
+    node_events = [event for event in events if event.get("event_type") == "node"]
+    assert node_events
+    for event in node_events:
+        assert "sql" not in event
+        assert "retrieved_trio_ids" not in event
+        assert event.get("state_after", {}).get("sql") is None
+        assert event.get("state_after", {}).get("retrieved_trio_ids") is None
 
 
 def test_turn_tracer_writes_node_and_turn_events(tmp_path):

@@ -16,7 +16,7 @@ python -m retail_agent.evals
 # Live pre-deploy gate (requires .env + BigQuery ADC)
 python -m retail_agent.evals --live
 
-# Safety subset only
+# Safety subset only (baseline comparison is scoped to the selected layer)
 python -m retail_agent.evals --layer safety
 ```
 
@@ -107,6 +107,8 @@ Each line records `case_id`, `layer`, `passed`, and `judge_score` (capability on
 ### Regression check
 
 By default, `python -m retail_agent.evals` compares the current run against the baseline. A case that **passed before but fails now** is flagged as a regression and causes exit code 1.
+
+When `--layer` is `capability` or `safety`, regression comparison uses only baseline records from that same layer, so subset runs do not report phantom regressions for cases outside the selected layer.
 
 ```bash
 # Normal CI / pre-commit check

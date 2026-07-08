@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "retail-agent"
-version = "0.18.0"
+version = "0.19.0"
 description = "Retail company data analysis chat assistant (Opsfleet AI assignment prototype)"
 readme = "README.md"
 requires-python = ">=3.11"

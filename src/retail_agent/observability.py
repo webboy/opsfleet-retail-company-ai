@@ -42,6 +42,11 @@ SAFE_STATE_FIELDS = (
     "persona_name",
 )
 
+ANALYSIS_TRACE_ROUTES = frozenset({"analysis", "schema"})
+ANALYSIS_ONLY_STATE_FIELDS = frozenset(
+    {"sql", "sql_attempts", "retrieved_trio_ids", "retrieval_method"}
+)
+
 
 def snapshot_state(state: AgentState | dict[str, Any] | None) -> dict[str, Any]:
     """Return a safe, JSON-serializable subset of graph state."""
@@ -49,8 +54,12 @@ def snapshot_state(state: AgentState | dict[str, Any] | None) -> dict[str, Any]:
     if not state:
         return {}
     snapshot: dict[str, Any] = {}
+    guard_route = state.get("guard_route")
+    include_analysis_fields = guard_route in ANALYSIS_TRACE_ROUTES
     for key in SAFE_STATE_FIELDS:
         if key in state:
+            if key in ANALYSIS_ONLY_STATE_FIELDS and not include_analysis_fields:
+                continue
             snapshot[key] = state[key]
     budget = state.get("llm_budget")
     if budget:
@@ -139,23 +148,26 @@ class TurnTracer:
         error: str | None = None,
         fallback_metadata: dict[str, object] | None = None,
     ) -> dict[str, Any]:
-        return self.emit(
-            "node",
-            node=node,
-            latency_ms=round(latency_ms, 2),
-            state_before=state_before,
-            state_after=state_after,
-            error_class=error or classify_error(state_after),
-            sql=state_after.get("sql"),
-            sql_attempts=state_after.get("sql_attempts"),
-            guard_decision=state_after.get("guard_decision"),
-            guard_route=state_after.get("guard_route"),
-            retrieved_trio_ids=state_after.get("retrieved_trio_ids"),
-            retrieval_method=state_after.get("retrieval_method"),
-            pii_mask_hits=state_after.get("pii_mask_hits"),
-            status=state_after.get("status"),
-            fallback_metadata=fallback_metadata or {},
-        )
+        guard_route = state_after.get("guard_route")
+        include_analysis_fields = guard_route in ANALYSIS_TRACE_ROUTES
+        fields: dict[str, Any] = {
+            "node": node,
+            "latency_ms": round(latency_ms, 2),
+            "state_before": state_before,
+            "state_after": state_after,
+            "error_class": error or classify_error(state_after),
+            "guard_decision": state_after.get("guard_decision"),
+            "guard_route": guard_route,
+            "pii_mask_hits": state_after.get("pii_mask_hits"),
+            "status": state_after.get("status"),
+            "fallback_metadata": fallback_metadata or {},
+        }
+        if include_analysis_fields:
+            fields["sql"] = state_after.get("sql")
+            fields["sql_attempts"] = state_after.get("sql_attempts")
+            fields["retrieved_trio_ids"] = state_after.get("retrieved_trio_ids")
+            fields["retrieval_method"] = state_after.get("retrieval_method")
+        return self.emit("node", **fields)
 
     def _append(self, event: dict[str, Any]) -> None:
         self.log_path.parent.mkdir(parents=True, exist_ok=True)
@@ -199,7 +211,15 @@ def aggregate_metrics(events: list[dict[str, Any]]) -> dict[str, Any]:
         for event in node_events
         if event.get("node") == "input_guard" and event.get("guard_decision") == "refused"
     )
-    self_heals = sum(1 for event in node_events if int(event.get("sql_attempts") or 0) > 1)
+    heal_turns: set[str] = set()
+    for event in node_events:
+        turn_id = event.get("turn_id")
+        if not turn_id:
+            continue
+        attempts = int(event.get("sql_attempts") or 0)
+        if attempts > 1:
+            heal_turns.add(turn_id)
+    self_heals = len(heal_turns)
     mask_hits = sum(int(event.get("pii_mask_hits") or 0) for event in node_events)
 
     outcomes: dict[str, int] = {}

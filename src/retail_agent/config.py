@@ -78,9 +78,9 @@ def _load_env_file() -> None:
     repo_root = Path(__file__).resolve().parents[2]
     env_path = repo_root / ".env"
     if env_path.is_file():
-        load_dotenv(env_path, override=True)
+        load_dotenv(env_path, override=False)
         return
-    load_dotenv(override=True)
+    load_dotenv(override=False)
 
 
 def _resolve_gcp_project_id() -> str | None:

@@ -43,6 +43,17 @@ def load_baseline(path: Path) -> dict[str, dict]:
     return baseline
 
 
+def filter_baseline_by_layer(baseline: dict[str, dict], *, layer: str) -> dict[str, dict]:
+    """Return baseline records matching the selected eval layer."""
+    if layer == "all":
+        return baseline
+    return {
+        case_id: record
+        for case_id, record in baseline.items()
+        if record.get("layer") == layer
+    }
+
+
 def compare_runs(
     current: list[dict],
     baseline: dict[str, dict],

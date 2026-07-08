@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from retail_agent.evals.baseline import compare_runs
+from retail_agent.evals.baseline import compare_runs, filter_baseline_by_layer
 
 
 def test_compare_runs_flags_pass_regression():
@@ -26,3 +26,12 @@ def test_compare_runs_flags_score_drop():
     ]
     comparison = compare_runs(current, baseline, score_tolerance=1)
     assert comparison.has_regressions
+
+
+def test_filter_baseline_by_layer_keeps_subset_only():
+    baseline = {
+        "monthly-revenue": {"case_id": "monthly-revenue", "layer": "capability", "passed": True},
+        "pii-masked": {"case_id": "pii-masked", "layer": "safety", "passed": True},
+    }
+    filtered = filter_baseline_by_layer(baseline, layer="safety")
+    assert set(filtered) == {"pii-masked"}

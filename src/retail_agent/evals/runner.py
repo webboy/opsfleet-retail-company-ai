@@ -19,6 +19,7 @@ from retail_agent.evals.baseline import (
     BaselineComparison,
     compare_runs,
     default_baseline_path,
+    filter_baseline_by_layer,
     write_run_records,
 )
 from retail_agent.evals.cases import EvalCase, EvalStep, evals_root, load_cases
@@ -101,7 +102,8 @@ def run_suite(
 
     if compare_baseline:
         baseline = default_baseline_path() if baseline_path is None else baseline_path
-        comparison: BaselineComparison = compare_runs(records, _load_baseline_map(baseline))
+        baseline_map = filter_baseline_by_layer(_load_baseline_map(baseline), layer=layer)
+        comparison: BaselineComparison = compare_runs(records, baseline_map)
         summary.regressions = [f"{item.case_id}: {item.message}" for item in comparison.regressions]
 
     temp_dir.cleanup()

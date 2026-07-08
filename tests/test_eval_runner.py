@@ -15,3 +15,10 @@ def test_dry_run_eval_suite_detects_no_regressions_against_baseline():
     summary = run_suite(live=False, layer="all", compare_baseline=True, with_judge=True)
     assert summary.failed == 0
     assert summary.regressions == []
+
+
+def test_dry_run_safety_layer_has_no_phantom_baseline_regressions():
+    summary = run_suite(live=False, layer="safety", compare_baseline=True, with_judge=False)
+    assert summary.failed == 0
+    assert summary.regressions == []
+    assert summary.total == 5

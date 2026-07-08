@@ -10,7 +10,7 @@ Second-pass confirmed bugs (each reproduced; details in the task folders):
 2. **0018 (medium)** — ~~`/save` persists non-analysis output~~ — **done** (user approved 2026-07-08): `last_analysis_*` state + graph regression tests.
 3. **0019 (medium)** — ~~malformed trio file crashes CLI~~ — **done** (user approved 2026-07-08): skip-and-warn in `load_trios`.
 4. **0020 (medium)** — ~~preference regex hijacks analysis~~ — **done** (user approved 2026-07-08): formatting-intent patterns + DB-table guard.
-5. **0021 (low)** — eval `--layer` subsets exit 1 with phantom baseline regressions; `self_heal_events` inflated (counts node events, not turns); node events carry stale cross-turn SQL/trios; `.env` overrides shell env vars (`override=True`).
+5. **0021 (low)** — eval `--layer` phantom regressions, inflated `self_heal_events`, stale trace fields, `.env` precedence — **pending_review** (implementation complete 2026-07-08).
 
 First-pass status: ~~0012~~ ~~0013~~ ~~0014~~ ~~0015~~ ~~0016~~ ~~0017~~ ~~0018~~ ~~0019~~ ~~0020~~ — **done** (user approved 2026-07-08).
 
@@ -41,7 +41,7 @@ First-pass status: ~~0012~~ ~~0013~~ ~~0014~~ ~~0015~~ ~~0016~~ ~~0017~~ ~~0018~
 
 ## Recent changes
 
-- 2026-07-08: Task 0020 **done** (user approved) — preference detection requires formatting intent; version **0.18.0**.
+- 2026-07-08: Task 0021 **pending_review** — eval layer baseline filter, per-turn self-heal metric, trace snapshot guard, env precedence; version **0.19.0**; pytest 189, dry-run eval 16/16, safety subset 5/5.
 - 2026-07-08: Task 0020 **pending_review** — preference detection requires formatting intent; version **0.18.0**; pytest 183, dry-run eval 16/16.
 - 2026-07-08: Task 0019 **done** (user approved) — skip malformed trio files with warning; version **0.17.0**.
 - 2026-07-08: Task 0019 **pending_review** — skip malformed trio files with warning; version **0.17.0**; pytest 175, dry-run eval 16/16.

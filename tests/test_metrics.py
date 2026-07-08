@@ -20,6 +20,39 @@ def test_aggregate_metrics_from_sample_events():
     assert metrics["latency_ms"]["count"] == 4
 
 
+def test_aggregate_metrics_counts_self_heal_per_turn_not_per_node():
+    events = [
+        {
+            "event_type": "node",
+            "turn_id": "turn-heal",
+            "node": "generate_sql",
+            "latency_ms": 10.0,
+            "sql_attempts": 2,
+        },
+        {
+            "event_type": "node",
+            "turn_id": "turn-heal",
+            "node": "execute_bq",
+            "latency_ms": 12.0,
+            "sql_attempts": 2,
+        },
+        {
+            "event_type": "node",
+            "turn_id": "turn-heal",
+            "node": "compose_report",
+            "latency_ms": 8.0,
+            "sql_attempts": 2,
+        },
+        {
+            "event_type": "turn_end",
+            "turn_id": "turn-heal",
+            "status": "done",
+        },
+    ]
+    metrics = aggregate_metrics(events)
+    assert metrics["self_heal_events"] == 1
+
+
 def test_metrics_cli_prints_summary(tmp_path, capsys):
     log_path = tmp_path / "events.jsonl"
     log_path.write_text(
