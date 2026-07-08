@@ -2,17 +2,17 @@
 
 ## Current focus
 
-Second deep-review pass (2026-07-08, strict edge-case testing) produced five new tasks **0017–0021**. Task **0016** polish is **done** (user approved 2026-07-08). Task **0017** PII marker over-match fix is **pending_review** (implementation complete 2026-07-08). First-pass fixes 0012–0015 verified working in this pass (CTE live on BigQuery, 10-turn budget reset, ownership-scoped deletes, MCP stdio handshake).
+Second deep-review pass (2026-07-08, strict edge-case testing) produced five new tasks **0017–0021**. Task **0016** polish is **done** (user approved 2026-07-08). Task **0017** PII marker over-match fix is **done** (user approved 2026-07-08). First-pass fixes 0012–0015 verified working in this pass (CTE live on BigQuery, 10-turn budget reset, ownership-scoped deletes, MCP stdio handshake).
 
 Second-pass confirmed bugs (each reproduced; details in the task folders):
 
-1. **0017 (high)** — ~~PII marker over-match~~ — **pending_review**: token-boundary matching + numeric metric exemption; graph regression test added.
+1. **0017 (high)** — ~~PII marker over-match~~ — **done** (user approved 2026-07-08): token-boundary matching + numeric metric exemption; live CLI verified (`Masked PII columns=[]`).
 2. **0018 (medium)** — `/save` persists the latest answer of *any* turn (preference confirmations, list output, refusals) instead of the last analysis report.
 3. **0019 (medium)** — one malformed `golden_bucket/*.md` file crashes CLI startup with a raw traceback.
 4. **0020 (medium)** — preference regex hijacks analysis questions like "Can I use the orders table to compute revenue?" and corrupts the stored preference.
 5. **0021 (low)** — eval `--layer` subsets exit 1 with phantom baseline regressions; `self_heal_events` inflated (counts node events, not turns); node events carry stale cross-turn SQL/trios; `.env` overrides shell env vars (`override=True`).
 
-First-pass status: ~~0012~~ ~~0013~~ ~~0014~~ ~~0015~~ ~~0016~~ — **done** (user approved 2026-07-08).
+First-pass status: ~~0012~~ ~~0013~~ ~~0014~~ ~~0015~~ ~~0016~~ ~~0017~~ — **done** (user approved 2026-07-08).
 
 ## How work is organized
 
@@ -41,6 +41,7 @@ First-pass status: ~~0012~~ ~~0013~~ ~~0014~~ ~~0015~~ ~~0016~~ — **done** (us
 
 ## Recent changes
 
+- 2026-07-08: Task 0017 **done** (user approved) — token-boundary PII column matching + numeric metric exemption; live CLI verified; version **0.15.0**.
 - 2026-07-08: Task 0017 **pending_review** — token-boundary PII column matching + numeric metric exemption; graph regression test; version **0.15.0**; pytest 167, dry-run eval 16/16.
 - 2026-07-08: Second deep-review pass — created tasks 0017–0021; verified 0012–0015 fixes live (CTE on BigQuery, 10-turn budget, cross-user delete scope, confirm-variant cancels, MCP stdio, eval flags); pytest 157, dry-run eval 16/16; `.env` on Ollama-primary + Gemini-fallback confirmed working in live CLI.
 - 2026-07-08: Task 0016 **done** (user approved) — CLI diagnostics gated to analysis turns; eval/docs polish; version **0.14.0**.

@@ -4,7 +4,7 @@
 
 - **Task ID**: 0017
 - **Title**: PII column markers over-match: legit metrics masked to `***` (regression of 0014)
-- **Status**: pending_review
+- **Status**: done
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08
@@ -60,7 +60,7 @@ because `ScriptLLM` ignores its input.
 - [x] `mask_dataframe` leaves `cancelled_rate`, `excellent_score`, `miscellaneous`, `email_count` (numeric), `phone_orders` (numeric) untouched.
 - [x] `email`, `customer_email`, `phone_number`, `mobile`, `contact_info` string columns are still fully masked (0014 guarantees hold; its tests stay green).
 - [x] Graph-level test: cancelled-rate style result reaches `result_preview` unmasked with no PII policy note.
-- [ ] Live sanity: "What share of orders are cancelled?" produces a numeric answer (subject to live model SQL quality).
+- [x] Live sanity: "What share of orders are cancelled?" produces a numeric answer (subject to live model SQL quality).
 
 ## References
 

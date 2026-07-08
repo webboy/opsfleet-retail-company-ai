@@ -45,4 +45,4 @@ retail-agent chat
 - [x] `mask_dataframe` leaves `cancelled_rate`, `excellent_score`, `miscellaneous`, `email_count` (numeric), `phone_orders` (numeric) untouched.
 - [x] `email`, `customer_email`, `phone_number`, `mobile`, `contact_info` string columns are still fully masked (0014 tests green).
 - [x] Graph-level test: cancelled-rate style result reaches compose-report prompt unmasked with no PII policy note.
-- [ ] Live sanity — not run in this session; user can confirm with live CLI.
+- [x] Live sanity — user confirmed live CLI: no spurious PII masking (`Masked PII columns=[]`); SQL quality on llama3.2 is a separate known limitation.

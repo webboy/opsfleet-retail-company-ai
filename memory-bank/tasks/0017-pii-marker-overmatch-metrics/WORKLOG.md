@@ -10,3 +10,4 @@
 - Added false-positive/true-positive unit tests in `test_safety.py` and cancelled-rate graph regression in `test_safety_graph.py`.
 - Verification: focused safety tests 31 passed; full pytest 167 passed; eval dry-run 16/16.
 - Version bumped to **0.15.0**; task set to `pending_review`.
+- User approved 2026-07-08 — task marked **done**; live CLI verified no spurious PII masking.
