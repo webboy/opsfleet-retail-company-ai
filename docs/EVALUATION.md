@@ -13,14 +13,32 @@ pytest -q
 # Eval suite — dry-run default (no live credentials)
 python -m retail_agent.evals
 
-# Live pre-deploy gate (requires .env + BigQuery ADC)
-python -m retail_agent.evals --live
+# Live pre-deploy check (requires .env + BigQuery ADC; do not compare to dry-run baseline)
+python -m retail_agent.evals --live --no-compare
 
 # Safety subset only (baseline comparison is scoped to the selected layer)
 python -m retail_agent.evals --layer safety
 ```
 
-Exit code `0` = all cases passed and no baseline regressions. Exit code `1` = failures or regressions.
+Exit code `0` = all cases passed and no baseline regressions (dry-run default). Exit code `1` = failures or regressions.
+
+## CI gate (deterministic, no API keys)
+
+GitHub Actions workflow [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs on pushes and pull requests to `main`:
+
+1. `pip install -e ".[dev]"`
+2. `pytest -q`
+3. `python -m retail_agent.evals`
+
+This is the **enforceable regression gate** for the public repo. It proves unit/integration coverage and dry-run eval orchestration against the committed baseline. It does **not** run live LLM or BigQuery.
+
+Run the same checks locally before opening a PR:
+
+```bash
+pip install -e ".[dev]"
+pytest -q
+python -m retail_agent.evals
+```
 
 ## pytest suite
 
@@ -34,8 +52,8 @@ The `tests/` directory covers deterministic logic without live APIs:
 - Eval assertion engine and baseline comparison
 
 ```bash
-pytest -q                    # quiet summary
-pytest tests/test_bq.py -v   # single module
+pytest -q                              # quiet summary
+pytest tests/test_sql_guard.py -v      # single module
 ```
 
 Run `pytest -q` for the current passing count; the summary line is the source of truth and is not hard-coded here to avoid documentation drift.
@@ -59,11 +77,11 @@ Capability cases use **property assertions**, not exact numeric values — the p
 | Mode | Flag | LLM | BigQuery | Use when |
 |------|------|-----|----------|----------|
 | **Dry-run** | (default) | `ScriptLLM` with canned SQL/report per case | `FakeBQRunner` with fixture rows | CI, offline verification, regression |
-| **Live** | `--live` | Real Gemini (or configured provider) | Real BigQuery | Pre-deploy gate with credentials |
+| **Live** | `--live` | Configured agent provider (e.g. Ollama/Gemini) | Real BigQuery | Optional pre-demo smoke test with credentials |
 
-Dry-run is the **default** so reviewers can verify the suite without API keys. It is deterministic: scripted LLM/BQ fixtures replay the same outcomes on every run and are the CI regression gate.
+Dry-run is the **default** and the **CI gate**. It is deterministic: scripted LLM/BQ fixtures replay the same outcomes on every run. It validates graph routing, safety guards, property assertions, and baseline regression — **not** live natural-language-to-SQL quality.
 
-Live mode (`--live`) is optional for pre-deploy checks with real credentials. Use `--no-compare` when running live so baseline comparison does not fail on model nondeterminism. Failed cases in saved JSONL runs now include a `diagnostics` object with `status`, `sql`, `sql_attempts`, `last_error`, `query_ok`, `query_empty`, and `retrieved_trio_ids` to explain regressions without a separate trace log.
+Live mode (`--live`) is optional for manual pre-demo checks with real credentials. **Always use `--no-compare`** for live runs unless you intentionally maintain a separate live baseline; comparing live nondeterministic output against the dry-run baseline will produce false regressions. Failed cases in saved JSONL runs include a `diagnostics` object with `status`, `sql`, `sql_attempts`, `last_error`, `query_ok`, `query_empty`, and `retrieved_trio_ids`.
 
 ### CLI flags
 
@@ -89,7 +107,7 @@ For capability cases that pass property assertions, a separate judge prompt (`ev
 - **Dry-run:** scripted judge scores from case fixtures
 - **Live:** local **Ollama** only (`RETAIL_AGENT_OLLAMA_MODEL`, `OLLAMA_HOST`) — no cloud fallback, so judge scoring does not consume Gemini quota
 
-Judge runs only on capability layer cases where `judge: true` in `cases.yaml`.
+Judge runs only on capability layer cases where `judge: true` in `cases.yaml`. If live judge scoring is unavailable (e.g. Ollama not running), the case records `judge unavailable` and does not fail the run — only a score below 3 fails a passing case.
 
 ## Baseline and regression workflow
 
@@ -146,10 +164,9 @@ On failure:
 
 ## Pre-deploy checklist
 
-1. `pytest -q` — all unit tests green
-2. `python -m retail_agent.evals` — dry-run passes, no regressions
-3. `python -m retail_agent.evals --live` — live gate with real credentials (optional but recommended before demo)
-4. Manual spot-check: one manager workflow in `retail-agent --user alice` (analysis → follow-up → preference → save → guarded delete)
+1. **CI / local gate** — `pytest -q` and `python -m retail_agent.evals` (same as GitHub Actions; no API keys)
+2. **Optional live smoke test** — `python -m retail_agent.evals --live --no-compare` with credentials (validates real LLM + BigQuery; results vary by model/quota)
+3. Manual spot-check: one manager workflow in `retail-agent --user alice` (analysis → follow-up → preference → save → guarded delete)
 
 ## Adding eval cases
 

@@ -130,18 +130,21 @@ Agent: I couldn't find a region column in the available tables. Try asking
 
 ## Verify installation (no live API keys needed)
 
+Same checks as CI (see [Evaluation Guide](docs/EVALUATION.md#ci-gate-deterministic-no-api-keys)):
+
 ```bash
+pip install -e ".[dev]"
 pytest -q                          # unit + graph integration tests
-python -m retail_agent.evals       # dry-run eval suite (16 cases)
+python -m retail_agent.evals       # dry-run eval suite (16 cases, baseline compare)
 ```
 
-With credentials configured, also try:
+With credentials configured, optional manual checks:
 
 ```bash
-python -m retail_agent.bq          # BigQuery smoke test
-python -m retail_agent.evals --live # full pre-deploy gate
-retail-agent --user alice          # interactive chat
-python -m retail_agent.metrics     # aggregate observability (after chat)
+python -m retail_agent.bq                              # BigQuery smoke test
+python -m retail_agent.evals --live --no-compare       # live smoke (not in CI)
+retail-agent --user alice                              # interactive chat
+python -m retail_agent.metrics                         # aggregate observability (after chat)
 ```
 
 See [Evaluation Guide](docs/EVALUATION.md) for eval flags and baseline workflow.

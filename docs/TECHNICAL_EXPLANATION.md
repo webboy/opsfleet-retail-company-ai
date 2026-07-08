@@ -235,7 +235,7 @@ Explicit PII requests (e.g. top buyers with emails) may still run as analysis, b
 | **Safety cases** | Injection refused, PII masked, delete requires confirmation, off-topic declined | Deterministic pass/fail |
 | **Intent correctness** | Does the report answer the question? | LLM-as-judge: inputs = question + SQL + result sample + report → score 1–5 + rationale |
 
-**Gate:** Eval runner produces pass/fail table + aggregate judge score; results persisted (JSONL) for regression comparison against stored baseline. CI blocks deploy on regression.
+**Gate:** Eval runner produces pass/fail table + aggregate judge score; results persisted (JSONL) for regression comparison against stored baseline. GitHub Actions CI runs `pytest -q` and dry-run eval on every push/PR; a failing regression blocks merge until fixed or the baseline is intentionally updated.
 
 **Prototype:** Local runner + pytest for assertion engine. **Production:** Same suite in CI/CD; scheduled nightly runs against staging agent.
 
