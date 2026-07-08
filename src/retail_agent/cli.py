@@ -107,12 +107,13 @@ def run_repl(*, user_id: str, thread_id: str | None = None, deps: AgentDeps | No
             if active_tracer is not None:
                 active_tracer.emit_turn_end(status=result.get("status"), report=report)
             print(f"\nAgent: {report}\n")
-            if result.get("sql"):
-                attempts = result.get("sql_attempts", 0)
-                print(f"[sql attempts={attempts}]\n")
-            if result.get("retrieved_trio_ids"):
-                method = result.get("retrieval_method", "unknown")
-                print(f"[retrieved trios={result['retrieved_trio_ids']} method={method}]\n")
+            if _should_print_analysis_diagnostics(result):
+                if result.get("sql"):
+                    attempts = result.get("sql_attempts", 0)
+                    print(f"[sql attempts={attempts}]\n")
+                if result.get("retrieved_trio_ids"):
+                    method = result.get("retrieval_method", "unknown")
+                    print(f"[retrieved trios={result['retrieved_trio_ids']} method={method}]\n")
         except Exception as exc:  # noqa: BLE001 — never leak stack traces in CLI
             if active_tracer is not None:
                 active_tracer.emit_turn_end(status="fallback", report=str(exc))
@@ -128,6 +129,12 @@ def run_repl(*, user_id: str, thread_id: str | None = None, deps: AgentDeps | No
                     "Please try again or rephrase your question.\n"
                 )
             awaiting_interrupt = False
+
+
+def _should_print_analysis_diagnostics(result: dict) -> bool:
+    """Print SQL/trio diagnostics only for completed analysis turns."""
+
+    return result.get("guard_route") == "analysis"
 
 
 def _invoke_context(
