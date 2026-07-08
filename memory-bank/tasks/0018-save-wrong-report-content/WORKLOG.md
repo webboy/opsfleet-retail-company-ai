@@ -11,3 +11,4 @@
 - Added graph regression tests for preference/list/refusal-only save scenarios.
 - Verification: reports graph tests 9 passed; full pytest 170 passed; eval dry-run 16/16.
 - Version bumped to **0.16.0**; task set to `pending_review`.
+- User approved 2026-07-08 — task marked **done**.

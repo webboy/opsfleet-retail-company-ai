@@ -4,7 +4,7 @@
 
 - **Task ID**: 0018
 - **Title**: /save persists non-analysis output as a "report"
-- **Status**: pending_review
+- **Status**: done
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08

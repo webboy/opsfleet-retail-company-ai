@@ -21,7 +21,7 @@ Quick overview of all tasks. Source of truth for each row is the task's `TASK.md
 | 0015 | LLM resilience: retry/fallback on connection-level outages | done | Engineer | 2026-07-08 |
 | 0016 | Polish: stale CLI diagnostics, docs test-count drift, brittle live eval assertion | done | Engineer | 2026-07-08 |
 | 0017 | PII column markers over-match: legit metrics masked to `***` (regression of 0014) | done | Engineer | 2026-07-08 |
-| 0018 | /save persists non-analysis output as a "report" | pending_review | Engineer | 2026-07-08 |
+| 0018 | /save persists non-analysis output as a "report" | done | Engineer | 2026-07-08 |
 | 0019 | Golden Bucket robustness: one malformed trio file crashes the CLI | todo | Engineer | 2026-07-08 |
 | 0020 | Preference regex hijacks analysis questions mentioning "table" | todo | Engineer | 2026-07-08 |
 | 0021 | Polish: eval --layer phantom regressions, inflated self-heal metric, stale trace fields, .env precedence | todo | Engineer | 2026-07-08 |
