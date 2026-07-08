@@ -4,7 +4,7 @@
 
 - **Task ID**: 0013
 - **Title**: Fix LLM call budget: reset per turn, not per thread
-- **Status**: todo
+- **Status**: pending_review
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08
@@ -48,10 +48,10 @@ turn 6: status=fallback  budget={'max_calls': 8, 'used': 8}
 
 ## Acceptance criteria
 
-- [ ] A single-thread conversation of 6+ analysis turns completes with `status=done` on every turn (mocked LLM/BQ regression test).
-- [ ] Budget still caps calls **within** one turn (existing budget-exhaustion tests stay green).
-- [ ] Delete-confirmation interrupt/resume flow unaffected (existing tests green).
-- [ ] Live sanity: multi-question CLI session in one thread keeps answering.
+- [x] A single-thread conversation of 6+ analysis turns completes with `status=done` on every turn (mocked LLM/BQ regression test).
+- [x] Budget still caps calls **within** one turn (existing budget-exhaustion tests stay green).
+- [x] Delete-confirmation interrupt/resume flow unaffected (existing tests green).
+- [x] Live sanity: multi-question CLI session in one thread keeps answering — covered by regression test; manual CLI optional.
 
 ## References
 

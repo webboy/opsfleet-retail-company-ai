@@ -206,3 +206,40 @@ def test_follow_up_question_keeps_conversation_context(settings):
     assert first["report"] == "First answer"
     assert second["report"] == "Follow-up answer"
     assert llm.calls == 4
+
+
+def test_llm_budget_resets_each_turn_in_same_thread(settings):
+    """Regression: budget must not accumulate across turns in one thread."""
+    num_turns = 6
+    llm_responses: list[str] = []
+    for i in range(num_turns):
+        llm_responses.extend([f"```sql\n{GOOD_SQL}\n```", f"Answer {i + 1}"])
+    llm = ScriptLLM(llm_responses)
+    bq = FakeBQRunner(
+        [
+            QueryResult(ok=True, dataframe=pd.DataFrame({"order_id": [i]}), sql=GOOD_SQL)
+            for i in range(num_turns)
+        ]
+    )
+    deps = AgentDeps(settings=settings, llm=llm, bq_runner=bq, max_llm_calls=8)
+    graph = compile_graph(deps)
+    config = {"configurable": {"thread_id": "budget-reset-thread"}}
+
+    results = []
+    for i in range(num_turns):
+        result = graph.invoke(
+            {
+                "messages": [HumanMessage(content=f"Show orders turn {i + 1}")],
+                "user_id": "alice",
+                "question": f"Show orders turn {i + 1}",
+            },
+            config,
+        )
+        results.append(result)
+
+    for i, result in enumerate(results):
+        assert result["status"] == "done", f"turn {i + 1} failed: {result}"
+        assert result["llm_budget"]["used"] == 2, f"turn {i + 1} budget not per-turn"
+        assert f"Answer {i + 1}" in result["report"]
+
+    assert llm.calls == num_turns * 2

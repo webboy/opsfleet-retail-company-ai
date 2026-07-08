@@ -6,7 +6,7 @@ import logging
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from retail_agent.deps import AgentDeps, resolve_budget
+from retail_agent.deps import AgentDeps, fresh_budget
 from retail_agent.llm import (
     BudgetExhaustedError,
     CallBudget,
@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 def input_guard(state: AgentState, deps: AgentDeps) -> dict:
     question = state.get("question") or _latest_user_message(state)
     precheck = classify_input_precheck(question)
-    budget = resolve_budget(state, deps)
+    budget = fresh_budget(deps)
 
     if precheck.decision == "refused":
         logger.info("Input guard refused turn route=%s reason=%s", precheck.route, precheck.reason)

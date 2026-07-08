@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009 and **0011** **done** (user approved). **0010** MCP stretch **pending_review**. Bug-fix tasks **0012–0016** created from the full-code review — all **todo**.
+Tasks 0001–0009 and **0011** **done** (user approved). **0010** MCP **pending_review**. **0013** budget fix **pending_review**. Bug-fix tasks **0012, 0014–0016** **todo**.
 
 ## What works
 
@@ -18,18 +18,20 @@ Tasks 0001–0009 and **0011** **done** (user approved). **0010** MCP stretch **
 - QA eval suite: 16 cases, dry-run default, judge scoring, baseline regression (task 0008, **done**).
 - **Human docs package**: README, USAGE, EVALUATION, drift-corrected architecture/technical (task 0009, **done**).
 - **Optional MCP server**: `retail-agent-mcp`, guarded `query_retail_data` + `retrieve_trios` (task 0010, **pending_review**).
-- `pytest` **132 passed**; eval dry-run **16/16 passed**; live eval (Ollama) **14/16** on 2026-07-08 (failures documented in task 0016).
+- `pytest` **133 passed**; eval dry-run **16/16 passed**; live eval (Ollama) **14/16** on 2026-07-08 (failures documented in task 0016).
+- **LLM budget per-turn reset** (task 0013, **pending_review**): `input_guard` uses `fresh_budget`; 6-turn regression test.
 
 ## What's left to build
 
 1. ~~`0001`–`0009`, `0011`~~ — **done**
 2. `0010` *(optional)* MCP server — **pending_review** (awaiting user approval)
-3. `0012`–`0016` bug fixes from the 2026-07-08 full review — **todo** (see `tasks/INDEX.md`)
+3. `0012`, `0014`–`0016` bug fixes — **todo**
+4. ~~`0013` LLM budget reset~~ — **pending_review**
 
 ## Known issues
 
 - **sql_guard rejects CTE queries** (task 0012) — CTE alias treated as disallowed table.
-- **LLM budget not reset per turn** (task 0013) — long single-thread conversations degrade to fallback.
+- **LLM budget not reset per turn** — fixed in task 0013 (**pending_review**).
 - **Unformatted phone values leak through name-flagged PII columns** (task 0014).
 - **Connection-level LLM outages skip the fallback provider** (task 0015).
 - **Stale CLI diagnostics after non-analysis turns; docs test-count drift; brittle live eval token** (task 0016).
@@ -39,4 +41,4 @@ Tasks 0001–0009 and **0011** **done** (user approved). **0010** MCP stretch **
 
 ## Version
 
-- Project version **0.9.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (task 0010 MCP delivery).
+- Project version **0.10.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (task 0013 budget fix).
