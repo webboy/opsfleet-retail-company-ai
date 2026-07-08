@@ -37,6 +37,10 @@ Added GitHub Actions CI that runs deterministic verification (`pytest -q` + dry-
 - CI does not require secrets; safe for public repo.
 - Removing `.github/workflows/ci.yml` reverts the gate.
 
+## User approval
+
+- **2026-07-08**: User confirmed task **0025** done.
+
 ## Acceptance criteria check
 
 - [x] CI workflow runs `pytest -q` and `python -m retail_agent.evals`.
