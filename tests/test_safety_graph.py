@@ -237,3 +237,53 @@ def test_ambiguous_exact_refusal_labels_still_block(settings, label, expected_ro
     assert result["guard_route"] == expected_route
     assert bq.calls == 0
     assert llm.calls == 1
+
+
+def test_ambiguous_classify_budget_exhausted_fails_closed(settings):
+    llm = ScriptLLM(["should not reach SQL generation"])
+    bq = FakeBQRunner([])
+    deps = AgentDeps(settings=settings, llm=llm, bq_runner=bq, max_llm_calls=0)
+
+    result = _run_turn(deps, AMBIGUOUS_QUESTION)
+
+    assert result["status"] == "fallback"
+    assert result["guard_decision"] == "refused"
+    assert result["guard_route"] == "off_topic"
+    assert "llm classifier unavailable" in (result.get("guard_reason") or "").lower()
+    assert bq.calls == 0
+    assert llm.calls == 0
+
+
+class _QuotaExhaustedLLM:
+    def invoke(self, messages):
+        raise RuntimeError(
+            "429 RESOURCE_EXHAUSTED quota exceeded for generate_content_free_tier_requests"
+        )
+
+
+def test_ambiguous_classify_quota_exhausted_fails_closed(settings):
+    bq = FakeBQRunner([])
+    deps = AgentDeps(settings=settings, llm=_QuotaExhaustedLLM(), bq_runner=bq)
+
+    result = _run_turn(deps, AMBIGUOUS_QUESTION)
+
+    assert result["status"] == "fallback"
+    assert result["guard_decision"] == "refused"
+    assert result["guard_route"] == "off_topic"
+    assert "llm classifier unavailable" in (result.get("guard_reason") or "").lower()
+    assert bq.calls == 0
+
+
+def test_obvious_analysis_with_zero_budget_still_uses_deterministic_route(settings):
+    """Deterministic analysis markers must not be blocked by classify-skip fail-closed."""
+
+    llm = ScriptLLM(["unused"])
+    bq = FakeBQRunner([])
+    deps = AgentDeps(settings=settings, llm=llm, bq_runner=bq, max_llm_calls=0)
+
+    result = _run_turn(deps, "Show me recent orders")
+
+    assert result["guard_decision"] == "allowed"
+    assert result["guard_route"] == "analysis"
+    assert result["status"] == "fallback"
+    assert "budget" in (result.get("last_error") or result["report"]).lower()

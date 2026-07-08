@@ -17,6 +17,7 @@ Review backlog (created 2026-07-08):
 9. **0030 (medium)** — ~~Input guard fail-closed fallback~~ — **done** (user instruction: mark done when tests pass): malformed classifier output routes to `off_topic`; version **0.26.0**.
 10. **0031 (low)** — ~~Reviewer docs polish~~ — **done** (user instruction: mark done when checks pass): clone URL, CLI-accurate examples, delete-by-today evidence, production data-flow label, MIT LICENSE.
 11. **0032 (medium)** — ~~Live QA evidence hardening~~ — **done** (user instruction: mark done when tests pass): judge tests, `--require-judge`, empty-result eval case, live limitation docs; version **0.27.0**.
+12. **0033 (medium)** — ~~Input guard classify-unavailable fail-closed~~ — **done** (user instruction: mark done when tests pass): budget/quota classify-skip fails closed for ambiguous input; version **0.28.0**.
 
 Second-pass confirmed bugs (each reproduced; details in the task folders):
 
@@ -58,6 +59,7 @@ First-pass status: ~~0012~~ ~~0013~~ ~~0014~~ ~~0015~~ ~~0016~~ ~~0017~~ ~~0018~
 
 ## Recent changes
 
+- Task 0033 **done** — input guard classify-unavailable fail-closed: budget/quota classify-skip refuses ambiguous input; version **0.28.0**; pytest 235, dry-run eval 17/17.
 - Task 0032 **done** — live QA evidence hardening: judge tests, `--require-judge`, `valid-empty-result` eval case, cancelled-order live weakness docs; version **0.27.0**; pytest 232, dry-run eval 17/17.
 - 2026-07-08: Task 0031 **done** — reviewer docs polish (clone URL, CLI-accurate examples, delete-by-today, production data-flow label, MIT LICENSE); dry-run eval 16/16.
 - 2026-07-08: Task 0030 **done** — input guard fail-closed fallback to `off_topic` for malformed classifier output; version **0.26.0**; pytest 226, safety eval 5/5, dry-run eval 16/16.

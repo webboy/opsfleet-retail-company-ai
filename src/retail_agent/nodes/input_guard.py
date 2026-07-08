@@ -91,13 +91,13 @@ def _llm_classify(
         )
         route = parse_llm_guard_label(str(response.content))
     except BudgetExhaustedError:
-        route = precheck.route
+        logger.warning("Input guard LLM classify skipped: budget exhausted")
+        return _classify_unavailable_precheck(precheck)
     except Exception as exc:
         if is_quota_exhausted_error(exc):
             logger.warning("Input guard LLM classify skipped: quota exhausted")
-            route = precheck.route
-        else:
-            raise
+            return _classify_unavailable_precheck(precheck)
+        raise
 
     if route in {"malicious", "off_topic"}:
         return InputPrecheck(
@@ -113,6 +113,19 @@ def _llm_classify(
         reason=f"llm classified as {route}",
         pii_sensitive=precheck.pii_sensitive,
     )
+
+
+def _classify_unavailable_precheck(precheck: InputPrecheck) -> InputPrecheck:
+    """Fail closed when ambiguous input cannot be LLM-classified."""
+
+    if precheck.needs_llm:
+        return InputPrecheck(
+            decision="refused",
+            route="off_topic",
+            reason="llm classifier unavailable",
+            pii_sensitive=precheck.pii_sensitive,
+        )
+    return precheck
 
 
 def _refused_update(question: str, precheck: InputPrecheck) -> dict:

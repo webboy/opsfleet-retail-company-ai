@@ -36,3 +36,4 @@ Quick overview of all tasks. Source of truth for each row is the task's `TASK.md
 | 0030 | Input guard fail-closed fallback | done | Engineer | 2026-07-08 |
 | 0031 | Reviewer docs polish | done | Engineer | 2026-07-08 |
 | 0032 | Live QA evidence hardening | done | Engineer | 2026-07-08 |
+| 0033 | Input guard classify-unavailable fail-closed | done | Engineer | 2026-07-08 |
