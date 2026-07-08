@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, and **0015** **done** (user approved). **0016** polish **pending_review**.
+Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, and **0015** **done** (user approved). **0016** polish **pending_review**. Second deep-review pass (2026-07-08) created bug-fix tasks **0017–0021** — all **todo**.
 
 ## What works
 
@@ -34,6 +34,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, and **0015*
 5. ~~`0015` LLM connection resilience~~ — **done**
 6. ~~`0016` CLI/docs/eval polish~~ — **pending_review**
 7. ~~`0013` LLM budget reset~~ — **done**
+8. `0017`–`0021` bug fixes from the 2026-07-08 second review pass — **todo** (see `tasks/INDEX.md`)
 
 ## Known issues
 
@@ -42,9 +43,15 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, and **0015*
 - ~~**Unformatted phone values leak through name-flagged PII columns**~~ — fixed in task 0014 (**done**).
 - ~~**Connection-level LLM outages skip the fallback provider**~~ — fixed in task 0015 (**done**).
 - ~~**Stale CLI diagnostics after non-analysis turns; docs test-count drift; brittle live eval token**~~ — fixed in task 0016 (**pending_review**).
+- **PII markers over-match** (task 0017, **todo**) — `cancelled_rate`/`email_count` masked to `***` before the report LLM; regression amplified by 0014; dry-run evals blind to it.
+- **/save persists non-analysis output** (task 0018, **todo**) — preference confirmations, list output and refusals get saved as "reports".
+- **Malformed trio file crashes CLI startup** (task 0019, **todo**) — raw traceback; loader should skip-and-warn.
+- **Preference regex hijacks analysis questions** (task 0020, **todo**) — "use the orders table…" silently rewrites saved preferences.
+- **Tooling polish** (task 0021, **todo**) — eval `--layer` phantom regressions (exit 1); `self_heal_events` ~6x inflated; stale SQL/trios in node events; `.env` overrides shell env.
 - Candidate JSONL grows without automatic pruning — curation workflow documented only.
 - Preference phrase detection is deterministic and may miss unusual phrasing.
 - Live eval gate requires LLM + BigQuery credentials; dry-run is CI-default.
+- llama3.2 (local) SQL quality: complex questions (e.g. cancelled-order share) can exhaust 3 self-heal attempts; Gemini fallback or a larger local model handles them.
 
 ## Version
 
