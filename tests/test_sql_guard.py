@@ -111,3 +111,58 @@ def test_non_sql_prose_is_blocked(settings):
     )
     assert result.ok is False
     assert "parse error" in (result.error or "").lower()
+
+
+def test_cte_over_allowed_table_passes(settings):
+    sql = """
+        WITH monthly AS (
+          SELECT DATE_TRUNC(DATE(created_at), MONTH) AS m, SUM(sale_price) AS rev
+          FROM `bigquery-public-data.thelook_ecommerce.order_items`
+          GROUP BY m
+        )
+        SELECT * FROM monthly ORDER BY m
+    """
+    result = sql_guard(sql, settings)
+    assert result.ok is True
+    assert "LIMIT 500" in result.sql
+
+
+def test_cte_body_with_disallowed_table_is_blocked(settings):
+    sql = """
+        WITH leaked AS (
+          SELECT * FROM `bigquery-public-data.thelook_ecommerce.secret_table`
+        )
+        SELECT * FROM leaked
+    """
+    result = sql_guard(sql, settings)
+    assert result.ok is False
+    assert "not allowed" in (result.error or "").lower()
+
+
+def test_bare_disallowed_non_cte_table_still_blocked(settings):
+    sql = """
+        WITH monthly AS (
+          SELECT id FROM `bigquery-public-data.thelook_ecommerce.orders`
+        )
+        SELECT * FROM secret_table
+    """
+    result = sql_guard(sql, settings)
+    assert result.ok is False
+    assert "not allowed" in (result.error or "").lower()
+
+
+def test_multiple_nested_ctes_pass(settings):
+    sql = """
+        WITH base AS (
+          SELECT order_id, sale_price
+          FROM `bigquery-public-data.thelook_ecommerce.order_items`
+        ),
+        agg AS (
+          SELECT order_id, SUM(sale_price) AS total
+          FROM base
+          GROUP BY order_id
+        )
+        SELECT * FROM agg
+    """
+    result = sql_guard(sql, settings)
+    assert result.ok is True

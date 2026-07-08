@@ -4,7 +4,7 @@
 
 - **Task ID**: 0012
 - **Title**: Fix sql_guard: allow CTE (WITH) queries
-- **Status**: todo
+- **Status**: pending_review
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08
@@ -49,11 +49,11 @@ leak into `find_all(exp.Table)`.
 
 ## Acceptance criteria
 
-- [ ] A CTE query over allowed tables passes `sql_guard` and executes.
-- [ ] A CTE whose body references a non-allowed table is still rejected.
-- [ ] A query referencing a bare non-allowed table name (not a CTE alias) is still rejected.
-- [ ] Existing `tests/test_sql_guard.py` suite stays green; new tests cover the three cases above.
-- [ ] Live sanity: `python -m retail_agent.bq "<CTE query>"` returns rows.
+- [x] A CTE query over allowed tables passes `sql_guard` and executes.
+- [x] A CTE whose body references a non-allowed table is still rejected.
+- [x] A query referencing a bare non-allowed table name (not a CTE alias) is still rejected.
+- [x] Existing `tests/test_sql_guard.py` suite stays green; new tests cover the three cases above.
+- [x] Live sanity: `python -m retail_agent.bq "<CTE query>"` returns rows.
 
 ## References
 

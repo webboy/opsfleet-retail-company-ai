@@ -59,8 +59,10 @@ def sql_guard(sql: str, settings: Settings) -> GuardResult:
     if not _is_read_query(expression):
         return GuardResult(ok=False, error="Only SELECT queries are allowed.")
 
+    cte_names = _collect_cte_names(expression)
+
     for table in expression.find_all(exp.Table):
-        if not _table_allowed(table, settings):
+        if not _table_allowed(table, settings, cte_names):
             return GuardResult(
                 ok=False,
                 error=f"Table not allowed: {_table_label(table)}",
@@ -81,12 +83,32 @@ def _is_read_query(expression: exp.Expression) -> bool:
     return False
 
 
-def _table_allowed(table: exp.Table, settings: Settings) -> bool:
+def _collect_cte_names(expression: exp.Expression) -> frozenset[str]:
+    names: set[str] = set()
+    for cte in expression.find_all(exp.CTE):
+        alias = cte.alias_or_name
+        if alias:
+            names.add(_normalize(alias))
+    return frozenset(names)
+
+
+def _table_allowed(
+    table: exp.Table,
+    settings: Settings,
+    cte_names: frozenset[str] = frozenset(),
+) -> bool:
     catalog = _normalize(table.catalog)
     db = _normalize(table.db)
     name = _normalize(table.name)
 
-    if not name or name not in settings.allowed_tables:
+    if not name:
+        return False
+
+    # Bare CTE alias reference — allowed when defined in WITH clause.
+    if not catalog and not db and name in cte_names:
+        return True
+
+    if name not in settings.allowed_tables:
         return False
 
     if catalog and db:

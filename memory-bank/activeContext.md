@@ -6,7 +6,7 @@ Full-code review (2026-07-08) against the assignment PDF produced five new bug-f
 
 Review-confirmed bugs (each reproduced; details in the task folders):
 
-1. **0012** — `sql_guard` rejects CTE (`WITH`) queries: CTE alias fails the table whitelist.
+1. **0012** — `sql_guard` rejects CTE queries — **pending_review** (fix delivered).
 2. ~~**0013**~~ — per-turn LLM budget reset — **done** (user approved 2026-07-08).
 3. **0014** — name-flagged PII columns leak unformatted values (`phone` = `5551234567` passes unmasked).
 4. **0015** — connection-level LLM outages (refused/DNS/timeout) bypass retry and never reach the configured fallback provider.
@@ -39,7 +39,7 @@ Review-confirmed bugs (each reproduced; details in the task folders):
 
 ## Recent changes
 
-- 2026-07-08: Task 0013 **done** (user approved) — live multi-turn CLI verified; budget resets per turn.
+- 2026-07-08: Task 0012 **pending_review** — CTE aliases allowed in `sql_guard`; 4 regression tests; live BQ verified; version **0.11.0**.
 - 2026-07-08: Task 0013 **pending_review** — `input_guard` resets LLM budget per turn; regression test; version **0.10.0**.
 - 2026-07-08: Task 0010 **pending_review** — MCP server (`query_retail_data`, `retrieve_trios`), handler tests, `docs/MCP.md`, version **0.9.0**; 131 pytest, 16/16 eval.
 - 2026-07-08: Task 0009 **done** (user approved) — submission README, USAGE, EVALUATION, architecture drift fixes.

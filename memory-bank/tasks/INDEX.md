@@ -15,7 +15,7 @@ Quick overview of all tasks. Source of truth for each row is the task's `TASK.md
 | 0009 | Final accompanying documentation & submission polish | done | Engineer | 2026-07-08 |
 | 0010 | Optional: expose guarded capabilities as an MCP server | pending_review | Engineer | 2026-07-08 |
 | 0011 | LLM provider fallback: OpenRouter / Ollama | done | Engineer | 2026-07-07 |
-| 0012 | Fix sql_guard: allow CTE (WITH) queries | todo | Engineer | 2026-07-08 |
+| 0012 | Fix sql_guard: allow CTE (WITH) queries | pending_review | Engineer | 2026-07-08 |
 | 0013 | Fix LLM call budget: reset per turn, not per thread | done | Engineer | 2026-07-08 |
 | 0014 | PII mask: fully mask name-flagged columns (unformatted phones leak) | todo | Engineer | 2026-07-08 |
 | 0015 | LLM resilience: retry/fallback on connection-level outages | todo | Engineer | 2026-07-08 |
