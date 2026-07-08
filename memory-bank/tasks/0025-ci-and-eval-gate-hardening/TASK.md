@@ -4,7 +4,7 @@
 
 - **Task ID**: 0025
 - **Title**: CI and eval gate hardening
-- **Status**: todo
+- **Status**: pending_review
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08
@@ -29,12 +29,12 @@ Turn the local QA story into an enforceable and honest gate. Reviewers should se
 
 ## Acceptance criteria
 
-- [ ] Repository contains a CI workflow or clear local gate script that runs `pytest -q` and `python -m retail_agent.evals`.
-- [ ] `docs/EVALUATION.md` accurately explains dry-run limitations, live eval usage, baseline comparison, and judge threshold.
-- [ ] The recommended live command avoids comparing live nondeterministic runs against the dry-run baseline unless intentionally requested.
-- [ ] Stale test paths and overclaims such as "CI blocks deploy" are corrected.
-- [ ] Tests cover any eval-runner behavior change.
-- [ ] `pytest -q` and `python -m retail_agent.evals` pass.
+- [x] Repository contains a CI workflow or clear local gate script that runs `pytest -q` and `python -m retail_agent.evals`.
+- [x] `docs/EVALUATION.md` accurately explains dry-run limitations, live eval usage, baseline comparison, and judge threshold.
+- [x] The recommended live command avoids comparing live nondeterministic runs against the dry-run baseline unless intentionally requested.
+- [x] Stale test paths and overclaims such as "CI blocks deploy" are corrected.
+- [x] Tests cover any eval-runner behavior change.
+- [x] `pytest -q` and `python -m retail_agent.evals` pass.
 
 ## References
 
