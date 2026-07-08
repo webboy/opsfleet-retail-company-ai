@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, **0020**, **0021**, **0022**, **0023**, **0024**, **0025**, **0026**, **0028**, **0029**, **0030**, **0031**, **0032**, **0033**, and **0034** **done** (user approved or per-task instruction). Tasks **0027** and **0035** are **pending_review**.
+Tasks **0001–0036** are **done** (user approved or per-task instruction). Final reviewer polish and metadata sync are complete.
 
 ## What works
 
@@ -24,7 +24,8 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - **Live QA evidence hardening** (task 0032, **done**): judge low-score/unavailable tests, `--require-judge`, `valid-empty-result` eval case, cancelled-order live weakness docs; version **0.27.0**.
 - **Input guard fail-closed fallback** (task 0030, **done**): malformed classifier output routes to `off_topic`; version **0.26.0**.
 - **Reviewer docs polish** (task 0031, **done**): clone URL, CLI-accurate example transcripts, delete-by-today examples, production data-flow label, MIT LICENSE.
-- **Final reviewer docs polish** (task 0035, **pending_review**): save-flow drift fix, complete-report gating docs, assignment phrasing, golden env vars, sanitized live eval evidence table.
+- **Final metadata and doc sync** (task 0036, **done**): stale automatic save-prompt wording removed; task metadata aligned and committed.
+- **Final reviewer docs polish** (task 0035, **done**): save-flow drift fix, complete-report gating docs, assignment phrasing, golden env vars, sanitized live eval evidence table.
 - **Save complete report gating** (task 0029, **done**): `/save` only persists complete analysis reports; version **0.25.0**.
 - **Golden embedding relevance** (task 0028, **done**): cosine similarity floor for embedding retrieval; version **0.24.0**.
 - **Empty-result routing** (task 0024, **done**): valid zero-row queries report without retry; eval failure diagnostics; dry-run regressions; live eval diagnostics verified.
@@ -41,7 +42,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - **Preference formatting intent** (task 0020, **done**): DB-table analysis questions no longer hijack preference routing.
 - **CI gate** (task 0025, **done**): GitHub Actions runs `pytest -q` + dry-run eval; docs clarify dry-run vs live.
 - **Submission docs alignment** (task 0026, **done**): `docs/SCHEMA.md`, supported-question matrix, dataset boundaries, eval/setup drift fixes.
-- **Golden Bucket hardening** (task 0027, **pending_review**): zero-overlap keyword fallback, `report_complete` capture gating; version **0.23.0**.
+- **Golden Bucket hardening** (task 0027, **done**): zero-overlap keyword fallback, `report_complete` capture gating; version **0.23.0**.
 
 1. ~~`0001`–`0009`, `0011`~~ — **done**
 2. ~~`0010` *(optional)* MCP server~~ — **done**
@@ -60,7 +61,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 15. ~~`0024` Empty results and live eval regression~~ — **done**
 16. ~~`0025` CI and eval gate hardening~~ — **done**
 17. ~~`0026` Submission docs alignment~~ — **done**
-18. `0027` Golden Bucket and learning-loop hardening — **pending_review**
+18. ~~`0027` Golden Bucket and learning-loop hardening~~ — **done**
 19. ~~`0028` Golden embedding relevance~~ — **done**
 20. ~~`0029` Save complete report gating~~ — **done**
 21. ~~`0030` Input guard fail-closed fallback~~ — **done**
@@ -68,7 +69,8 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 23. ~~`0032` Live QA evidence hardening~~ — **done**
 24. ~~`0033` Input guard classify-unavailable fail-closed~~ — **done**
 25. ~~`0034` Golden keyword fallback relevance floor~~ — **done**
-26. `0035` Final reviewer docs and evidence polish — **pending_review**
+26. ~~`0035` Final reviewer docs and evidence polish~~ — **done**
+27. ~~`0036` Final metadata and doc sync~~ — **done**
 
 ## Known issues
 
@@ -92,7 +94,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - ~~**Malformed LLM guard classifier output defaults to analysis**~~ — fixed in task 0030 (**done**): fail-closed to `off_topic`; version **0.26.0**.
 - ~~**Ambiguous input fails open when guard classifier unavailable**~~ — fixed in task 0033 (**done**): budget/quota classify-skip fails closed; version **0.28.0**.
 - ~~**Keyword fallback injects weak one-token overlaps**~~ — fixed in task 0034 (**done**): minimum shared-token floor; version **0.29.0**.
-- **Golden Bucket hardening** (task 0027, **pending_review**): zero-overlap keyword fallback, `report_complete` capture gating; version **0.23.0**.
+- ~~**Golden Bucket hardening metadata drift**~~ — fixed in task 0036 (**done**): task 0027 is aligned to `done`.
 - Preference phrase detection is deterministic and may miss unusual phrasing.
 - Live eval gate requires LLM + BigQuery credentials; dry-run is CI-default.
 - llama3.2 (local) SQL quality: complex questions (e.g. cancelled-order share) can exhaust 3 self-heal attempts; Gemini fallback or a larger local model handles them.

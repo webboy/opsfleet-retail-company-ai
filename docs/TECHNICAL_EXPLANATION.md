@@ -88,7 +88,7 @@ A single analysis turn proceeds as follows:
 7. **compose_report** calls the LLM with masked rows, active persona, and user format preference.
 8. **output_mask** regex-sweeps the final report text for residual PII.
 9. **capture_candidate** automatically appends a candidate trio when the turn completes with `status=done`, `report_complete=True`, SQL, and a fully composed report (analysis path only).
-10. **Response** returned to client; optional prompt to save report.
+10. **Response** returned to client. Saving remains user-initiated via `/save` or natural-language report commands after a complete analysis.
 11. **Observability** emits one structured event per node (latency, SQL text, error class, retry count, mask hits).
 
 Report-management turns skip steps 3–8 and route through **reports_router** (save/list/delete with confirmation interrupt). Preference turns route through **preferences_router** (save/show output format without LLM).

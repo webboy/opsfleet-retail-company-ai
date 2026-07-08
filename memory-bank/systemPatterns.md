@@ -21,7 +21,7 @@ flowchart TD
     HEAL -->|give up| APOLOGY[graceful fallback answer]
     EXEC -->|rows| MASK[pii_mask\ncolumn deny-list + regex sweep]
     MASK --> REPORT[compose_report\npersona + user format prefs]
-    REPORT --> OUT[answer + offer to save]
+    REPORT --> OUT[answer + user-initiated save available]
 ```
 
 ## Key decisions (ADR-style)

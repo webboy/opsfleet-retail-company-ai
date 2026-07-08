@@ -4,7 +4,7 @@
 
 - **Task ID**: 0027
 - **Title**: Golden Bucket and learning-loop hardening
-- **Status**: pending_review
+- **Status**: done
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08

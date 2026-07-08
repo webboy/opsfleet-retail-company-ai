@@ -37,11 +37,9 @@ python -m retail_agent.mcp_server
 
 **Note:** Running `retail-agent-mcp` without flags produces no visible output in the terminal. The process waits on stdin for JSON-RPC messages from an MCP client. Use `--help` to confirm the install, then register the command in your MCP client config (see below).
 
-## Register in Cursor
+## Register in an MCP client
 
-### Project-local only (recommended)
-
-Create `.cursor/mcp.json` in the repository root. Cursor loads it **only** when this project is open — it does not affect other workspaces.
+Add a server entry to your MCP client's project-local configuration. The exact file location depends on the client; keep the entry scoped to this project when possible so it does not affect other workspaces.
 
 ```json
 {
@@ -55,18 +53,14 @@ Create `.cursor/mcp.json` in the repository root. Cursor loads it **only** when 
 }
 ```
 
-`${workspaceFolder}` resolves to the project root (the folder containing `.cursor/mcp.json`). The app loads `.env` from the repo root automatically.
+`${workspaceFolder}` resolves to the project root. The app loads `.env` from the repo root automatically.
 
 **Steps:**
 
 1. `pip install -e ".[mcp]"` in the project venv
-2. Save `.cursor/mcp.json` (included in this repo)
-3. `Ctrl+Shift+P` → **Developer: Reload Window**
-4. **Cursor Settings → MCP** — `retail-agent` should show connected; enable tools if toggled off
-
-### Global (all projects)
-
-Put the same JSON in `~/.cursor/mcp.json` if you want the server in every workspace. Project-local config wins when the same server name exists in both files.
+2. Add the JSON server entry to your MCP client's project configuration
+3. Reload the MCP client
+4. Confirm that `retail-agent` shows as connected and enable the tools if your client has per-tool toggles
 
 ### Absolute paths (WSL example)
 
@@ -82,7 +76,7 @@ Put the same JSON in `~/.cursor/mcp.json` if you want the server in every worksp
 }
 ```
 
-Replace paths with your clone location. Reload Cursor after saving.
+Replace paths with your clone location. Reload your MCP client after saving.
 
 ## Tools
 

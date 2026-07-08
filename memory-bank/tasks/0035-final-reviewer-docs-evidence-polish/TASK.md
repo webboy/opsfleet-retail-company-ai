@@ -4,7 +4,7 @@
 
 - **Task ID**: 0035
 - **Title**: Final reviewer docs and evidence polish
-- **Status**: pending_review
+- **Status**: done
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08
