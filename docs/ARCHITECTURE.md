@@ -4,7 +4,7 @@ This document describes the **production** High-Level Design (HLD) for an intern
 
 ## Problem and goals
 
-Executives ask complex natural-language questions about sales, inventory and branch performance (for example: *"Why is branch X underperforming and how does it compare to branch Y?"*). The system must:
+Executives ask complex natural-language questions about sales, customers, products, and time-based metrics (for example: *"How did monthly revenue trend last year?"* or *"Which product categories drive the most revenue?"*). The prototype answers against the public `thelook_ecommerce` dataset — see [Schema & Supported Questions](./SCHEMA.md) for boundaries (no branch/store/inventory stock data). The system must:
 
 - Answer with analyst-grade reports backed by live SQL against the company data warehouse.
 - Ground answers in expert-approved historical patterns stored in a **Golden Knowledge Bucket** (Question → SQL → Analyst Report "Trios").
@@ -136,14 +136,19 @@ flowchart TD
     Interrupt -->|yes confirm| DeleteOwn[Delete scoped to owner]
     Interrupt -->|no or other| Cancel[Cancel keep reports]
     RepRoute -->|save or list| RepAction[Persist or list reports]
-    Guard -->|analysis question| RouteTurn[route_turn]
-    RouteTurn --> Retrieve[retrieve_trios top-k]
+    Guard -->|preferences| PrefsRoute[preferences_router]
+    Guard -->|allowed turn| RouteTurn[route_turn]
+    RouteTurn -->|schema question| SchemaAns[answer_schema static docs]
+    RouteTurn -->|chitchat| ChitChat[answer_chitchat]
+    RouteTurn -->|analysis| Retrieve[retrieve_trios top-k]
+    SchemaAns --> OutSchema[Answer no BigQuery]
+    ChitChat --> OutChat[Short redirect]
     Retrieve --> SQLGen[generate_sql LLM plus schema plus trios]
     SQLGen --> Exec[execute_bq sql_guard plus BigQuery]
-    Exec -->|error empty or guard block| Heal{retry up to 3}
+    Exec -->|SQL or guard error| Heal{retry up to 3}
     Heal -->|retry| SQLGen
     Heal -->|exhausted| Apology[fallback_answer]
-    Exec -->|rows| Mask[pii_mask column deny-list plus regex]
+    Exec -->|rows or valid empty result| Mask[pii_mask column deny-list plus regex]
     Mask --> Report[compose_report persona plus prefs]
     Report --> Out[Answer plus offer to save]
 ```
@@ -183,7 +188,7 @@ flowchart LR
 
 **Query-time retrieval:** When a manager asks a question, the system embeds the question, retrieves the top-k most similar curated Trios from the vector index, and injects them as few-shot examples into the SQL-generation prompt. This teaches the model how analysts previously interpreted similar questions.
 
-**Update over time:** After a successful turn, the system captures a **candidate trio** (question, SQL, report excerpt) to a review queue — not directly into golden. Data analysts curate candidates: approve (promote to golden, re-index), edit-then-approve, or reject. This keeps the bucket high-quality and prevents bad agent outputs from polluting expert knowledge.
+**Update over time:** After a successful **SQL analysis turn** (`status=done` with question, SQL, and report), the graph automatically captures a **candidate trio** to a review queue — not directly into golden. Data analysts curate candidates: approve (promote to golden, re-index), edit-then-approve, or reject. Schema answers, refusals, and chitchat turns are not captured.
 
 **Prototype vs production:** The prototype stores seed trios as local files, embeds at startup, and appends candidates to a local folder/JSONL. The production pipeline uses GCS, Vertex AI Vector Search, and an analyst review UI or ticket queue.
 
@@ -255,7 +260,7 @@ The prototype demonstrates this pattern with a thin MCP wrapper over `bq.py` and
 7. **PII:** `pii_mask` scrubs DataFrame and final text deterministically.
 8. **Composition:** LLM writes report using persona + user prefs; offer to save.
 9. **Egress:** Response to client; structured observability event emitted per node.
-10. **Learning:** Successful turns optionally capture candidate trios for analyst curation.
+10. **Learning:** Successful SQL analysis turns automatically capture candidate trios for analyst curation.
 
 ## Security and compliance notes
 
@@ -267,6 +272,7 @@ The prototype demonstrates this pattern with a thin MCP wrapper over `bq.py` and
 
 ## Related documentation
 
+- [Schema & Supported Questions](./SCHEMA.md) — allowed tables, joins, supported-question matrix, dataset boundaries.
 - [Technical Explanation](./TECHNICAL_EXPLANATION.md) — technology choices, error handling, setup overview, and requirement-by-requirement design.
 - [Usage Guide](./USAGE.md) — CLI commands, personas, golden trios, observability.
 - [Evaluation Guide](./EVALUATION.md) — pytest, eval suite, judge scoring, baseline workflow.

@@ -10,6 +10,7 @@ This repository is the **Opsfleet AI Technical Assignment** prototype: LangGraph
 |----------|----------------|
 | [Architecture](docs/ARCHITECTURE.md) | Production HLD, Mermaid diagrams, prototype vs production |
 | [Technical Explanation](docs/TECHNICAL_EXPLANATION.md) | Technology choices, data flow, error handling, requirements |
+| [Schema & Supported Questions](docs/SCHEMA.md) | Allowed tables, joins, dataset boundaries, supported-question matrix |
 | [Usage Guide](docs/USAGE.md) | CLI commands, personas, golden trios, traces, artifacts |
 | [Evaluation Guide](docs/EVALUATION.md) | pytest, eval suite, judge scoring, baseline workflow |
 | [MCP Server](docs/MCP.md) | Optional guarded BigQuery + Golden Bucket MCP tools |
@@ -32,9 +33,9 @@ pip install -e ".[dev]"            # runtime + pytest (canonical install)
 cp .env.example .env
 # Edit .env — at minimum:
 #   GOOGLE_API_KEY=...
-#   GCP_PROJECT_ID=your-billing-project
+#   GCP_PROJECT_ID=your-gcp-billing-project   # BigQuery job billing, not dataset storage
 
-gcloud auth application-default login
+gcloud auth application-default login   # ADC required for live BigQuery queries
 ```
 
 Run from the **repository root** so relative paths (`personas/`, `golden_bucket/`, `evals/`) resolve correctly.
@@ -117,15 +118,15 @@ Agent: Top buyers by spend (contact details masked per policy):
 [pii masked; no raw email addresses in output]
 ```
 
-**Self-heal** — bad SQL is retried internally; the manager sees only the final report or a graceful fallback:
+**Unsupported dimension** — the public dataset has no branch/store/region columns; the agent explains and suggests supported dimensions:
 
 ```
 You: Show revenue by region
 
-Agent: I couldn't find a region column in the available tables. Try asking
-       about departments, traffic sources, or product categories instead.
+Agent: There is no region column in thelook_ecommerce. Try revenue by
+       department, traffic source, or product category instead.
 
-[sql attempts=3 — agent retried internally before this message]
+[sql attempts=3 — agent retried internally before this fallback message]
 ```
 
 ## Verify installation (no live API keys needed)

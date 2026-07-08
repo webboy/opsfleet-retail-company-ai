@@ -4,7 +4,7 @@
 
 - **Task ID**: 0026
 - **Title**: Submission docs alignment
-- **Status**: todo
+- **Status**: pending_review
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08
@@ -30,13 +30,13 @@ Align human-facing documentation with the original assignment and the actual shi
 
 ## Acceptance criteria
 
-- [ ] README and docs avoid unsupported branch/inventory claims for the shipped dataset.
-- [ ] Human docs include a concise supported-question matrix mapped to assignment expected capabilities.
-- [ ] Schema-question behavior is documented in the human docs.
-- [ ] Eval, CI, token, candidate-capture, and live baseline wording matches the actual implementation.
-- [ ] Setup instructions mention BigQuery billing-project expectations clearly.
-- [ ] `rg "memory-bank|task 0|\\.cursor" README.md docs/` returns no forbidden internal workflow references, except intentional MCP client configuration if retained and justified.
-- [ ] Documentation-only verification is recorded in `HANDOFF.md`.
+- [x] README and docs avoid unsupported branch/inventory claims for the shipped dataset.
+- [x] Human docs include a concise supported-question matrix mapped to assignment expected capabilities.
+- [x] Schema-question behavior is documented in the human docs.
+- [x] Eval, CI, token, candidate-capture, and live baseline wording matches the actual implementation.
+- [x] Setup instructions mention BigQuery billing-project expectations clearly.
+- [x] `rg "memory-bank|task 0|\\.cursor" README.md docs/` returns no forbidden internal workflow references, except intentional MCP client configuration if retained and justified.
+- [x] Documentation-only verification is recorded in `HANDOFF.md`.
 
 ## References
 

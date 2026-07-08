@@ -154,7 +154,12 @@ Stdio client smoke (requires `.env` + BigQuery ADC for live PII query):
 python -m retail_agent.mcp_server   # starts stdio server (Ctrl+C to exit)
 ```
 
-Or run the verification script recorded in the repository's development workflow: list tools, reject DML, mask PII emails, retrieve revenue trios.
+Or run the same checks as CI:
+
+```bash
+pytest tests/test_mcp_server.py -q
+retail-agent-mcp --help
+```
 
 ## Architecture note
 

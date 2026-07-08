@@ -65,12 +65,12 @@ python -m retail_agent.trace <turn_id>      # reconstruct one turn's node sequen
 
 Optional LangSmith: set `LANGSMITH_TRACING=true` and `LANGSMITH_API_KEY` for full LLM trace export.
 
-**Eval gate:** `pytest` for pure logic; full eval suite under `evals/` with property assertions, safety cases, and LLM-as-judge intent scoring. Default runner is dry-run (no live API keys); use `--live` for pre-deploy gate against real Gemini + BigQuery:
+**Eval gate:** `pytest` for pure logic; full eval suite under `evals/` with property assertions, safety cases, and LLM-as-judge intent scoring. Default runner is dry-run (no live API keys); use `--live --no-compare` for optional manual smoke tests against real Gemini + BigQuery:
 
 ```bash
-python -m retail_agent.evals                # dry-run default; compares to evals/baseline/dry-run-v0.8.0.jsonl
-python -m retail_agent.evals --live         # live pre-deploy gate (requires .env + BigQuery auth)
-python -m retail_agent.evals --layer safety # safety subset only
+python -m retail_agent.evals                          # dry-run default; compares to evals/baseline/dry-run-v0.8.0.jsonl
+python -m retail_agent.evals --live --no-compare      # optional live smoke (requires .env + BigQuery auth)
+python -m retail_agent.evals --layer safety           # safety subset only
 ```
 
 ---
@@ -80,14 +80,14 @@ python -m retail_agent.evals --layer safety # safety subset only
 A single analysis turn proceeds as follows:
 
 1. **Client** sends natural-language message with user identity and thread ID.
-2. **input_guard** classifies intent. Malicious/off-topic → polite refusal (no BigQuery, minimal LLM).
-3. **retrieve_trios** embeds the question, searches the Golden Bucket index, returns top-k Trios.
+2. **input_guard** classifies intent. Malicious/off-topic → polite refusal (no BigQuery, minimal LLM). Schema questions → static schema docs (no BigQuery). Chitchat → short redirect.
+3. **retrieve_trios** (analysis only) embeds the question, searches the Golden Bucket index, returns top-k Trios.
 4. **generate_sql** calls the LLM with: table schemas, retrieved trios, conversation history, and safety instructions.
 5. **execute_bq** runs `sql_guard` (inside `BigQueryRunner`) then submits the job. Guard violations, syntax errors, and permission errors → **self_heal** loop (feed error + prior SQL to LLM, retry up to N times, default **3**). Valid empty result sets are treated as successful queries and go straight to report composition.
 6. **pii_mask** scrubs email/phone columns in the DataFrame.
 7. **compose_report** calls the LLM with masked rows, active persona, and user format preference.
 8. **output_mask** regex-sweeps the final report text for residual PII.
-9. **capture_candidate** optionally appends a candidate trio for analyst review.
+9. **capture_candidate** automatically appends a candidate trio when the turn completes with `status=done`, SQL, and a report (analysis path only).
 10. **Response** returned to client; optional prompt to save report.
 11. **Observability** emits one structured event per node (latency, SQL text, error class, retry count, mask hits).
 
@@ -135,7 +135,7 @@ gcloud auth application-default login
 
 cp .env.example .env
 # GOOGLE_API_KEY=...
-# GCP_PROJECT_ID=your-billing-project
+# GCP_PROJECT_ID=your-gcp-billing-project   # BigQuery job billing project (ADC also required)
 ```
 
 > `requirements.txt` is a legacy assignment artifact. Prefer `pip install -e ".[dev]"` — it includes OpenRouter/Ollama dependencies and pytest.
@@ -164,7 +164,7 @@ See [Usage Guide](./USAGE.md) for all CLI flags and commands.
 
 **Query-time retrieval:** Embed the user question → vector search top-k Trios → inject as few-shot examples in the SQL-generation prompt. Keyword fallback if embeddings fail.
 
-**Update over time:** Successful agent turns write **candidate** trios (question, SQL, report) to a review queue — not directly into golden. Analysts approve, edit, or reject. Approved trios are written to GCS, re-embedded, and indexed. Rejected candidates are archived. This prevents low-quality automation from polluting expert knowledge.
+**Update over time:** Successful SQL analysis turns automatically write **candidate** trios (question, SQL, report) to a review queue — not directly into golden. Analysts approve, edit, or reject. Approved trios are written to GCS, re-embedded, and indexed. Rejected candidates are archived. Schema, chitchat, and refused turns are not captured.
 
 **Prototype:** Local seed trios + `golden_bucket/candidates/` capture; curation UI documented only. **Production:** GCS + Vertex AI Vector Search + analyst review workflow.
 
@@ -174,7 +174,7 @@ See [Usage Guide](./USAGE.md) for all CLI flags and commands.
 
 **Problem:** Raw logs contain customer emails and phones; the agent must answer analysis questions only and never display PII, even if SQL retrieves it.
 
-**Input guard:** First graph node (`input_guard`) applies deterministic rules for obvious prompt injection, destructive SQL language, and off-topic requests, then uses a small LLM fallback only for ambiguous turns. The LLM classifier must return one canonical label (`analysis`, `schema`, `chitchat`, `off_topic`, `malicious`) on the first line or as minimal JSON; negated/mixed prose falls back to `analysis` rather than substring matching. Refusals exit early with a polite message — no Golden Bucket retrieval or BigQuery.
+**Input guard:** First graph node (`input_guard`) applies deterministic rules for obvious prompt injection, destructive SQL language, and off-topic requests, then uses a small LLM fallback only for ambiguous turns. The LLM classifier must return one canonical label (`analysis`, `schema`, `chitchat`, `off_topic`, `malicious`) on the first line or as minimal JSON; negated/mixed prose falls back to `analysis` rather than substring matching. Refusals exit early with a polite message — no Golden Bucket retrieval or BigQuery. **Schema questions** route to `answer_schema`, which answers from bundled static documentation only (see [Schema & Supported Questions](./SCHEMA.md)).
 
 **PII masking (deterministic, two layers):**
 1. **DataFrame layer (`pii_mask`):** Detect email/phone columns by name (`email`, `phone`, …) and by content sampling; mask values (`j***@***.***`, `***-***-1234`) **before** rows reach the report LLM.
@@ -205,7 +205,7 @@ Explicit PII requests (e.g. top buyers with emails) may still run as analysis, b
 
 **4a — User level:** Per-manager format preferences (`table`, `bullets`, `prose`) are detected deterministically from phrases like "I prefer tables" or `/prefs`, persisted in the shared SQLite store (`preferences` table, keyed by `user_id`), and injected into every `compose_report` system prompt. Survives CLI restart; scoped per user.
 
-**4b — System level:** Successful turns capture candidate trios (see Requirement 1). Interaction logs feed eval baselines and analyst review. Over time, approved trios improve retrieval quality for all users.
+**4b — System level:** Successful SQL analysis turns automatically capture candidate trios (see Requirement 1). Interaction logs feed eval baselines and analyst review. Over time, approved trios improve retrieval quality for all users.
 
 **Prototype:** SQLite preferences in `src/retail_agent/stores.py` + local candidate capture. **Production:** Managed DB + GCS curation pipeline.
 
@@ -215,7 +215,7 @@ Explicit PII requests (e.g. top buyers with emails) may still run as analysis, b
 
 **Problem:** SQL errors and empty results must self-correct; the UI must not crash; costs must not inflate; third-party APIs fail.
 
-**Self-heal loop:** On BigQuery error, sql_guard block, or zero rows, feed error message + previous SQL to the LLM; regenerate; retry up to N (default **3**). After exhaustion → `fallback_answer` with a graceful rephrase suggestion.
+**Self-heal loop:** On BigQuery error or sql_guard block, feed error message + previous SQL to the LLM; regenerate; retry up to N (default **3**). After exhaustion → `fallback_answer` with a graceful rephrase suggestion. **Valid empty result sets** (zero rows) are treated as successful queries and go straight to report composition — they do not trigger self-heal.
 
 **Resilience elsewhere:** LLM retry/backoff; optional provider fallback; embedding keyword fallback; top-level CLI exception handler; per-turn LLM call budget; sql_guard prevents expensive bad queries.
 
@@ -231,9 +231,9 @@ Explicit PII requests (e.g. top buyers with emails) may still run as analysis, b
 
 | Layer | What it checks | How |
 |-------|----------------|-----|
-| **Capability cases** | ~15–20 questions across customer behavior, product performance, time metrics, schema questions | Property assertions: expected tables referenced, non-empty results, must/must-not-contain strings (dataset is rolling — no exact value assertions) |
-| **Safety cases** | Injection refused, PII masked, delete requires confirmation, off-topic declined | Deterministic pass/fail |
-| **Intent correctness** | Does the report answer the question? | LLM-as-judge: inputs = question + SQL + result sample + report → score 1–5 + rationale |
+| **Capability cases** | **11** questions across customer behavior, product performance, time metrics, and schema questions (see [Schema & Supported Questions](./SCHEMA.md)) | Property assertions: expected tables referenced, non-empty results where applicable, must/must-not-contain strings (dataset is rolling — no exact value assertions) |
+| **Safety cases** | **5** cases: injection refused, PII masked, delete requires confirmation, off-topic declined, destructive SQL blocked | Deterministic pass/fail |
+| **Intent correctness** | Does the report answer the question? | LLM-as-judge: inputs = question + SQL + result sample + report → score 1–5 + rationale; **score &lt; 3 fails** a passing capability case |
 
 **Gate:** Eval runner produces pass/fail table + aggregate judge score; results persisted (JSONL) for regression comparison against stored baseline. GitHub Actions CI runs `pytest -q` and dry-run eval on every push/PR; a failing regression blocks merge until fixed or the baseline is intentionally updated.
 
@@ -245,9 +245,9 @@ Explicit PII requests (e.g. top buyers with emails) may still run as analysis, b
 
 **Problem:** Know when and why the agent fails; support deep-dive debugging of message correspondence.
 
-**Structured events (every node):** turn id, user, node name, latency ms, model, SQL text, error class, retry count, guard decision, trios retrieved, PII mask hit count, tokens (when available).
+**Structured events (every node):** turn id, user, node name, latency ms, model, SQL text, error class, retry count, guard decision, trios retrieved, PII mask hit count.
 
-**Metrics tracked:** turn success rate, self-heal rate, SQL failure classes, guard-block rate, PII mask hits, p50/p95 latency, tokens per turn.
+**Metrics tracked:** turn success rate, fallback rate, self-heal event count, guard-block rate, PII mask hits, p50/p95 latency (via `python -m retail_agent.metrics`).
 
 **Deep dive:** Reconstruct full turn from turn id (messages, SQL attempts, mask actions, final report). Optional LangSmith trace for LLM-level debugging.
 
@@ -284,6 +284,7 @@ User format preferences (Requirement 4a) complement personas: persona = company 
 
 ## Related documentation
 
+- [Schema & Supported Questions](./SCHEMA.md) — allowed tables, supported-question matrix, schema route.
 - [Architecture](./ARCHITECTURE.md) — production HLD, Mermaid diagrams, extensibility (including MCP), prototype vs production mapping.
 - [Usage Guide](./USAGE.md) — CLI reference, personas, golden trios, observability.
 - [Evaluation Guide](./EVALUATION.md) — pytest, eval suite layers, judge scoring, baseline workflow.

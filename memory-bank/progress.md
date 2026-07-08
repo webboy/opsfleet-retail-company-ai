@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, **0020**, **0021**, **0022**, **0023**, **0024**, and **0025** **done** (user approved). Tasks **0026–0027** are **todo**.
+Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, **0020**, **0021**, **0022**, **0023**, **0024**, and **0025** **done** (user approved). Task **0026** is **pending_review**. Task **0027** is **todo**.
 
 ## What works
 
@@ -32,6 +32,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - **Golden Bucket robust loading** (task 0019, **done**): malformed trio files skipped with warning; CLI/MCP keep running.
 - **Preference formatting intent** (task 0020, **done**): DB-table analysis questions no longer hijack preference routing.
 - **CI gate** (task 0025, **done**): GitHub Actions runs `pytest -q` + dry-run eval; docs clarify dry-run vs live.
+- **Submission docs alignment** (task 0026, **pending_review**): `docs/SCHEMA.md`, supported-question matrix, dataset boundaries, eval/setup drift fixes.
 
 1. ~~`0001`–`0009`, `0011`~~ — **done**
 2. ~~`0010` *(optional)* MCP server~~ — **done**
@@ -49,7 +50,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 14. ~~`0023` Input guard structured labels~~ — **done**
 15. ~~`0024` Empty results and live eval regression~~ — **done**
 16. ~~`0025` CI and eval gate hardening~~ — **done**
-17. `0026` Submission docs alignment — **todo**
+17. `0026` Submission docs alignment — **pending_review**
 18. `0027` Golden Bucket and learning-loop hardening — **todo**
 
 ## Known issues
@@ -69,7 +70,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - ~~LLM guard label parser uses substring matching and can misread negated/mixed labels~~ — fixed in task 0023 (**done**).
 - ~~Valid empty query results currently take the same retry path as failures~~ — fixed in task 0024 (**done**).
 - ~~Dry-run eval is strong for orchestration but not live NL-to-SQL quality; no CI gate exists yet~~ — fixed in task 0025 (**done**): `.github/workflows/ci.yml`.
-- Human docs need final assignment/dataset alignment to remove overclaims and clarify schema/eval/setup details (task 0026).
+- ~~Human docs need final assignment/dataset alignment to remove overclaims and clarify schema/eval/setup details~~ — addressed in task 0026 (**pending_review**): `docs/SCHEMA.md` + README/docs drift fixes.
 - Golden Bucket keyword fallback can inject arbitrary no-overlap trios; incomplete reports can be captured as candidates (task 0027).
 - Preference phrase detection is deterministic and may miss unusual phrasing.
 - Live eval gate requires LLM + BigQuery credentials; dry-run is CI-default.

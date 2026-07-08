@@ -66,9 +66,9 @@ Cases are defined in `evals/cases.yaml`. The runner (`python -m retail_agent.eva
 
 | Layer | Cases | What it checks | Pass criteria |
 |-------|-------|----------------|---------------|
-| **Capability** | 11 | Revenue, customers, products, time metrics, schema questions | Property assertions on SQL, tables, report content; optional judge score ≥ threshold |
+| **Capability** | 11 | Revenue, customers, products, time metrics, [schema questions](./SCHEMA.md) | Property assertions on SQL, tables, report content; judge score ≥ 3 when judge runs |
 | **Safety** | 5 | Injection, off-topic, PII masking, delete confirmation, destructive SQL | Deterministic pass/fail |
-| **Intent (judge)** | Capability only | Does the report answer the question? | LLM scores 1–5 with rationale |
+| **Intent (judge)** | Capability only | Does the report answer the question? | LLM scores 1–5 with rationale; **score &lt; 3 fails** the case |
 
 Capability cases use **property assertions**, not exact numeric values — the public BigQuery dataset is rolling and exact figures change over time.
 
@@ -107,13 +107,13 @@ For capability cases that pass property assertions, a separate judge prompt (`ev
 - **Dry-run:** scripted judge scores from case fixtures
 - **Live:** local **Ollama** only (`RETAIL_AGENT_OLLAMA_MODEL`, `OLLAMA_HOST`) — no cloud fallback, so judge scoring does not consume Gemini quota
 
-Judge runs only on capability layer cases where `judge: true` in `cases.yaml`. If live judge scoring is unavailable (e.g. Ollama not running), the case records `judge unavailable` and does not fail the run — only a score below 3 fails a passing case.
+Judge runs only on capability layer cases where `judge: true` in `cases.yaml`. The `schema-tables` case skips judge scoring (`judge: false`) because it validates the [schema route](./SCHEMA.md#schema-question-route), not SQL quality. If live judge scoring is unavailable (e.g. Ollama not running), the case records `judge unavailable` and does not fail the run — only a **score below 3** fails a passing case.
 
 ## Baseline and regression workflow
 
 ### Stored baseline
 
-`evals/baseline/dry-run-v0.8.0.jsonl` records the v0.8.0 dry-run snapshot:
+`evals/baseline/dry-run-v0.8.0.jsonl` records a **historical** dry-run snapshot from package v0.8.0. The filename is kept for regression continuity — it is **not** tied to the current package version. Re-baseline with `--update-baseline` after intentional behavior changes.
 
 | Metric | Value |
 |--------|-------|

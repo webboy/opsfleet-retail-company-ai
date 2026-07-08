@@ -2,7 +2,7 @@
 
 How to run the retail analysis agent CLI, manage personas and golden trios, inspect observability output, and understand runtime artifacts.
 
-See also: [README](../README.md) (quick setup), [Architecture](./ARCHITECTURE.md), [Technical Explanation](./TECHNICAL_EXPLANATION.md), [Evaluation Guide](./EVALUATION.md), [MCP Server](./MCP.md).
+See also: [README](../README.md) (quick setup), [Schema & Supported Questions](./SCHEMA.md), [Architecture](./ARCHITECTURE.md), [Technical Explanation](./TECHNICAL_EXPLANATION.md), [Evaluation Guide](./EVALUATION.md), [MCP Server](./MCP.md).
 
 ## CLI entry points
 
@@ -48,6 +48,9 @@ Type these at the `You:` prompt:
 | `delete reports mentioning <term>` | Start guarded delete flow (confirmation required) |
 | `I prefer tables from now on` | Save table-format preference |
 | `give me bullet points from now on` | Save bullet-format preference |
+| `What tables do you have?` | Schema question — answered from static docs, no BigQuery |
+
+See [Schema & Supported Questions](./SCHEMA.md) for the supported-question matrix and dataset boundaries.
 
 ### Delete confirmation flow
 
@@ -121,7 +124,7 @@ Malformed trio files (missing required keys, invalid YAML, or missing front matt
 
 ### Candidate capture
 
-After a successful analysis turn, the agent appends a candidate to `golden_bucket/candidates/candidates.jsonl`. Promote approved candidates into new seed files manually (prototype has no analyst UI).
+After a successful **SQL analysis turn** (`status=done` with question, SQL, and report), the graph **automatically** appends a candidate to `golden_bucket/candidates/candidates.jsonl`. This is not user-controlled — schema answers, refusals, and chitchat are not captured. Promote approved candidates into new seed files manually (prototype has no analyst UI).
 
 ### Custom bucket path
 
@@ -224,7 +227,7 @@ See [MCP Server Guide](./MCP.md) for tool schemas, client registration, and safe
 Copy `.env.example` → `.env`. Minimum for live chat:
 
 - `GOOGLE_API_KEY` — Gemini (AI Studio)
-- `GCP_PROJECT_ID` — BigQuery billing project
-- `gcloud auth application-default login` — ADC for BigQuery
+- `GCP_PROJECT_ID` — **your** Google Cloud project used for BigQuery **job billing** when querying the public `thelook_ecommerce` dataset (storage stays in `bigquery-public-data`)
+- `gcloud auth application-default login` — Application Default Credentials (ADC) for the BigQuery client
 
 See `.env.example` for optional overrides: model IDs, embedding model, persona, dataset, bytes billed, provider fallback, DB path, personas dir, golden bucket dir, LangSmith.
