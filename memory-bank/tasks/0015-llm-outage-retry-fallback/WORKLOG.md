@@ -9,3 +9,4 @@
 - Added `is_connection_error()` with type-chain and message-marker detection; connection errors are transient and trigger immediate fallback when configured.
 - Added 10 regression tests in `tests/test_llm.py`.
 - Verification: pytest **149 passed**; eval **16/16**; version **0.13.0**.
+- User approved 2026-07-08 — live Ollama-primary CLI verified; task marked **done**.

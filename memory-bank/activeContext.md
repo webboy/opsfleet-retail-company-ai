@@ -2,14 +2,14 @@
 
 ## Current focus
 
-Full-code review (2026-07-08) against the assignment PDF produced five new bug-fix tasks **0012–0016**. Tasks **0010** (optional MCP server), **0011**–**0014** are **done**. Bug-fix tasks **0015–0016** remain **todo**.
+Full-code review (2026-07-08) against the assignment PDF produced five new bug-fix tasks **0012–0016**. Tasks **0010**–**0015** are **done**. Bug-fix task **0016** remains **todo**.
 
 Review-confirmed bugs (each reproduced; details in the task folders):
 
 1. ~~**0012**~~ — CTE support in `sql_guard` — **done** (user approved 2026-07-08).
 2. ~~**0013**~~ — per-turn LLM budget reset — **done** (user approved 2026-07-08).
 3. ~~**0014**~~ — name-flagged PII columns leak unformatted values — **done** (user approved 2026-07-08).
-4. **0015** — connection-level LLM outages bypass retry/fallback — **pending_review**.
+4. ~~**0015**~~ — connection-level LLM outages bypass retry/fallback — **done** (user approved 2026-07-08).
 5. **0016** — CLI prints stale `[sql attempts]`/`[retrieved trios]` after save/list/prefs turns; docs test-count drift (120/131 vs actual 132); brittle live eval token (`denim`).
 
 ## How work is organized

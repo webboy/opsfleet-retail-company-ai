@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, and **0014** **done** (user approved). **0015** LLM connection resilience **pending_review**. Bug-fix task **0016** **todo**.
+Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, and **0015** **done** (user approved). Bug-fix task **0016** **todo**.
 
 ## What works
 
