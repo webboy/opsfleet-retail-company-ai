@@ -21,9 +21,9 @@ Hardened LLM-assisted input guard classification by replacing substring label pa
 
 ## How to verify
 
-1. `pytest tests/test_safety.py tests/test_safety_graph.py -q`
-2. `pytest -q`
-3. `python -m retail_agent.evals --layer safety`
+1. `pytest tests/test_safety.py tests/test_safety_graph.py -q` → **53 passed**
+2. `pytest -q` → **207 passed**
+3. `python -m retail_agent.evals --layer safety` → **5/5 passed**
 
 ## Risks / rollback
 
