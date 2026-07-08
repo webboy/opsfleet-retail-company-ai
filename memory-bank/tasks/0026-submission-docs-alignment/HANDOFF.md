@@ -2,7 +2,7 @@
 
 ## Summary
 
-Aligned human-facing submission documentation with the shipped prototype and `thelook_ecommerce` dataset. Added `docs/SCHEMA.md` with supported-question matrix, schema route, tables/joins, and dataset boundaries. Corrected drift in README and docs (branch/inventory overclaims, empty-result self-heal wording, eval case counts, judge threshold, token metrics, candidate capture, live eval flags, BigQuery billing project notes).
+User approved. Human-facing docs aligned with the shipped prototype and `thelook_ecommerce` dataset via `docs/SCHEMA.md` and README/docs drift fixes. Documentation-only — no version bump.
 
 ## Changed files
 

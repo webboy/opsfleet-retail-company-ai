@@ -2,7 +2,7 @@
 
 ## Current focus
 
-Full assignment review pass (2026-07-08, reviewer stance against `docs/AI Technical Assignment - Retail Company.pdf`) produced new backlog tasks **0022–0027**. Tasks **0016** through **0025** are **done** (user approved 2026-07-08); task **0026** is **pending_review**; task **0027** is **todo**.
+Full assignment review pass (2026-07-08, reviewer stance against `docs/AI Technical Assignment - Retail Company.pdf`) produced new backlog tasks **0022–0027**. Tasks **0016** through **0026** are **done** (user approved 2026-07-08); task **0027** is **todo**.
 
 Review backlog (created 2026-07-08):
 
@@ -10,7 +10,7 @@ Review backlog (created 2026-07-08):
 2. **0023 (high)** — ~~input guard structured labels~~ — **done** (user approved 2026-07-08): replace brittle substring label parsing.
 3. **0024 (high)** — ~~empty results and live eval regression~~ — **done** (user approved 2026-07-08): valid empty results report without retry; eval failure diagnostics; version **0.22.0**.
 4. **0025 (medium/high)** — ~~CI and eval gate hardening~~ — **done** (user approved 2026-07-08): GitHub Actions `pytest` + dry-run eval; docs clarify dry-run vs live.
-5. **0026 (medium)** — ~~submission docs alignment~~ — **pending_review**: `docs/SCHEMA.md`, dataset-faithful examples, eval/setup drift fixes.
+5. **0026 (medium)** — ~~submission docs alignment~~ — **done** (user approved 2026-07-08): `docs/SCHEMA.md`, dataset-faithful examples, eval/setup drift fixes.
 6. **0027 (medium)** — Golden Bucket and learning-loop hardening: avoid arbitrary no-overlap trios and incomplete candidate captures.
 
 Second-pass confirmed bugs (each reproduced; details in the task folders):
@@ -52,6 +52,7 @@ First-pass status: ~~0012~~ ~~0013~~ ~~0014~~ ~~0015~~ ~~0016~~ ~~0017~~ ~~0018~
 
 ## Recent changes
 
+- 2026-07-08: Task 0026 **done** (user approved) — `docs/SCHEMA.md`, submission doc alignment (no version bump); dry-run eval 16/16.
 - 2026-07-08: Task 0026 **pending_review** — `docs/SCHEMA.md`, submission doc alignment (no version bump); dry-run eval 16/16.
 - 2026-07-08: Task 0025 **done** (user approved) — GitHub Actions CI (`pytest` + dry-run eval); eval/README docs for dry-run vs live.
 - 2026-07-08: Task 0024 **pending_review** — empty-result routing fix, eval diagnostics, regressions; version **0.22.0**; pytest 212, dry-run eval 16/16, live eval 14/16.
