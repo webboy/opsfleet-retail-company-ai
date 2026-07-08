@@ -2,7 +2,15 @@
 
 ## Current focus
 
-Task **0010** (optional MCP server) is **pending_review** — implementation complete, awaiting user approval. All core tasks 0001–0009 and 0011 are **done**.
+Full-code review (2026-07-08) against the assignment PDF produced five new bug-fix tasks **0012–0016** (all `todo`). Task **0010** (optional MCP server) remains **pending_review**. All core tasks 0001–0009 and 0011 are **done**.
+
+Review-confirmed bugs (each reproduced; details in the task folders):
+
+1. **0012** — `sql_guard` rejects CTE (`WITH`) queries: CTE alias fails the table whitelist.
+2. **0013** — per-turn LLM budget persists across turns in a thread; conversation degrades to fallback after ~4 analysis turns.
+3. **0014** — name-flagged PII columns leak unformatted values (`phone` = `5551234567` passes unmasked).
+4. **0015** — connection-level LLM outages (refused/DNS/timeout) bypass retry and never reach the configured fallback provider.
+5. **0016** — CLI prints stale `[sql attempts]`/`[retrieved trios]` after save/list/prefs turns; docs test-count drift (120/131 vs actual 132); brittle live eval token (`denim`).
 
 ## How work is organized
 
@@ -31,6 +39,7 @@ Task **0010** (optional MCP server) is **pending_review** — implementation com
 
 ## Recent changes
 
+- 2026-07-08: Full review vs assignment PDF — created tasks 0012–0016; `.env` set to Gemini primary + Ollama fallback for local testing; verified live: BigQuery smoke, embeddings, MCP handlers, scripted CLI session, live eval 14/16 (both failures documented in 0016), pytest 132, dry-run eval 16/16.
 - 2026-07-08: Task 0010 **pending_review** — MCP server (`query_retail_data`, `retrieve_trios`), handler tests, `docs/MCP.md`, version **0.9.0**; 131 pytest, 16/16 eval.
 - 2026-07-08: Task 0009 **done** (user approved) — submission README, USAGE, EVALUATION, architecture drift fixes.
 - 2026-07-08: Task 0009 **pending_review** — full README, USAGE, EVALUATION, architecture/technical drift fixes, fresh venv verified (120 pytest, 16 eval).
