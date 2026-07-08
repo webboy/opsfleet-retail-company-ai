@@ -1,6 +1,6 @@
 # Handoff — Task 0021
 
-**Status:** pending_review
+**Status:** done (user approved 2026-07-08)
 
 ## Summary
 

@@ -4,7 +4,7 @@
 
 - **Task ID**: 0021
 - **Title**: Polish: eval --layer phantom regressions, inflated self-heal metric, stale trace fields, .env precedence
-- **Status**: pending_review
+- **Status**: done
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08

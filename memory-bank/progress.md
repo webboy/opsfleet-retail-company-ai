@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, and **0020** **done** (user approved). Second deep-review pass task **0021** is **pending_review**.
+Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, **0020**, and **0021** **done** (user approved). Second deep-review pass is **complete**.
 
 ## What works
 
@@ -42,7 +42,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 9. ~~`0018` `/save` scope fix~~ — **done**
 10. ~~`0019` Golden Bucket robust loading~~ — **done**
 11. ~~`0020` preference regex tightening~~ — **done**
-12. `0021` tooling polish — **pending_review**
+12. ~~`0021` tooling polish~~ — **done**
 
 ## Known issues
 
@@ -55,7 +55,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - ~~**/save persists non-analysis output**~~ — fixed in task 0018 (**done**).
 - ~~**Malformed trio file crashes CLI startup**~~ — fixed in task 0019 (**done**).
 - ~~**Preference regex hijacks analysis questions**~~ — fixed in task 0020 (**done**).
-- **Tooling polish** (task 0021, **pending_review**): eval `--layer` baseline scoped; per-turn self-heal metric; trace suppresses stale analysis fields; shell env beats `.env`.
+- ~~**Tooling polish**~~ — fixed in task 0021 (**done**).
 - Candidate JSONL grows without automatic pruning — curation workflow documented only.
 - Preference phrase detection is deterministic and may miss unusual phrasing.
 - Live eval gate requires LLM + BigQuery credentials; dry-run is CI-default.
