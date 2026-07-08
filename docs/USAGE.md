@@ -117,6 +117,8 @@ Analyst report excerpt shown to the LLM as style guidance.
 2. Restart the CLI (embeddings load at `TrioStore` initialization).
 3. Ask a similar question — the trio should appear in `[retrieved trios=...]`.
 
+Malformed trio files (missing required keys, invalid YAML, or missing front matter) are **skipped** with a warning in the logs; the agent keeps running with the remaining valid trios. Fix or remove bad files during curation.
+
 ### Candidate capture
 
 After a successful analysis turn, the agent appends a candidate to `golden_bucket/candidates/candidates.jsonl`. Promote approved candidates into new seed files manually (prototype has no analyst UI).

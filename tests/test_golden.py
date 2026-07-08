@@ -76,6 +76,47 @@ def test_load_trios_from_directory(bucket_dir: Path):
     assert {trio.id for trio in trios} == {"sample-trio", "monthly-revenue"}
 
 
+@pytest.mark.parametrize(
+    ("filename", "content"),
+    [
+        ("broken-missing-id.md", "---\nquestion: broken\nsql: SELECT 1\n---\nbody\n"),
+        ("broken-yaml.md", "---\nquestion: [unclosed\nsql: SELECT 1\nid: broken\n---\nbody\n"),
+        ("broken-no-frontmatter.md", "Just a markdown body without front matter.\n"),
+    ],
+)
+def test_load_trios_skips_malformed_files(bucket_dir: Path, filename: str, content: str, caplog):
+    (bucket_dir / filename).write_text(content, encoding="utf-8")
+
+    with caplog.at_level("WARNING"):
+        trios = load_trios(bucket_dir)
+
+    assert len(trios) == 2
+    assert {trio.id for trio in trios} == {"sample-trio", "monthly-revenue"}
+    assert any(filename in record.message for record in caplog.records)
+    assert any("Skipping invalid trio file" in record.message for record in caplog.records)
+
+
+def test_trio_store_starts_with_malformed_file_present(bucket_dir: Path, caplog):
+    (bucket_dir / "zz-broken.md").write_text(
+        "---\nquestion: broken\nsql: SELECT 1\n---\nbody\n",
+        encoding="utf-8",
+    )
+
+    with caplog.at_level("WARNING"):
+        store = TrioStore(
+            bucket_dir,
+            embedder=FakeEmbedder(),
+            settings=make_settings(),
+            embedding_enabled=True,
+            top_k=1,
+        )
+
+    result = store.retrieve("Who are the top customers by spend?")
+
+    assert result.trios[0].id == "sample-trio"
+    assert any("zz-broken.md" in record.message for record in caplog.records)
+
+
 def test_fake_embedding_ranks_similar_question(bucket_dir: Path):
     store = TrioStore(
         bucket_dir,

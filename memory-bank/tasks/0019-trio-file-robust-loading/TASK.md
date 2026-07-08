@@ -4,7 +4,7 @@
 
 - **Task ID**: 0019
 - **Title**: Golden Bucket robustness: one malformed trio file crashes the CLI
-- **Status**: todo
+- **Status**: pending_review
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08
@@ -50,10 +50,10 @@ The same fragility affects the MCP server (`TrioStore()` in
 
 ## Acceptance criteria
 
-- [ ] A bucket with one broken file (each of the three failure modes) still loads the remaining trios; CLI starts and answers.
-- [ ] Warning log names the offending file and reason.
-- [ ] MCP `retrieve_trios` keeps working with a broken file present.
-- [ ] New unit tests in `tests/test_golden.py` for the skip behavior.
+- [x] A bucket with one broken file (each of the three failure modes) still loads the remaining trios; CLI starts and answers.
+- [x] Warning log names the offending file and reason.
+- [x] MCP `retrieve_trios` keeps working with a broken file present.
+- [x] New unit tests in `tests/test_golden.py` for the skip behavior.
 
 ## References
 

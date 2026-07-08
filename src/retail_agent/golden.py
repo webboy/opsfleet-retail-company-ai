@@ -197,7 +197,10 @@ def load_trios(bucket_dir: Path) -> list[Trio]:
     if not bucket_dir.exists():
         return trios
     for path in sorted(bucket_dir.glob("*.md")):
-        trios.append(load_trio_file(path))
+        try:
+            trios.append(load_trio_file(path))
+        except Exception as exc:  # noqa: BLE001 — skip bad analyst edits, keep bucket usable
+            logger.warning("Skipping invalid trio file %s: %s", path, exc)
     return trios
 
 

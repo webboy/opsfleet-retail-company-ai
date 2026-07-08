@@ -113,6 +113,25 @@ def test_retrieve_trios_returns_expected_shape(tmp_path: Path):
     assert {"id", "question", "sql", "report", "tags"} <= set(payload["trios"][0])
 
 
+def test_retrieve_trios_works_when_bucket_has_malformed_file(tmp_path: Path):
+    bucket_dir = _bucket_dir(tmp_path)
+    (bucket_dir / "zz-broken.md").write_text(
+        "---\nquestion: broken\nsql: SELECT 1\n---\nbody\n",
+        encoding="utf-8",
+    )
+    store = TrioStore(
+        bucket_dir=bucket_dir,
+        embedder=FakeEmbedder(),
+        settings=make_settings(),
+    )
+
+    payload = retrieve_trios_handler("monthly revenue last year", k=2, store=store)
+
+    assert payload["error"] is None
+    assert payload["count"] == 2
+    assert {trio["id"] for trio in payload["trios"]} == {"monthly-revenue", "sample-trio"}
+
+
 def test_retrieve_trios_clamps_k_and_rejects_empty_question(tmp_path: Path):
     bucket_dir = _bucket_dir(tmp_path)
     store = TrioStore(
