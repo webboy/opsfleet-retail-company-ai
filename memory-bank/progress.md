@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, **0020**, **0021**, **0022**, **0023**, **0024**, **0025**, **0026**, **0028**, **0029**, **0030**, **0031**, **0032**, and **0033** **done** (user approved or per-task instruction). Task **0027** is **pending_review**.
+Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, **0020**, **0021**, **0022**, **0023**, **0024**, **0025**, **0026**, **0028**, **0029**, **0030**, **0031**, **0032**, **0033**, and **0034** **done** (user approved or per-task instruction). Task **0027** is **pending_review**.
 
 ## What works
 
@@ -18,7 +18,8 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - QA eval suite: 17 cases, dry-run default, judge scoring, baseline regression (task 0008 + 0032, **done**).
 - **Human docs package**: README, USAGE, EVALUATION, drift-corrected architecture/technical (task 0009, **done**).
 - **Optional MCP server**: `retail-agent-mcp`, guarded `query_retail_data` + `retrieve_trios` (task 0010, **done**).
-- `pytest` **235 passed**; eval dry-run **17/17 passed**; safety subset **5/5 passed**.
+- `pytest` **236 passed**; eval dry-run **17/17 passed**; safety subset **5/5 passed**.
+- **Golden keyword fallback relevance floor** (task 0034, **done**): minimum shared-token count for keyword fallback; version **0.29.0**.
 - **Input guard classify-unavailable fail-closed** (task 0033, **done**): budget/quota classify-skip refuses ambiguous input; version **0.28.0**.
 - **Live QA evidence hardening** (task 0032, **done**): judge low-score/unavailable tests, `--require-judge`, `valid-empty-result` eval case, cancelled-order live weakness docs; version **0.27.0**.
 - **Input guard fail-closed fallback** (task 0030, **done**): malformed classifier output routes to `off_topic`; version **0.26.0**.
@@ -65,6 +66,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 22. ~~`0031` Reviewer docs polish~~ — **done**
 23. ~~`0032` Live QA evidence hardening~~ — **done**
 24. ~~`0033` Input guard classify-unavailable fail-closed~~ — **done**
+25. ~~`0034` Golden keyword fallback relevance floor~~ — **done**
 
 ## Known issues
 
@@ -87,6 +89,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - ~~**Embedding retrieval returns arbitrary top-k for unrelated questions**~~ — fixed in task 0028 (**done**): cosine similarity floor; version **0.24.0**.
 - ~~**Malformed LLM guard classifier output defaults to analysis**~~ — fixed in task 0030 (**done**): fail-closed to `off_topic`; version **0.26.0**.
 - ~~**Ambiguous input fails open when guard classifier unavailable**~~ — fixed in task 0033 (**done**): budget/quota classify-skip fails closed; version **0.28.0**.
+- ~~**Keyword fallback injects weak one-token overlaps**~~ — fixed in task 0034 (**done**): minimum shared-token floor; version **0.29.0**.
 - **Golden Bucket hardening** (task 0027, **pending_review**): zero-overlap keyword fallback, `report_complete` capture gating; version **0.23.0**.
 - Preference phrase detection is deterministic and may miss unusual phrasing.
 - Live eval gate requires LLM + BigQuery credentials; dry-run is CI-default.
@@ -94,4 +97,4 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 
 ## Version
 
-- Project version **0.28.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (task 0033 input guard classify-unavailable fail-closed).
+- Project version **0.29.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (task 0034 golden keyword fallback relevance floor).

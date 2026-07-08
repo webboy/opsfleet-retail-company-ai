@@ -1,6 +1,6 @@
 """Test helpers."""
 
-from retail_agent.config import DEFAULT_EMBEDDING_MIN_SIMILARITY, Settings
+from retail_agent.config import DEFAULT_EMBEDDING_MIN_SIMILARITY, DEFAULT_KEYWORD_MIN_OVERLAP, Settings
 
 
 def make_settings(**overrides) -> Settings:
@@ -23,6 +23,7 @@ def make_settings(**overrides) -> Settings:
         "default_limit": 1000,
         "mcp_max_response_rows": 100,
         "embedding_min_similarity": DEFAULT_EMBEDDING_MIN_SIMILARITY,
+        "keyword_min_overlap": DEFAULT_KEYWORD_MIN_OVERLAP,
     }
     defaults.update(overrides)
     return Settings(**defaults)

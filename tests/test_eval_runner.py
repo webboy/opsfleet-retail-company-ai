@@ -120,6 +120,7 @@ def test_cancelled_order_rate_exhaustion_matches_live_failure_pattern():
         default_limit=1000,
         mcp_max_response_rows=100,
         embedding_min_similarity=0.35,
+        keyword_min_overlap=2,
     )
     llm = ScriptLLM([f"```sql\n{bad_sql}\n```"] * 3)
     bq = FakeBQRunner(

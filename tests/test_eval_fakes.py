@@ -69,6 +69,7 @@ def test_validate_live_llm_settings_rejects_missing_openrouter_key():
         default_limit=1000,
         mcp_max_response_rows=100,
         embedding_min_similarity=0.35,
+        keyword_min_overlap=2,
     )
 
     try:

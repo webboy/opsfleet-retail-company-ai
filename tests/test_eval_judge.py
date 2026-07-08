@@ -53,6 +53,7 @@ def test_score_intent_passes_budget_to_invoke_with_retry():
         default_limit=1000,
         mcp_max_response_rows=100,
         embedding_min_similarity=0.35,
+        keyword_min_overlap=2,
     )
 
     def fake_invoke(_llm, _messages, budget):

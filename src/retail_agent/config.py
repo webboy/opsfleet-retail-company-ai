@@ -14,6 +14,7 @@ DEFAULT_MAX_BYTES_BILLED = 1_073_741_824  # 1 GiB
 DEFAULT_QUERY_LIMIT = 1000
 DEFAULT_MCP_MAX_RESPONSE_ROWS = 100
 DEFAULT_EMBEDDING_MIN_SIMILARITY = 0.35
+DEFAULT_KEYWORD_MIN_OVERLAP = 2
 DEFAULT_LLM_PROVIDER = "gemini"
 DEFAULT_OPENROUTER_MODEL = "openrouter/auto"
 DEFAULT_OLLAMA_HOST = "http://localhost:11434"
@@ -42,6 +43,7 @@ class Settings:
     default_limit: int
     mcp_max_response_rows: int
     embedding_min_similarity: float
+    keyword_min_overlap: int
     allowed_tables: frozenset[str] = field(default=DEFAULT_ALLOWED_TABLES)
 
 
@@ -80,6 +82,10 @@ def get_settings(*, load_env: bool = True) -> Settings:
         embedding_min_similarity=_float_env(
             "GOLDEN_EMBEDDING_MIN_SIMILARITY",
             DEFAULT_EMBEDDING_MIN_SIMILARITY,
+        ),
+        keyword_min_overlap=_int_env(
+            "GOLDEN_KEYWORD_MIN_OVERLAP",
+            DEFAULT_KEYWORD_MIN_OVERLAP,
         ),
     )
 

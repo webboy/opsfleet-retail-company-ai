@@ -170,6 +170,29 @@ def test_keyword_fallback_returns_empty_when_no_overlap(bucket_dir: Path):
     assert result.trios == []
 
 
+def test_keyword_fallback_filters_weak_single_token_overlap(bucket_dir: Path):
+    class BrokenEmbedder:
+        def embed_query(self, text: str) -> list[float]:
+            raise RuntimeError("embedding unavailable")
+
+        def embed_documents(self, texts: list[str]) -> list[list[float]]:
+            raise RuntimeError("embedding unavailable")
+
+    store = TrioStore(
+        bucket_dir,
+        embedder=BrokenEmbedder(),
+        settings=make_settings(),
+        embedding_enabled=True,
+        top_k=2,
+    )
+
+    # Shares only "monthly" with monthly-revenue trio — below default min_overlap=2.
+    result = store.retrieve("monthly sales trends")
+
+    assert result.method == "keyword"
+    assert result.trios == []
+
+
 def test_format_trios_for_prompt_handles_empty_list():
     prompt = format_trios_for_prompt([])
 

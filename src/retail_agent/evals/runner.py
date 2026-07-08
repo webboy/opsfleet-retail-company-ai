@@ -206,6 +206,7 @@ def _build_settings(work_dir: Path, *, live: bool) -> Settings:
         default_limit=1000,
         mcp_max_response_rows=100,
         embedding_min_similarity=0.35,
+        keyword_min_overlap=2,
     )
 
 

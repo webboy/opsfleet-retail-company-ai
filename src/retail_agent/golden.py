@@ -146,7 +146,12 @@ class TrioStore:
                 logger.warning("Embedding retrieval failed, using keyword fallback: %s", exc)
 
         return RetrievalResult(
-            trios=_retrieve_by_keywords(question, self._trios, k),
+            trios=_retrieve_by_keywords(
+                question,
+                self._trios,
+                k,
+                min_overlap=self.settings.keyword_min_overlap,
+            ),
             method="keyword",
         )
 
@@ -267,13 +272,29 @@ def trios_from_state(raw: list[dict] | None) -> list[Trio]:
     return [Trio.from_dict(item) for item in raw]
 
 
-def _retrieve_by_keywords(question: str, trios: list[Trio], k: int) -> list[Trio]:
+def _retrieve_by_keywords(
+    question: str,
+    trios: list[Trio],
+    k: int,
+    *,
+    min_overlap: int = 2,
+) -> list[Trio]:
     scored = [
-        (_keyword_score(question, trio.question), trio)
+        (_keyword_overlap(question, trio.question), _keyword_score(question, trio.question), trio)
         for trio in trios
     ]
-    scored.sort(key=lambda item: item[0], reverse=True)
-    return [trio for score, trio in scored[:k] if score > 0]
+    scored.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    return [
+        trio
+        for overlap, _score, trio in scored[:k]
+        if overlap >= min_overlap
+    ]
+
+
+def _keyword_overlap(left: str, right: str) -> int:
+    left_tokens = set(_tokenize(left))
+    right_tokens = set(_tokenize(right))
+    return len(left_tokens & right_tokens)
 
 
 def _keyword_score(left: str, right: str) -> float:

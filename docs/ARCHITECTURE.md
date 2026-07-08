@@ -109,7 +109,7 @@ flowchart TB
 | **LangGraph Orchestrator** | Explicit state machine: nodes, conditional edges (self-heal loop), `interrupt()` for delete confirmation, checkpointer for conversation memory. |
 | **input_guard** | Classifies turns: analysis question, report management, off-topic, malicious (injection, PII fishing). Refusals exit early without BigQuery cost. |
 | **reports_router** | Save, list, delete saved reports. Delete resolves candidates scoped to `owner = current_user`, lists exact matches, then pauses for confirmation. |
-| **retrieve_trios** | Top-k similarity search over Golden Bucket question embeddings (returns no trios when best cosine similarity is below `GOLDEN_EMBEDDING_MIN_SIMILARITY`, default 0.35); keyword-overlap fallback when embedding API is down (returns no trios when there is zero overlap) |
+| **retrieve_trios** | Top-k similarity search over Golden Bucket question embeddings (returns no trios when best cosine similarity is below `GOLDEN_EMBEDDING_MIN_SIMILARITY`, default 0.35); keyword-overlap fallback when embedding API is down (requires at least `GOLDEN_KEYWORD_MIN_OVERLAP` shared tokens, default 2) |
 | **generate_sql** | LLM generates SQL using schema context + retrieved trios + conversation history. |
 | **sql_guard** | Deterministic pre-execution checks inside `BigQueryRunner.execute()`: single statement, SELECT-only, allowed tables only, LIMIT injection/clamping to `BQ_DEFAULT_LIMIT`, `maximum_bytes_billed` cap. Not a separate LangGraph node in the prototype. |
 | **execute_bq** | Graph node that calls `BigQueryRunner` (sql_guard + BigQuery client); returns rows, typed errors that trigger the self-heal loop, or valid empty results that proceed to reporting. |
