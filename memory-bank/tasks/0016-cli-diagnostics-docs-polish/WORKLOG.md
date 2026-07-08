@@ -10,3 +10,4 @@
 - Relaxed `top-products-sales` and `revenue-by-traffic-source` eval assertions; updated dry-run report wording.
 - Updated `docs/EVALUATION.md` to avoid hard-coded pytest count.
 - Verification: pytest **157 passed**; eval **16/16**; version **0.14.0**.
+- User approved 2026-07-08 — task marked **done**.

@@ -4,7 +4,7 @@
 
 - **Task ID**: 0016
 - **Title**: Polish: stale CLI diagnostics, docs test-count drift, brittle live eval assertion
-- **Status**: pending_review
+- **Status**: done
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08

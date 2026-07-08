@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, and **0015** **done** (user approved). **0016** polish **pending_review**. Second deep-review pass (2026-07-08) created bug-fix tasks **0017–0021** — all **todo**.
+Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, and **0016** **done** (user approved). Second deep-review pass (2026-07-08) created bug-fix tasks **0017–0021** — all **todo**.
 
 ## What works
 
@@ -23,7 +23,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, and **0015*
 - **CTE support in sql_guard** (task 0012, **done**): bare CTE aliases allowed; 4 regression tests; live BQ verified.
 - **Name-flagged PII column masking** (task 0014, **done**): unformatted phones and arbitrary strings masked in PII-named columns; content-detected path unchanged.
 - **LLM connection-outage resilience** (task 0015, **done**): connection errors classify as transient; immediate fallback when configured.
-- **CLI/docs/eval polish** (task 0016, **pending_review**): analysis-only diagnostics; property-based live eval tokens; docs count drift removed.
+- **CLI/docs/eval polish** (task 0016, **done**): analysis-only diagnostics; property-based live eval tokens; docs count drift removed.
 
 ## What's left to build
 
@@ -32,7 +32,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, and **0015*
 3. ~~`0012` CTE sql_guard~~ — **done**
 4. ~~`0014` PII name-flagged masking~~ — **done**
 5. ~~`0015` LLM connection resilience~~ — **done**
-6. ~~`0016` CLI/docs/eval polish~~ — **pending_review**
+6. ~~`0016` CLI/docs/eval polish~~ — **done**
 7. ~~`0013` LLM budget reset~~ — **done**
 8. `0017`–`0021` bug fixes from the 2026-07-08 second review pass — **todo** (see `tasks/INDEX.md`)
 
@@ -42,7 +42,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, and **0015*
 - ~~**LLM budget not reset per turn**~~ — fixed in task 0013 (**done**).
 - ~~**Unformatted phone values leak through name-flagged PII columns**~~ — fixed in task 0014 (**done**).
 - ~~**Connection-level LLM outages skip the fallback provider**~~ — fixed in task 0015 (**done**).
-- ~~**Stale CLI diagnostics after non-analysis turns; docs test-count drift; brittle live eval token**~~ — fixed in task 0016 (**pending_review**).
+- ~~**Stale CLI diagnostics after non-analysis turns; docs test-count drift; brittle live eval token**~~ — fixed in task 0016 (**done**).
 - **PII markers over-match** (task 0017, **todo**) — `cancelled_rate`/`email_count` masked to `***` before the report LLM; regression amplified by 0014; dry-run evals blind to it.
 - **/save persists non-analysis output** (task 0018, **todo**) — preference confirmations, list output and refusals get saved as "reports".
 - **Malformed trio file crashes CLI startup** (task 0019, **todo**) — raw traceback; loader should skip-and-warn.
