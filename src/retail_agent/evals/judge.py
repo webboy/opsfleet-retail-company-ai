@@ -50,9 +50,13 @@ def parse_judge_response(text: str) -> tuple[int | None, str]:
 
 
 def _judge_settings(settings: Settings) -> Settings:
-    """Judge uses the configured primary provider only — no agent fallback chain."""
+    """Eval judge always uses local Ollama — avoids cloud quota on live eval runs."""
 
-    return replace(settings, fallback_provider=None)
+    return replace(
+        settings,
+        provider="ollama",
+        fallback_provider=None,
+    )
 
 
 def score_intent(

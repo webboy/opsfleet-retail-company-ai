@@ -68,7 +68,10 @@ def test_score_intent_passes_budget_to_invoke_with_retry():
             )
 
     create_model.assert_called_once()
-    assert create_model.call_args.args[0].fallback_provider is None
+    judge_settings = create_model.call_args.args[0]
+    assert judge_settings.provider == "ollama"
+    assert judge_settings.fallback_provider is None
+    assert judge_settings.ollama_model == "llama3.2"
     assert score == 4
     assert rationale == "live judge"
 

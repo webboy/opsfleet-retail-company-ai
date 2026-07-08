@@ -87,7 +87,7 @@ For capability cases that pass property assertions, a separate judge prompt (`ev
 - **Inputs:** user question, generated SQL, result sample, final report
 - **Output:** numeric score + short rationale
 - **Dry-run:** scripted judge scores from case fixtures
-- **Live:** primary Gemini only (no fallback provider) — judge failures are recorded gracefully without aborting the run
+- **Live:** local **Ollama** only (`RETAIL_AGENT_OLLAMA_MODEL`, `OLLAMA_HOST`) — no cloud fallback, so judge scoring does not consume Gemini quota
 
 Judge runs only on capability layer cases where `judge: true` in `cases.yaml`.
 
