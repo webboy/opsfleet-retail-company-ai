@@ -53,7 +53,6 @@ First-pass status: ~~0012~~ ~~0013~~ ~~0014~~ ~~0015~~ ~~0016~~ ~~0017~~ ~~0018~
 ## Recent changes
 
 - 2026-07-08: Task 0025 **done** (user approved) — GitHub Actions CI (`pytest` + dry-run eval); eval/README docs for dry-run vs live.
-- 2026-07-08: Task 0025 **pending_review** — GitHub Actions CI (`pytest` + dry-run eval); eval/README docs for dry-run vs live.
 - 2026-07-08: Task 0024 **pending_review** — empty-result routing fix, eval diagnostics, regressions; version **0.22.0**; pytest 212, dry-run eval 16/16, live eval 14/16.
 - 2026-07-08: Task 0023 **pending_review** — exact LLM guard label parsing + regressions; version **0.21.0**.
 - 2026-07-08: Task 0022 **done** (user approved) — SQL LIMIT clamping + MCP response row cap (`MCP_MAX_RESPONSE_ROWS`); version **0.20.0**.
