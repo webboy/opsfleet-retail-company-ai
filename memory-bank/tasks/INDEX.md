@@ -31,3 +31,8 @@ Quick overview of all tasks. Source of truth for each row is the task's `TASK.md
 | 0025 | CI and eval gate hardening | done | Engineer | 2026-07-08 |
 | 0026 | Submission docs alignment | done | Engineer | 2026-07-08 |
 | 0027 | Golden Bucket and learning-loop hardening | pending_review | Engineer | 2026-07-08 |
+| 0028 | Golden embedding relevance | done | Engineer | 2026-07-08 |
+| 0029 | Save complete report gating | done | Engineer | 2026-07-08 |
+| 0030 | Input guard fail-closed fallback | done | Engineer | 2026-07-08 |
+| 0031 | Reviewer docs polish | done | Engineer | 2026-07-08 |
+| 0032 | Live QA evidence hardening | done | Engineer | 2026-07-08 |

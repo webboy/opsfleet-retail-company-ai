@@ -36,7 +36,7 @@ This document explains **why** the system is built the way it is, how data flows
 
 **Production:** Trios stored as objects in **Google Cloud Storage**; question embeddings indexed in **Vertex AI Vector Search** (or equivalent managed vector DB). Analyst curation pipeline promotes approved candidates.
 
-**Prototype:** Trios as YAML/Markdown files under `golden_bucket/` (one file per trio with YAML front-matter: `id`, `question`, `sql`, `tags`, `report`); question embeddings via Gemini (`gemini-embedding-001` by default, overridable with `RETAIL_AGENT_EMBEDDING_MODEL`) with in-memory cosine similarity; **keyword-overlap fallback** when the embedding API is unavailable — if no trio shares tokens with the question, retrieval returns no examples instead of arbitrary top-k matches. Embedding retrieval is best-effort and separate from the per-turn LLM generation/composition call budget. Complete successful analysis turns append to `golden_bucket/candidates/candidates.jsonl`. Override the bucket location with `GOLDEN_BUCKET_DIR` if needed.
+**Prototype:** Trios as YAML/Markdown files under `golden_bucket/` (one file per trio with YAML front-matter: `id`, `question`, `sql`, `tags`, `report`); question embeddings via Gemini (`gemini-embedding-001` by default, overridable with `RETAIL_AGENT_EMBEDDING_MODEL`) with in-memory cosine similarity; retrieval returns no examples when the best embedding similarity is below `GOLDEN_EMBEDDING_MIN_SIMILARITY` (default **0.35**); **keyword-overlap fallback** when the embedding API is unavailable — if no trio shares tokens with the question, retrieval returns no examples instead of arbitrary top-k matches. Embedding retrieval is best-effort and separate from the per-turn LLM generation/composition call budget. Complete successful analysis turns append to `golden_bucket/candidates/candidates.jsonl`. Override the bucket location with `GOLDEN_BUCKET_DIR` if needed.
 
 **Reasoning:** Vector search scales to thousands of trios with sub-second retrieval. Local files keep the prototype zero-ops while preserving the same retrieval → inject → generate SQL flow.
 
@@ -174,7 +174,7 @@ See [Usage Guide](./USAGE.md) for all CLI flags and commands.
 
 **Problem:** Raw logs contain customer emails and phones; the agent must answer analysis questions only and never display PII, even if SQL retrieves it.
 
-**Input guard:** First graph node (`input_guard`) applies deterministic rules for obvious prompt injection, destructive SQL language, and off-topic requests, then uses a small LLM fallback only for ambiguous turns. The LLM classifier must return one canonical label (`analysis`, `schema`, `chitchat`, `off_topic`, `malicious`) on the first line or as minimal JSON; negated/mixed prose falls back to `analysis` rather than substring matching. Refusals exit early with a polite message — no Golden Bucket retrieval or BigQuery. **Schema questions** route to `answer_schema`, which answers from bundled static documentation only (see [Schema & Supported Questions](./SCHEMA.md)).
+**Input guard:** First graph node (`input_guard`) applies deterministic rules for obvious prompt injection, destructive SQL language, and off-topic requests, then uses a small LLM fallback only for ambiguous turns. The LLM classifier must return one canonical label (`analysis`, `schema`, `chitchat`, `off_topic`, `malicious`) on the first line or as minimal JSON; negated/mixed/malformed prose fails closed to `off_topic` rather than substring matching. Refusals exit early with a polite message — no Golden Bucket retrieval or BigQuery. **Schema questions** route to `answer_schema`, which answers from bundled static documentation only (see [Schema & Supported Questions](./SCHEMA.md)).
 
 **PII masking (deterministic, two layers):**
 1. **DataFrame layer (`pii_mask`):** Detect email/phone columns by name (`email`, `phone`, …) and by content sampling; mask values (`j***@***.***`, `***-***-1234`) **before** rows reach the report LLM.
@@ -231,7 +231,7 @@ Explicit PII requests (e.g. top buyers with emails) may still run as analysis, b
 
 | Layer | What it checks | How |
 |-------|----------------|-----|
-| **Capability cases** | **11** questions across customer behavior, product performance, time metrics, and schema questions (see [Schema & Supported Questions](./SCHEMA.md)) | Property assertions: expected tables referenced, non-empty results where applicable, must/must-not-contain strings (dataset is rolling — no exact value assertions) |
+| **Capability cases** | **12** questions across customer behavior, product performance, time metrics, valid empty results, and schema questions (see [Schema & Supported Questions](./SCHEMA.md)) | Property assertions: expected tables referenced, non-empty results where applicable, must/must-not-contain strings (dataset is rolling — no exact value assertions) |
 | **Safety cases** | **5** cases: injection refused, PII masked, delete requires confirmation, off-topic declined, destructive SQL blocked | Deterministic pass/fail |
 | **Intent correctness** | Does the report answer the question? | LLM-as-judge: inputs = question + SQL + result sample + report → score 1–5 + rationale; **score &lt; 3 fails** a passing capability case |
 

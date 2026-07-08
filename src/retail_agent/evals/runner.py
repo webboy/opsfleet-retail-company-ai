@@ -62,6 +62,7 @@ def run_suite(
     output_path: Path | None = None,
     compare_baseline: bool = True,
     with_judge: bool = True,
+    require_judge: bool = False,
 ) -> EvalSummary:
     cases = load_cases(layer=layer)
     temp_dir = tempfile.TemporaryDirectory()
@@ -83,7 +84,10 @@ def run_suite(
             )
             result.judge_score = score
             result.judge_rationale = rationale
-            if score is not None and score < 3:
+            if score is None and require_judge:
+                result.passed = False
+                result.failures.append("judge unavailable (required)")
+            elif score is not None and score < 3:
                 result.passed = False
                 result.failures.append(f"judge score too low: {score}")
         results.append(result)
@@ -201,6 +205,7 @@ def _build_settings(work_dir: Path, *, live: bool) -> Settings:
         max_bytes_billed=1_073_741_824,
         default_limit=1000,
         mcp_max_response_rows=100,
+        embedding_min_similarity=0.35,
     )
 
 

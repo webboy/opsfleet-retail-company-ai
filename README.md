@@ -22,7 +22,7 @@ Assignment brief: `docs/AI Technical Assignment - Retail Company.pdf`
 **Prerequisites:** Python 3.11+, a [Google Cloud](https://cloud.google.com/) project, [Gemini API key](https://aistudio.google.com/) (free tier), and the `gcloud` CLI.
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/webboy/opsfleet-retail-company-ai.git
 cd opsfleet-retail-company-ai
 
 python3 -m venv .venv
@@ -53,7 +53,7 @@ Optional flags: `--thread <id>` (conversation memory), `--log-level DEBUG|INFO|W
 
 ## Example session — one manager workflow
 
-Curated transcript showing a continuous Store Manager session (analysis → follow-up → preference → save → guarded delete). Format matches the shipped CLI; report wording varies with live data.
+Curated transcript showing a continuous Store Manager session (analysis → follow-up → preference → save → guarded delete). Format matches the shipped CLI; report wording and dates vary with live data. Bracketed lines such as `[sql attempts=1]` are real CLI diagnostics printed **after** analysis answers only.
 
 ```
 Retail Agent CLI — user=alice thread=alice-a1b2c3d4
@@ -89,18 +89,43 @@ Agent: Saved report "How did monthly revenue trend last year?" to your library.
 You: show my reports
 
 Agent: Your saved reports:
-       1. How did monthly revenue trend last year? (saved today)
+       - How did monthly revenue trend last year? (2026-07-08)
 
 You: delete reports mentioning revenue
 
-Agent: I found 1 report to delete:
-       - "How did monthly revenue trend last year?" (saved today)
-       Reply yes to confirm deletion, or anything else to cancel.
+Agent: I found the following saved reports that match your delete request:
+       - How did monthly revenue trend last year? (2026-07-08)
+
+       Reply yes or confirm to delete them, or anything else to cancel.
 
 You: no
 
 Agent: Deletion cancelled. Your reports were not changed.
 ```
+
+### Guarded delete variants (assignment)
+
+The agent supports mention-based, today-based, and all-reports selectors. Each lists exact matches and requires explicit confirmation (`yes`, `y`, `confirm`, or `delete`).
+
+**Delete by mention** (shown in the workflow above): `delete reports mentioning revenue`
+
+**Delete reports saved today:**
+
+```
+You: delete reports we made today
+
+Agent: I found the following saved reports that match your delete request:
+       - How did monthly revenue trend last year? (2026-07-08)
+       - Product category comparison (2026-07-08)
+
+       Reply yes or confirm to delete them, or anything else to cancel.
+
+You: yes
+
+Agent: Deleted 2 saved report(s).
+```
+
+**Delete all my reports:** `delete all my reports` — same confirmation flow, scoped to your user ID only.
 
 ### Safety snippets (same CLI)
 
@@ -114,9 +139,9 @@ Agent: Top buyers by spend (contact details masked per policy):
        | 1    | $2,450      |
        ...
        Note: Customer contact details were masked per company policy.
-
-[pii masked; no raw email addresses in output]
 ```
+
+PII masking is silent in the CLI (no diagnostic line); enable `DEBUG` logging to see mask hits in server logs.
 
 **Unsupported dimension** — the public dataset has no branch/store/region columns; the agent explains and suggests supported dimensions:
 
@@ -126,7 +151,7 @@ You: Show revenue by region
 Agent: There is no region column in thelook_ecommerce. Try revenue by
        department, traffic source, or product category instead.
 
-[sql attempts=3 — agent retried internally before this fallback message]
+[sql attempts=3]
 ```
 
 ## Verify installation (no live API keys needed)
@@ -136,7 +161,7 @@ Same checks as CI (see [Evaluation Guide](docs/EVALUATION.md#ci-gate-determinist
 ```bash
 pip install -e ".[dev]"
 pytest -q                          # unit + graph integration tests
-python -m retail_agent.evals       # dry-run eval suite (16 cases, baseline compare)
+python -m retail_agent.evals       # dry-run eval suite (17 cases, baseline compare)
 ```
 
 With credentials configured, optional manual checks:
@@ -178,4 +203,4 @@ data/                 SQLite reports/preferences DB (created at runtime)
 
 ## License
 
-MIT — see assignment deliverable context in `docs/`.
+MIT — see [LICENSE](LICENSE).

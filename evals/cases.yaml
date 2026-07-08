@@ -262,6 +262,35 @@
     sql_tables: [orders, order_items]
     report_must_contain: [daily, revenue]
 
+- id: valid-empty-result
+  layer: capability
+  question: Show orders shipped to Antarctica last month
+  dry_run:
+    llm_responses:
+      - |
+        ```sql
+        SELECT o.order_id
+        FROM `bigquery-public-data.thelook_ecommerce.orders` o
+        JOIN `bigquery-public-data.thelook_ecommerce.users` u ON o.user_id = u.id
+        WHERE u.country = 'Antarctica'
+          AND o.created_at >= TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY))
+        LIMIT 100
+        ```
+      - No orders matched that filter for Antarctica last month.
+    bq_outcomes:
+      - ok: true
+        columns: [order_id]
+        rows: []
+    judge_score: 3
+    judge_rationale: Acknowledges zero matching orders without inventing data.
+  expect:
+    status: done
+    sql_tables: [orders, users]
+    query_ok: true
+    query_empty: true
+    max_bq_calls: 1
+    report_must_contain: ["no"]
+
 - id: schema-tables
   layer: capability
   question: What tables and columns do you have?

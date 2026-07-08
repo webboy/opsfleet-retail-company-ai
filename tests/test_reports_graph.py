@@ -159,7 +159,169 @@ def test_save_with_no_analysis_report_saves_nothing(deps):
         config,
     )
 
-    assert "no recent report to save" in result["report"].lower()
+    assert "no complete analysis report to save" in result["report"].lower()
+    assert deps.report_store.list_reports("alice") == []
+
+
+def test_save_after_compose_budget_exhaustion_refuses(deps):
+    llm = ScriptLLM([f"```sql\n{GOOD_SQL}\n```"])
+    bq = FakeBQRunner(
+        [QueryResult(ok=True, dataframe=pd.DataFrame({"order_id": [1]}), sql=GOOD_SQL)]
+    )
+    analysis_deps = AgentDeps(
+        settings=deps.settings,
+        llm=llm,
+        bq_runner=bq,
+        report_store=deps.report_store,
+        max_llm_calls=1,
+    )
+    graph = compile_graph(analysis_deps)
+    config = _thread_config("budget-exhaustion-save")
+
+    graph.invoke(
+        {
+            "messages": [HumanMessage(content="How did revenue trend?")],
+            "user_id": "alice",
+            "question": "How did revenue trend?",
+        },
+        config,
+    )
+
+    result = graph.invoke(
+        {
+            "messages": [HumanMessage(content="save this report")],
+            "user_id": "alice",
+            "question": "save this report",
+        },
+        config,
+    )
+
+    assert "no complete analysis report to save" in result["report"].lower()
+    assert deps.report_store.list_reports("alice") == []
+
+
+def test_save_after_self_heal_fallback_refuses_without_prior_analysis(deps):
+    bad_sql = "SELECT bad_column FROM `bigquery-public-data.thelook_ecommerce.orders` LIMIT 5"
+    llm = ScriptLLM([f"```sql\n{bad_sql}\n```"] * 3)
+    bq = FakeBQRunner(
+        [QueryResult(ok=False, error="Unrecognized name: bad_column", sql=bad_sql)] * 3
+    )
+    analysis_deps = AgentDeps(
+        settings=deps.settings,
+        llm=llm,
+        bq_runner=bq,
+        report_store=deps.report_store,
+        max_sql_attempts=3,
+    )
+    graph = compile_graph(analysis_deps)
+    config = _thread_config("fallback-then-save")
+
+    graph.invoke(
+        {
+            "messages": [HumanMessage(content="Show me recent orders")],
+            "user_id": "alice",
+            "question": "Show me recent orders",
+        },
+        config,
+    )
+
+    result = graph.invoke(
+        {
+            "messages": [HumanMessage(content="save this report")],
+            "user_id": "alice",
+            "question": "save this report",
+        },
+        config,
+    )
+
+    assert "no complete analysis report to save" in result["report"].lower()
+    assert deps.report_store.list_reports("alice") == []
+
+
+def test_save_after_compose_budget_exhaustion_keeps_prior_complete_report(deps):
+    graph, config = _seed_analysis_report(deps, thread_id="prior-then-budget")
+
+    llm = ScriptLLM([f"```sql\n{GOOD_SQL}\n```"])
+    bq = FakeBQRunner(
+        [QueryResult(ok=True, dataframe=pd.DataFrame({"order_id": [2]}), sql=GOOD_SQL)]
+    )
+    budget_deps = AgentDeps(
+        settings=deps.settings,
+        llm=llm,
+        bq_runner=bq,
+        report_store=deps.report_store,
+        max_llm_calls=1,
+    )
+    budget_graph = compile_graph(budget_deps)
+    budget_graph.invoke(
+        {
+            "messages": [HumanMessage(content="What were top products?")],
+            "user_id": "alice",
+            "question": "What were top products?",
+        },
+        config,
+    )
+
+    result = graph.invoke(
+        {
+            "messages": [HumanMessage(content="save this report")],
+            "user_id": "alice",
+            "question": "save this report",
+        },
+        config,
+    )
+
+    assert "Saved report" in result["report"]
+    saved = deps.report_store.list_reports("alice")
+    assert len(saved) == 1
+    assert saved[0].content == "Revenue grew 12% in Q1."
+    assert saved[0].question == "How did revenue trend?"
+
+
+def test_save_after_compose_llm_outage_refuses(deps):
+    class OutageOnComposeLLM:
+        def __init__(self, sql_response: str):
+            self._sql_response = sql_response
+            self.calls = 0
+
+        def invoke(self, messages):
+            self.calls += 1
+            if self.calls == 1:
+                return AIMessage(content=self._sql_response)
+            raise RuntimeError("401 Missing Authentication header")
+
+    llm = OutageOnComposeLLM(f"```sql\n{GOOD_SQL}\n```")
+    bq = FakeBQRunner(
+        [QueryResult(ok=True, dataframe=pd.DataFrame({"order_id": [1]}), sql=GOOD_SQL)]
+    )
+    analysis_deps = AgentDeps(
+        settings=deps.settings,
+        llm=llm,
+        bq_runner=bq,
+        report_store=deps.report_store,
+    )
+    graph = compile_graph(analysis_deps)
+    config = _thread_config("compose-outage-save")
+
+    graph.invoke(
+        {
+            "messages": [HumanMessage(content="How did revenue trend?")],
+            "user_id": "alice",
+            "question": "How did revenue trend?",
+        },
+        config,
+    )
+
+    result = graph.invoke(
+        {
+            "messages": [HumanMessage(content="save this report")],
+            "user_id": "alice",
+            "question": "save this report",
+        },
+        config,
+    )
+
+    assert "no complete analysis report to save" in result["report"].lower()
     assert deps.report_store.list_reports("alice") == []
 
 

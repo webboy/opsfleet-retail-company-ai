@@ -12,6 +12,11 @@ Review backlog (created 2026-07-08):
 4. **0025 (medium/high)** — ~~CI and eval gate hardening~~ — **done** (user approved 2026-07-08): GitHub Actions `pytest` + dry-run eval; docs clarify dry-run vs live.
 5. **0026 (medium)** — ~~submission docs alignment~~ — **done** (user approved 2026-07-08): `docs/SCHEMA.md`, dataset-faithful examples, eval/setup drift fixes.
 6. **0027 (medium)** — ~~Golden Bucket and learning-loop hardening~~ — **pending_review**: zero-overlap keyword fallback, `report_complete` capture gating, version **0.23.0**.
+7. **0028 (medium)** — ~~Golden embedding relevance~~ — **done** (user instruction: mark done when tests pass): embedding similarity floor, version **0.24.0**.
+8. **0029 (medium)** — ~~Save complete report gating~~ — **done** (user instruction: mark done when tests pass): `/save` only persists complete analysis reports; version **0.25.0**.
+9. **0030 (medium)** — ~~Input guard fail-closed fallback~~ — **done** (user instruction: mark done when tests pass): malformed classifier output routes to `off_topic`; version **0.26.0**.
+10. **0031 (low)** — ~~Reviewer docs polish~~ — **done** (user instruction: mark done when checks pass): clone URL, CLI-accurate examples, delete-by-today evidence, production data-flow label, MIT LICENSE.
+11. **0032 (medium)** — ~~Live QA evidence hardening~~ — **done** (user instruction: mark done when tests pass): judge tests, `--require-judge`, empty-result eval case, live limitation docs; version **0.27.0**.
 
 Second-pass confirmed bugs (each reproduced; details in the task folders):
 
@@ -49,9 +54,15 @@ First-pass status: ~~0012~~ ~~0013~~ ~~0014~~ ~~0015~~ ~~0016~~ ~~0017~~ ~~0018~
 - Live eval judge scores may vary; dry-run baseline is committed for CI-stable regression checks.
 - Preference phrase detection is deterministic; edge phrasing may need expansion over time.
 - README transcripts are curated; spot-check with live chat recommended before final demo.
+- Task 0031 **done** — reviewer docs polish (clone URL, CLI-accurate examples, delete variants, production data-flow label).
 
 ## Recent changes
 
+- Task 0032 **done** — live QA evidence hardening: judge tests, `--require-judge`, `valid-empty-result` eval case, cancelled-order live weakness docs; version **0.27.0**; pytest 232, dry-run eval 17/17.
+- 2026-07-08: Task 0031 **done** — reviewer docs polish (clone URL, CLI-accurate examples, delete-by-today, production data-flow label, MIT LICENSE); dry-run eval 16/16.
+- 2026-07-08: Task 0030 **done** — input guard fail-closed fallback to `off_topic` for malformed classifier output; version **0.26.0**; pytest 226, safety eval 5/5, dry-run eval 16/16.
+- 2026-07-08: Task 0029 **done** — `/save` gated on `last_analysis_complete`; incomplete compose/fallback no longer populates saveable state; version **0.25.0**; pytest 225, dry-run eval 16/16.
+- 2026-07-08: Task 0028 **done** — embedding similarity threshold (`GOLDEN_EMBEDDING_MIN_SIMILARITY`, default 0.35); version **0.24.0**; pytest 221, dry-run eval 16/16.
 - 2026-07-08: Task 0027 **pending_review** — zero-overlap keyword fallback, `report_complete` capture gating; version **0.23.0**; pytest 219, dry-run eval 16/16.
 - 2026-07-08: Task 0026 **done** (user approved) — `docs/SCHEMA.md`, submission doc alignment (no version bump); dry-run eval 16/16.
 - 2026-07-08: Task 0026 **pending_review** — `docs/SCHEMA.md`, submission doc alignment (no version bump); dry-run eval 16/16.

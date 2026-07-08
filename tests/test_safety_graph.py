@@ -177,10 +177,24 @@ def test_cancelled_rate_metrics_reach_compose_report_unmasked(settings):
     assert "***" not in compose_prompt
 
 
-def test_ambiguous_negated_llm_label_is_not_refused(settings):
+def test_ambiguous_malformed_llm_label_is_refused(settings):
+    llm = ScriptLLM(["not malicious; analysis", "should not reach SQL generation"])
+    bq = FakeBQRunner([])
+    deps = AgentDeps(settings=settings, llm=llm, bq_runner=bq)
+
+    result = _run_turn(deps, AMBIGUOUS_QUESTION)
+
+    assert result["status"] == "fallback"
+    assert result["guard_decision"] == "refused"
+    assert result["guard_route"] == "off_topic"
+    assert bq.calls == 0
+    assert llm.calls == 1
+
+
+def test_ambiguous_valid_llm_label_still_allows_analysis(settings):
     llm = ScriptLLM(
         [
-            "not malicious; analysis",
+            "analysis",
             f"```sql\n{GOOD_SQL}\n```",
             "Downtown and suburban trend summary",
         ]

@@ -68,6 +68,7 @@ def test_validate_live_llm_settings_rejects_missing_openrouter_key():
         max_bytes_billed=1_073_741_824,
         default_limit=1000,
         mcp_max_response_rows=100,
+        embedding_min_similarity=0.35,
     )
 
     try:

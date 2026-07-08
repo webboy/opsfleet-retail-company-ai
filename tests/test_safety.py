@@ -281,8 +281,8 @@ def test_parse_llm_guard_label_accepts_structured_outputs(response, expected):
         "",
     ],
 )
-def test_parse_llm_guard_label_falls_back_for_negated_or_malformed(response):
-    assert parse_llm_guard_label(response) == "analysis"
+def test_parse_llm_guard_label_fails_closed_for_negated_or_malformed(response):
+    assert parse_llm_guard_label(response) == "off_topic"
 
 
 def test_classify_ambiguous_question_needs_llm():

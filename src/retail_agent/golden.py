@@ -94,10 +94,10 @@ class FakeEmbedder:
 
     def _vectorize(self, text: str) -> list[float]:
         tokens = _tokenize(text)
-        # Simple bag-of-words hash vector
+        # Simple bag-of-words hash vector (deterministic — not Python hash()).
         vec = [0.0] * 32
         for token in tokens:
-            vec[hash(token) % 32] += 1.0
+            vec[_stable_token_bucket(token) % 32] += 1.0
         return _normalize(vec)
 
 
@@ -189,7 +189,17 @@ class TrioStore:
             for vector, trio in zip(self._question_vectors, self._trios, strict=True)
         ]
         scored.sort(key=lambda item: item[0], reverse=True)
-        return RetrievalResult(trios=[trio for _, trio in scored[:k]], method="embedding")
+        min_similarity = self.settings.embedding_min_similarity
+        if not scored or scored[0][0] < min_similarity:
+            return RetrievalResult(trios=[], method="embedding")
+        return RetrievalResult(
+            trios=[
+                trio
+                for score, trio in scored[:k]
+                if score >= min_similarity
+            ],
+            method="embedding",
+        )
 
 
 def load_trios(bucket_dir: Path) -> list[Trio]:
@@ -278,6 +288,15 @@ def _keyword_score(left: str, right: str) -> float:
 
 def _tokenize(text: str) -> list[str]:
     return TOKEN_PATTERN.findall(text.lower())
+
+
+def _stable_token_bucket(token: str) -> int:
+    """Deterministic token hash for FakeEmbedder (stable across PYTHONHASHSEED)."""
+
+    bucket = 0
+    for char in token:
+        bucket = (bucket * 31 + ord(char)) & 0xFFFFFFFF
+    return bucket
 
 
 def _cosine_similarity(left: list[float], right: list[float]) -> float:

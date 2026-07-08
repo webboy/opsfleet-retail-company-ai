@@ -35,3 +35,12 @@ def test_evaluate_expectations_detects_failures():
     )
     assert not result.passed
     assert len(result.failures) >= 3
+
+
+def test_evaluate_expectations_requires_empty_result_when_expected():
+    result = evaluate_expectations(
+        {"status": "done", "query_ok": True, "query_empty": False, "report": "Found orders."},
+        {"query_empty": True},
+    )
+    assert not result.passed
+    assert "expected query_empty=True" in result.failures

@@ -88,6 +88,7 @@ def score_intent(
         max_bytes_billed=1_073_741_824,
         default_limit=1000,
         mcp_max_response_rows=100,
+        embedding_min_similarity=0.35,
     )
     judge_settings = _judge_settings(settings)
     llm = llm or create_chat_model(judge_settings)

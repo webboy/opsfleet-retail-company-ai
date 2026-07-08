@@ -140,8 +140,8 @@ def test_retrieve_trios_returns_expected_shape(tmp_path: Path):
 
     assert payload["error"] is None
     assert payload["method"] == "embedding"
-    assert payload["count"] == 2
-    assert payload["trios"][0]["id"] in {"monthly-revenue", "sample-trio"}
+    assert payload["count"] == 1
+    assert payload["trios"][0]["id"] == "monthly-revenue"
     assert {"id", "question", "sql", "report", "tags"} <= set(payload["trios"][0])
 
 
@@ -160,8 +160,8 @@ def test_retrieve_trios_works_when_bucket_has_malformed_file(tmp_path: Path):
     payload = retrieve_trios_handler("monthly revenue last year", k=2, store=store)
 
     assert payload["error"] is None
-    assert payload["count"] == 2
-    assert {trio["id"] for trio in payload["trios"]} == {"monthly-revenue", "sample-trio"}
+    assert payload["count"] == 1
+    assert {trio["id"] for trio in payload["trios"]} == {"monthly-revenue"}
 
 
 def test_retrieve_trios_clamps_k_and_rejects_empty_question(tmp_path: Path):

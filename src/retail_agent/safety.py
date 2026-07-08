@@ -347,13 +347,14 @@ def parse_llm_guard_label(text: str) -> GuardRoute:
     - first non-empty line exactly matching an allowed label, or
     - minimal JSON such as ``{"label": "analysis"}``.
 
-    Ambiguous, negated, mixed, or malformed responses fall back to ``analysis``
-    because this path runs only after deterministic precheck for ambiguous turns.
+    Ambiguous, negated, mixed, malformed, or refusal-like responses fall back
+    to ``off_topic`` (fail-closed) because this path runs only after
+    deterministic precheck for ambiguous turns.
     """
 
     raw = (text or "").strip()
     if not raw:
-        return "analysis"
+        return "off_topic"
 
     json_label = _parse_json_guard_label(raw)
     if json_label is not None:
@@ -363,7 +364,7 @@ def parse_llm_guard_label(text: str) -> GuardRoute:
     if first_line in LLM_GUARD_LABELS:
         return first_line  # type: ignore[return-value]
 
-    return "analysis"
+    return "off_topic"
 
 
 def _parse_json_guard_label(text: str) -> GuardRoute | None:

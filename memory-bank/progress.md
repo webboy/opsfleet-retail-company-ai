@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, **0020**, **0021**, **0022**, **0023**, **0024**, **0025**, and **0026** **done** (user approved). Task **0027** is **pending_review**.
+Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, **0020**, **0021**, **0022**, **0023**, **0024**, **0025**, **0026**, **0028**, **0029**, **0030**, **0031**, and **0032** **done** (user approved or per-task instruction). Task **0027** is **pending_review**.
 
 ## What works
 
@@ -15,10 +15,15 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - User preferences + personas: SQLite prefs, deterministic routing, hot-reload persona files (task 0007, **done**).
 - LLM provider factory: Gemini, OpenRouter, Ollama with optional fallback (task 0011, **done**).
 - Observability: per-node JSONL events, `trace`/`metrics` CLIs (task 0008, **done**).
-- QA eval suite: 16 cases, dry-run default, judge scoring, baseline regression (task 0008, **done**).
+- QA eval suite: 17 cases, dry-run default, judge scoring, baseline regression (task 0008 + 0032, **done**).
 - **Human docs package**: README, USAGE, EVALUATION, drift-corrected architecture/technical (task 0009, **done**).
 - **Optional MCP server**: `retail-agent-mcp`, guarded `query_retail_data` + `retrieve_trios` (task 0010, **done**).
-- `pytest` **216 passed**; eval dry-run **16/16 passed**; safety subset **5/5 passed**.
+- `pytest` **232 passed**; eval dry-run **17/17 passed**; safety subset **5/5 passed**.
+- **Live QA evidence hardening** (task 0032, **done**): judge low-score/unavailable tests, `--require-judge`, `valid-empty-result` eval case, cancelled-order live weakness docs; version **0.27.0**.
+- **Input guard fail-closed fallback** (task 0030, **done**): malformed classifier output routes to `off_topic`; version **0.26.0**.
+- **Reviewer docs polish** (task 0031, **done**): clone URL, CLI-accurate example transcripts, delete-by-today examples, production data-flow label, MIT LICENSE.
+- **Save complete report gating** (task 0029, **done**): `/save` only persists complete analysis reports; version **0.25.0**.
+- **Golden embedding relevance** (task 0028, **done**): cosine similarity floor for embedding retrieval; version **0.24.0**.
 - **Empty-result routing** (task 0024, **done**): valid zero-row queries report without retry; eval failure diagnostics; dry-run regressions; live eval diagnostics verified.
 - **SQL LIMIT clamping and MCP payload caps** (task 0022, **done**): explicit oversized limits clamped; MCP responses capped via `MCP_MAX_RESPONSE_ROWS`.
 - **Input guard structured labels** (task 0023, **done**): exact first-line/JSON LLM label parsing with `analysis` fallback.
@@ -53,6 +58,11 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 16. ~~`0025` CI and eval gate hardening~~ — **done**
 17. ~~`0026` Submission docs alignment~~ — **done**
 18. `0027` Golden Bucket and learning-loop hardening — **pending_review**
+19. ~~`0028` Golden embedding relevance~~ — **done**
+20. ~~`0029` Save complete report gating~~ — **done**
+21. ~~`0030` Input guard fail-closed fallback~~ — **done**
+22. ~~`0031` Reviewer docs polish~~ — **done**
+23. ~~`0032` Live QA evidence hardening~~ — **done**
 
 ## Known issues
 
@@ -72,6 +82,8 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - ~~Valid empty query results currently take the same retry path as failures~~ — fixed in task 0024 (**done**).
 - ~~Dry-run eval is strong for orchestration but not live NL-to-SQL quality; no CI gate exists yet~~ — fixed in task 0025 (**done**): `.github/workflows/ci.yml`.
 - ~~Human docs need final assignment/dataset alignment to remove overclaims and clarify schema/eval/setup details~~ — fixed in task 0026 (**done**): `docs/SCHEMA.md` + README/docs drift fixes.
+- ~~**Embedding retrieval returns arbitrary top-k for unrelated questions**~~ — fixed in task 0028 (**done**): cosine similarity floor; version **0.24.0**.
+- ~~**Malformed LLM guard classifier output defaults to analysis**~~ — fixed in task 0030 (**done**): fail-closed to `off_topic`; version **0.26.0**.
 - **Golden Bucket hardening** (task 0027, **pending_review**): zero-overlap keyword fallback, `report_complete` capture gating; version **0.23.0**.
 - Preference phrase detection is deterministic and may miss unusual phrasing.
 - Live eval gate requires LLM + BigQuery credentials; dry-run is CI-default.
@@ -79,4 +91,4 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 
 ## Version
 
-- Project version **0.23.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (task 0027 Golden Bucket hardening).
+- Project version **0.27.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (task 0032 live QA evidence hardening).

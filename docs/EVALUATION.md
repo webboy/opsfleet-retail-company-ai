@@ -66,7 +66,7 @@ Cases are defined in `evals/cases.yaml`. The runner (`python -m retail_agent.eva
 
 | Layer | Cases | What it checks | Pass criteria |
 |-------|-------|----------------|---------------|
-| **Capability** | 11 | Revenue, customers, products, time metrics, [schema questions](./SCHEMA.md) | Property assertions on SQL, tables, report content; judge score ≥ 3 when judge runs |
+| **Capability** | 12 | Revenue, customers, products, time metrics, valid empty results, [schema questions](./SCHEMA.md) | Property assertions on SQL, tables, report content; judge score ≥ 3 when judge runs |
 | **Safety** | 5 | Injection, off-topic, PII masking, delete confirmation, destructive SQL | Deterministic pass/fail |
 | **Intent (judge)** | Capability only | Does the report answer the question? | LLM scores 1–5 with rationale; **score &lt; 3 fails** the case |
 
@@ -95,6 +95,7 @@ python -m retail_agent.evals [options]
   --output PATH       Write this run's results to a JSONL file
   --no-compare        Skip baseline regression check
   --no-judge          Skip LLM-as-judge intent scoring
+  --require-judge     Fail capability cases when judge scoring is unavailable (strict live mode)
   --update-baseline   Overwrite baseline with this run (use after intentional behavior change)
 ```
 
@@ -107,7 +108,11 @@ For capability cases that pass property assertions, a separate judge prompt (`ev
 - **Dry-run:** scripted judge scores from case fixtures
 - **Live:** local **Ollama** only (`RETAIL_AGENT_OLLAMA_MODEL`, `OLLAMA_HOST`) — no cloud fallback, so judge scoring does not consume Gemini quota
 
-Judge runs only on capability layer cases where `judge: true` in `cases.yaml`. The `schema-tables` case skips judge scoring (`judge: false`) because it validates the [schema route](./SCHEMA.md#schema-question-route), not SQL quality. If live judge scoring is unavailable (e.g. Ollama not running), the case records `judge unavailable` and does not fail the run — only a **score below 3** fails a passing case.
+Judge runs only on capability layer cases where `judge: true` in `cases.yaml`. The `schema-tables` case skips judge scoring (`judge: false`) because it validates the [schema route](./SCHEMA.md#schema-question-route), not SQL quality.
+
+**Judge unavailable (default):** If live judge scoring is unavailable (e.g. Ollama not running), the case records `judge unavailable` in the rationale and **does not fail** the run — only a **score below 3** fails a passing case. This keeps optional live smoke tests usable when the judge service is down.
+
+**Strict mode:** Pass `--require-judge` with `--live` when you want capability cases to **fail** if judge scoring cannot run. Dry-run CI does not use this flag; scripted judge scores from case fixtures always satisfy the judge step.
 
 ## Baseline and regression workflow
 
@@ -117,8 +122,8 @@ Judge runs only on capability layer cases where `judge: true` in `cases.yaml`. T
 
 | Metric | Value |
 |--------|-------|
-| Total cases | 16 |
-| Passed | 16 |
+| Total cases | 17 |
+| Passed | 17 |
 | Failed | 0 |
 | Avg judge score (capability) | 4.0 |
 
@@ -150,7 +155,7 @@ The `evals/runs/` directory is gitignored.
 
 ```
 Eval summary (dry-run)
-  total=16 passed=16 failed=0
+  total=17 passed=17 failed=0
   avg_judge_score=4.0
   regressions: none
 ```
@@ -165,8 +170,25 @@ On failure:
 ## Pre-deploy checklist
 
 1. **CI / local gate** — `pytest -q` and `python -m retail_agent.evals` (same as GitHub Actions; no API keys)
-2. **Optional live smoke test** — `python -m retail_agent.evals --live --no-compare` with credentials (validates real LLM + BigQuery; results vary by model/quota)
+2. **Optional live smoke test** — `python -m retail_agent.evals --live --no-compare` with credentials (validates real LLM + BigQuery; results vary by model/quota). Add `--require-judge` when Ollama is running and you want intent scoring to be mandatory.
 3. Manual spot-check: one manager workflow in `retail-agent --user alice` (analysis → follow-up → preference → save → guarded delete)
+
+## Known live NL-to-SQL limitations
+
+Dry-run eval proves graph routing, safety, and property assertions with scripted fixtures. It does **not** prove that a live LLM will generate correct SQL on the first try.
+
+Documented live weakness (reproduced 2026-07-08 with Ollama-primary):
+
+| Case | Dry-run | Typical live issue |
+|------|---------|-------------------|
+| `cancelled-order-rate` | Passes (scripted SQL) | Live LLM may emit invalid aggregation SQL (e.g. `GROUP BY total_orders`), exhaust 3 self-heal attempts, and fall back |
+
+Deterministic regression evidence (no credentials):
+
+- `tests/test_graph.py::test_cancelled_rate_recovers_after_failed_sql_attempt` — retry recovery path
+- `tests/test_eval_runner.py::test_cancelled_order_rate_exhaustion_matches_live_failure_pattern` — exhaustion fallback with live-like diagnostics (`sql_attempts=3`, `query_ok=false`, trio `cancelled-order-rate` retrieved)
+
+Failed live runs include `diagnostics` in saved JSONL (`status`, `sql`, `sql_attempts`, `last_error`, `query_ok`, `query_empty`, `retrieved_trio_ids`) for root-cause analysis.
 
 ## Adding eval cases
 

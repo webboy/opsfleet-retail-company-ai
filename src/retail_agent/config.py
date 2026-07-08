@@ -13,6 +13,7 @@ DEFAULT_DATASET = "bigquery-public-data.thelook_ecommerce"
 DEFAULT_MAX_BYTES_BILLED = 1_073_741_824  # 1 GiB
 DEFAULT_QUERY_LIMIT = 1000
 DEFAULT_MCP_MAX_RESPONSE_ROWS = 100
+DEFAULT_EMBEDDING_MIN_SIMILARITY = 0.35
 DEFAULT_LLM_PROVIDER = "gemini"
 DEFAULT_OPENROUTER_MODEL = "openrouter/auto"
 DEFAULT_OLLAMA_HOST = "http://localhost:11434"
@@ -40,6 +41,7 @@ class Settings:
     max_bytes_billed: int
     default_limit: int
     mcp_max_response_rows: int
+    embedding_min_similarity: float
     allowed_tables: frozenset[str] = field(default=DEFAULT_ALLOWED_TABLES)
 
 
@@ -75,6 +77,10 @@ def get_settings(*, load_env: bool = True) -> Settings:
             "MCP_MAX_RESPONSE_ROWS",
             DEFAULT_MCP_MAX_RESPONSE_ROWS,
         ),
+        embedding_min_similarity=_float_env(
+            "GOLDEN_EMBEDDING_MIN_SIMILARITY",
+            DEFAULT_EMBEDDING_MIN_SIMILARITY,
+        ),
     )
 
 
@@ -109,3 +115,10 @@ def _int_env(name: str, default: int) -> int:
     if raw is None or raw.strip() == "":
         return default
     return int(raw)
+
+
+def _float_env(name: str, default: float) -> float:
+    raw = getenv(name)
+    if raw is None or raw.strip() == "":
+        return default
+    return float(raw)

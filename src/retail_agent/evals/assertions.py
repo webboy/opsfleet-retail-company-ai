@@ -47,6 +47,9 @@ def evaluate_expectations(
     if expect.get("query_empty") is False and state.get("query_empty"):
         failures.append("expected non-empty query result")
 
+    if expect.get("query_empty") is True and not state.get("query_empty"):
+        failures.append("expected query_empty=True")
+
     if "sql_tables" in expect:
         found = tables_in_sql(state.get("sql"))
         missing = [table for table in expect["sql_tables"] if table not in found]

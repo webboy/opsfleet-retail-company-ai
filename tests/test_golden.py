@@ -133,6 +133,21 @@ def test_fake_embedding_ranks_similar_question(bucket_dir: Path):
     assert result.trios[0].id == "sample-trio"
 
 
+def test_embedding_returns_empty_for_unrelated_question(bucket_dir: Path):
+    store = TrioStore(
+        bucket_dir,
+        embedder=FakeEmbedder(),
+        settings=make_settings(),
+        embedding_enabled=True,
+        top_k=2,
+    )
+
+    result = store.retrieve("weather forecast for tomorrow")
+
+    assert result.method == "embedding"
+    assert result.trios == []
+
+
 def test_keyword_fallback_returns_empty_when_no_overlap(bucket_dir: Path):
     class BrokenEmbedder:
         def embed_query(self, text: str) -> list[float]:

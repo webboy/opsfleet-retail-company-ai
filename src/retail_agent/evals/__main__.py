@@ -45,6 +45,11 @@ def main(argv: list[str] | None = None) -> int:
         help="Skip LLM-as-judge intent scoring",
     )
     parser.add_argument(
+        "--require-judge",
+        action="store_true",
+        help="Fail capability cases when judge scoring is unavailable (live strict mode)",
+    )
+    parser.add_argument(
         "--update-baseline",
         action="store_true",
         help="Overwrite the baseline file with this run's results",
@@ -58,6 +63,7 @@ def main(argv: list[str] | None = None) -> int:
         output_path=Path(args.output) if args.output else None,
         compare_baseline=not args.no_compare and not args.update_baseline,
         with_judge=not args.no_judge,
+        require_judge=args.require_judge,
     )
     print(format_summary(summary))
 

@@ -23,12 +23,23 @@ def output_mask(state: AgentState, deps: AgentDeps) -> dict:
     if text_hits:
         logger.info("Output mask swept %s additional PII hits from report text", text_hits)
 
-    return {
+    updates: dict = {
         "report": final_report,
-        "last_analysis_report": final_report,
-        "last_analysis_question": state.get("question") or None,
-        "last_analysis_sql": state.get("sql"),
         "pii_note_required": note_required,
         "pii_mask_hits": total_hits,
         "messages": [AIMessage(content=final_report)],
     }
+    if (
+        state.get("report_complete")
+        and state.get("status") == "done"
+        and state.get("query_ok")
+    ):
+        updates.update(
+            {
+                "last_analysis_report": final_report,
+                "last_analysis_question": state.get("question") or None,
+                "last_analysis_sql": state.get("sql"),
+                "last_analysis_complete": True,
+            }
+        )
+    return updates

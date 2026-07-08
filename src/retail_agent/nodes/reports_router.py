@@ -48,10 +48,10 @@ def _list_reports(deps: AgentDeps, user_id: str) -> dict:
 
 def _save_report(state: AgentState, deps: AgentDeps, user_id: str) -> dict:
     report = state.get("last_analysis_report")
-    if not report:
+    if not state.get("last_analysis_complete") or not report:
         return _done(
-            "There is no recent report to save yet. Ask an analytics question first, "
-            "then say \"save this report\" or use /save."
+            "There is no complete analysis report to save yet. Ask an analytics question "
+            "and wait for a full answer, then say \"save this report\" or use /save."
         )
 
     source_question = state.get("last_analysis_question") or ""

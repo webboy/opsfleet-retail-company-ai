@@ -86,6 +86,17 @@ def test_retrieve_trios_runs_before_sql_generation(bucket_dir: Path):
     assert "top 10 customers" in update["retrieved_trios"][0]["question"].lower()
 
 
+def test_retrieve_trios_returns_empty_for_unrelated_embedding_match(bucket_dir: Path):
+    deps = _deps(bucket_dir, ScriptLLM(["unused"]), FakeBQRunner([]))
+    state = {"question": "weather forecast for tomorrow"}
+
+    update = retrieve_trios(state, deps)
+
+    assert update["retrieval_method"] == "embedding"
+    assert update["retrieved_trio_ids"] == []
+    assert update["retrieved_trios"] == []
+
+
 def test_generate_sql_prompt_includes_retrieved_examples(bucket_dir: Path):
     deps = _deps(bucket_dir, RecordingLLM([f"```sql\n{GOOD_SQL}\n```"]), FakeBQRunner([]))
     state = {

@@ -1,6 +1,6 @@
 """Test helpers."""
 
-from retail_agent.config import Settings
+from retail_agent.config import DEFAULT_EMBEDDING_MIN_SIMILARITY, Settings
 
 
 def make_settings(**overrides) -> Settings:
@@ -22,6 +22,7 @@ def make_settings(**overrides) -> Settings:
         "max_bytes_billed": 1_073_741_824,
         "default_limit": 1000,
         "mcp_max_response_rows": 100,
+        "embedding_min_similarity": DEFAULT_EMBEDDING_MIN_SIMILARITY,
     }
     defaults.update(overrides)
     return Settings(**defaults)

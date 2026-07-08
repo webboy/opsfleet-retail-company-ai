@@ -109,7 +109,7 @@ flowchart TB
 | **LangGraph Orchestrator** | Explicit state machine: nodes, conditional edges (self-heal loop), `interrupt()` for delete confirmation, checkpointer for conversation memory. |
 | **input_guard** | Classifies turns: analysis question, report management, off-topic, malicious (injection, PII fishing). Refusals exit early without BigQuery cost. |
 | **reports_router** | Save, list, delete saved reports. Delete resolves candidates scoped to `owner = current_user`, lists exact matches, then pauses for confirmation. |
-| **retrieve_trios** | Top-k similarity search over Golden Bucket question embeddings; keyword-overlap fallback when embedding API is down (returns no trios when there is zero overlap) |
+| **retrieve_trios** | Top-k similarity search over Golden Bucket question embeddings (returns no trios when best cosine similarity is below `GOLDEN_EMBEDDING_MIN_SIMILARITY`, default 0.35); keyword-overlap fallback when embedding API is down (returns no trios when there is zero overlap) |
 | **generate_sql** | LLM generates SQL using schema context + retrieved trios + conversation history. |
 | **sql_guard** | Deterministic pre-execution checks inside `BigQueryRunner.execute()`: single statement, SELECT-only, allowed tables only, LIMIT injection/clamping to `BQ_DEFAULT_LIMIT`, `maximum_bytes_billed` cap. Not a separate LangGraph node in the prototype. |
 | **execute_bq** | Graph node that calls `BigQueryRunner` (sql_guard + BigQuery client); returns rows, typed errors that trigger the self-heal loop, or valid empty results that proceed to reporting. |
@@ -250,6 +250,8 @@ The prototype demonstrates this pattern with a thin MCP wrapper over `bq.py` and
 | Scheduled reports | Out of prototype scope | Cloud Scheduler + agent batch job |
 
 ## Data flow summary
+
+> **Production HLD.** The numbered steps below describe the managed-cloud deployment (authenticated chat service, GCS-backed vector index, Cloud Logging). The CLI prototype runs the same logical nodes in-process — see [Prototype vs production mapping](#prototype-vs-production-mapping) for component equivalents.
 
 1. **Ingress:** User message → authenticated chat service → LangGraph thread state updated.
 2. **Classification:** `input_guard` routes to analysis, report management, or refusal.

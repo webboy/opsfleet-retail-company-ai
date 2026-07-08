@@ -45,7 +45,9 @@ Type these at the `You:` prompt:
 | `/exit`, `/quit` | End the session |
 | `show my reports` | List saved reports |
 | `save this report` | Same as `/save` |
-| `delete reports mentioning <term>` | Start guarded delete flow (confirmation required) |
+| `delete reports mentioning <term>` | Delete reports whose title/content mentions `<term>` (confirmation required) |
+| `delete reports we made today` | Delete reports you saved today (UTC date; confirmation required) |
+| `delete all my reports` | Delete every report in your library (confirmation required) |
 | `I prefer tables from now on` | Save table-format preference |
 | `give me bullet points from now on` | Save bullet-format preference |
 | `What tables do you have?` | Schema question — answered from static docs, no BigQuery |
@@ -55,6 +57,30 @@ See [Schema & Supported Questions](./SCHEMA.md) for the supported-question matri
 ### Delete confirmation flow
 
 When you request a delete, the agent lists **exact** candidate reports scoped to your user ID, then pauses. Reply `yes`, `y`, `confirm`, or `delete` to proceed; anything else cancels. Cross-user deletion is not possible.
+
+**Supported delete phrases** (assignment variants):
+
+| Intent | Example phrase |
+|--------|----------------|
+| Mention match | `delete reports mentioning Client X` |
+| Saved today (UTC) | `delete reports we made today` |
+| All owned reports | `delete all my reports` |
+
+**Example — delete reports saved today:**
+
+```
+You: delete reports we made today
+
+Agent: I found the following saved reports that match your delete request:
+       - Monthly revenue trend (2026-07-08)
+       - Product category comparison (2026-07-08)
+
+       Reply yes or confirm to delete them, or anything else to cancel.
+
+You: yes
+
+Agent: Deleted 2 saved report(s).
+```
 
 ### CLI output hints
 
