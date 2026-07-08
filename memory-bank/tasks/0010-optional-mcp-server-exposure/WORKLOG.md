@@ -18,3 +18,4 @@
   - `pytest -q` → **131 passed**
   - `python -m retail_agent.evals` → **16/16 passed** (dry-run)
   - Real MCP stdio client (official SDK): `tools/list` shows both tools; `DELETE FROM` rejected; PII emails masked; `retrieve_trios` returns embedding hits for revenue question.
+- User approved 2026-07-08 — task marked **done**.

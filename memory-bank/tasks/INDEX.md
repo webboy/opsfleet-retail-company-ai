@@ -13,7 +13,7 @@ Quick overview of all tasks. Source of truth for each row is the task's `TASK.md
 | 0007 | Learning loop: user preferences & personas | done | Engineer | 2026-07-07 |
 | 0008 | Observability & QA evaluation suite | done | Engineer | 2026-07-08 |
 | 0009 | Final accompanying documentation & submission polish | done | Engineer | 2026-07-08 |
-| 0010 | Optional: expose guarded capabilities as an MCP server | pending_review | Engineer | 2026-07-08 |
+| 0010 | Optional: expose guarded capabilities as an MCP server | done | Engineer | 2026-07-08 |
 | 0011 | LLM provider fallback: OpenRouter / Ollama | done | Engineer | 2026-07-07 |
 | 0012 | Fix sql_guard: allow CTE (WITH) queries | done | Engineer | 2026-07-08 |
 | 0013 | Fix LLM call budget: reset per turn, not per thread | done | Engineer | 2026-07-08 |

@@ -4,7 +4,7 @@
 
 - **Task ID**: 0010
 - **Title**: Optional: expose guarded capabilities as an MCP server
-- **Status**: pending_review
+- **Status**: done
 - **Owner**: Engineer
 - **Created**: 2026-07-07
 - **Updated**: 2026-07-08

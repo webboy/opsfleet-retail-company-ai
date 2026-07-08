@@ -2,7 +2,7 @@
 
 ## Current focus
 
-Full-code review (2026-07-08) against the assignment PDF produced five new bug-fix tasks **0012–0016** (all `todo`). Task **0010** (optional MCP server) remains **pending_review**. All core tasks 0001–0009 and 0011 are **done**.
+Full-code review (2026-07-08) against the assignment PDF produced five new bug-fix tasks **0012–0016**. Tasks **0010** (optional MCP server), **0011**–**0014** are **done**. Bug-fix tasks **0015–0016** remain **todo**.
 
 Review-confirmed bugs (each reproduced; details in the task folders):
 
@@ -44,6 +44,7 @@ Review-confirmed bugs (each reproduced; details in the task folders):
 - 2026-07-08: Task 0012 **done** (user approved) — CTE aliases in `sql_guard`; live BQ verified.
 - 2026-07-08: Task 0012 **pending_review** — CTE aliases allowed in `sql_guard`; 4 regression tests; live BQ verified; version **0.11.0**.
 - 2026-07-08: Task 0013 **pending_review** — `input_guard` resets LLM budget per turn; regression test; version **0.10.0**.
+- 2026-07-08: Task 0010 **done** (user approved) — MCP server (`query_retail_data`, `retrieve_trios`), `docs/MCP.md`, version **0.9.0**.
 - 2026-07-08: Task 0010 **pending_review** — MCP server (`query_retail_data`, `retrieve_trios`), handler tests, `docs/MCP.md`, version **0.9.0**; 131 pytest, 16/16 eval.
 - 2026-07-08: Task 0009 **done** (user approved) — submission README, USAGE, EVALUATION, architecture drift fixes.
 - 2026-07-08: Task 0009 **pending_review** — full README, USAGE, EVALUATION, architecture/technical drift fixes, fresh venv verified (120 pytest, 16 eval).
