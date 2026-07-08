@@ -12,6 +12,7 @@ DEFAULT_ALLOWED_TABLES = frozenset({"orders", "order_items", "products", "users"
 DEFAULT_DATASET = "bigquery-public-data.thelook_ecommerce"
 DEFAULT_MAX_BYTES_BILLED = 1_073_741_824  # 1 GiB
 DEFAULT_QUERY_LIMIT = 1000
+DEFAULT_MCP_MAX_RESPONSE_ROWS = 100
 DEFAULT_LLM_PROVIDER = "gemini"
 DEFAULT_OPENROUTER_MODEL = "openrouter/auto"
 DEFAULT_OLLAMA_HOST = "http://localhost:11434"
@@ -38,6 +39,7 @@ class Settings:
     personas_dir: str | None
     max_bytes_billed: int
     default_limit: int
+    mcp_max_response_rows: int
     allowed_tables: frozenset[str] = field(default=DEFAULT_ALLOWED_TABLES)
 
 
@@ -69,6 +71,10 @@ def get_settings(*, load_env: bool = True) -> Settings:
         personas_dir=_optional_str("RETAIL_AGENT_PERSONAS_DIR"),
         max_bytes_billed=_int_env("BQ_MAX_BYTES_BILLED", DEFAULT_MAX_BYTES_BILLED),
         default_limit=_int_env("BQ_DEFAULT_LIMIT", DEFAULT_QUERY_LIMIT),
+        mcp_max_response_rows=_int_env(
+            "MCP_MAX_RESPONSE_ROWS",
+            DEFAULT_MCP_MAX_RESPONSE_ROWS,
+        ),
     )
 
 

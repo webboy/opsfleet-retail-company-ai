@@ -51,6 +51,7 @@ def test_score_intent_passes_budget_to_invoke_with_retry():
         personas_dir=None,
         max_bytes_billed=1_073_741_824,
         default_limit=1000,
+        mcp_max_response_rows=100,
     )
 
     def fake_invoke(_llm, _messages, budget):

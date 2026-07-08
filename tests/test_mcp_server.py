@@ -64,8 +64,40 @@ def test_query_retail_data_masks_pii_columns():
     assert payload["ok"] is True
     assert payload["masked_columns"] == ["email"]
     assert payload["pii_mask_hits"] == 1
+    assert payload["row_count"] == 1
+    assert payload["returned_row_count"] == 1
+    assert payload["response_row_limit"] == settings.mcp_max_response_rows
+    assert payload["truncated"] is False
     assert "alice@example.com" not in json.dumps(payload["rows"])
     assert "@***.***" in payload["rows"][0]["email"]
+
+
+def test_query_retail_data_truncates_large_payloads():
+    settings = make_settings(mcp_max_response_rows=2)
+    runner = BigQueryRunner(settings=settings)
+    runner.execute = MagicMock(
+        return_value=QueryResult(
+            ok=True,
+            dataframe=pd.DataFrame({"id": [1, 2, 3, 4, 5]}),
+            sql="SELECT id FROM orders LIMIT 5",
+            empty=False,
+        )
+    )
+
+    payload = query_retail_data_handler(
+        "SELECT id FROM orders LIMIT 5",
+        runner=runner,
+        max_response_rows=2,
+    )
+
+    assert payload["ok"] is True
+    assert payload["row_count"] == 5
+    assert payload["returned_row_count"] == 2
+    assert payload["response_row_limit"] == 2
+    assert payload["truncated"] is True
+    assert len(payload["rows"]) == 2
+    assert payload["rows"][0]["id"] == 1
+    assert payload["rows"][1]["id"] == 2
 
 
 def test_query_retail_data_preserves_numeric_revenue():

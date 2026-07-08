@@ -32,6 +32,25 @@ def test_existing_limit_is_preserved(settings):
     assert "LIMIT 500" not in result.sql
 
 
+def test_oversized_explicit_limit_is_clamped(settings):
+    sql = (
+        "SELECT id FROM `bigquery-public-data.thelook_ecommerce.orders` "
+        "LIMIT 1000000"
+    )
+    result = sql_guard(sql, settings)
+    assert result.ok is True
+    assert "LIMIT 500" in result.sql
+    assert "LIMIT 1000000" not in result.sql
+
+
+def test_non_literal_limit_is_replaced_with_cap(settings):
+    sql = "SELECT id FROM orders LIMIT (SELECT 1)"
+    result = sql_guard(sql, settings)
+    assert result.ok is True
+    assert "LIMIT 500" in result.sql
+    assert "SELECT 1" not in result.sql
+
+
 def test_bare_allowed_table_name_passes(settings):
     sql = "SELECT id FROM orders"
     result = sql_guard(sql, settings)

@@ -30,7 +30,7 @@ This document explains **why** the system is built the way it is, how data flows
 
 **Reasoning:** Assignment specifies this dataset. BigQuery handles ad-hoc analyst queries at scale, integrates with GCP IAM, and offers `maximum_bytes_billed` for cost caps. pandas DataFrames via the official client suit the report-composition step.
 
-**Guardrails (always on):** Deterministic `sql_guard` before execution — SELECT-only, single statement, four allowed tables, LIMIT injection, bytes billed cap. Defense in depth even when the dataset is public/read-only.
+**Guardrails (always on):** Deterministic `sql_guard` before execution — SELECT-only, single statement, four allowed tables, LIMIT injection/clamping to `BQ_DEFAULT_LIMIT`, bytes billed cap. Defense in depth even when the dataset is public/read-only.
 
 ### Golden Bucket storage and retrieval
 

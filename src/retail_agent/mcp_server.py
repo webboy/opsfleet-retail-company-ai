@@ -44,10 +44,14 @@ def query_retail_data_handler(
     sql: str,
     *,
     runner: BigQueryRunner | None = None,
+    max_response_rows: int | None = None,
 ) -> dict[str, Any]:
     """Execute guarded SQL, mask PII in results, return JSON-serializable payload."""
 
     runner = runner or BigQueryRunner()
+    response_row_limit = max_response_rows
+    if response_row_limit is None:
+        response_row_limit = runner.settings.mcp_max_response_rows
     result = runner.execute(sql)
 
     if not result.ok:
@@ -56,6 +60,9 @@ def query_retail_data_handler(
             "sql": result.sql,
             "rows": [],
             "row_count": 0,
+            "returned_row_count": 0,
+            "response_row_limit": response_row_limit,
+            "truncated": False,
             "masked_columns": [],
             "pii_mask_hits": 0,
             "error": result.error,
@@ -63,13 +70,18 @@ def query_retail_data_handler(
 
     assert result.dataframe is not None
     masked = mask_dataframe(result.dataframe)
-    rows = _dataframe_to_rows(masked.dataframe)
+    total_rows = len(masked.dataframe)
+    truncated_df = masked.dataframe.head(response_row_limit)
+    rows = _dataframe_to_rows(truncated_df)
 
     return {
         "ok": True,
         "sql": result.sql,
         "rows": rows,
-        "row_count": len(rows),
+        "row_count": total_rows,
+        "returned_row_count": len(rows),
+        "response_row_limit": response_row_limit,
+        "truncated": total_rows > response_row_limit,
         "empty": result.empty,
         "masked_columns": list(masked.masked_columns),
         "pii_mask_hits": masked.mask_hit_count,
@@ -124,7 +136,8 @@ def create_mcp_server():
         description=(
             "Run a read-only BigQuery SELECT against thelook_ecommerce tables "
             "(orders, order_items, products, users). DML/DDL is rejected. "
-            "PII columns are masked in returned rows."
+            "PII columns are masked in returned rows. Response payloads are "
+            "capped by MCP_MAX_RESPONSE_ROWS with truncation metadata."
         ),
     )
     def query_retail_data(sql: str) -> str:

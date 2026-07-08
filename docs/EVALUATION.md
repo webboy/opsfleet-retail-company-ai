@@ -26,7 +26,7 @@ Exit code `0` = all cases passed and no baseline regressions. Exit code `1` = fa
 
 The `tests/` directory covers deterministic logic without live APIs:
 
-- SQL guard (`sql_guard`) — SELECT-only, table whitelist, LIMIT injection
+- SQL guard (`sql_guard`) — SELECT-only, table whitelist, LIMIT injection/clamping
 - PII masking — column detection and output regex
 - Input guard — injection/off-topic classification
 - Graph routing — self-heal retries, delete interrupt, preferences

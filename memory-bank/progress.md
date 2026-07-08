@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, **0020**, and **0021** **done** (user approved). Second deep-review pass is **complete**.
+Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, **0020**, and **0021** **done** (user approved). Task **0022** is **pending_review**; tasks **0023–0027** are **todo**.
 
 ## What works
 
@@ -43,6 +43,12 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 10. ~~`0019` Golden Bucket robust loading~~ — **done**
 11. ~~`0020` preference regex tightening~~ — **done**
 12. ~~`0021` tooling polish~~ — **done**
+13. `0022` SQL cost controls and MCP payload caps — **pending_review**
+14. `0023` Input guard structured labels — **todo**
+15. `0024` Empty results and live eval regression — **todo**
+16. `0025` CI and eval gate hardening — **todo**
+17. `0026` Submission docs alignment — **todo**
+18. `0027` Golden Bucket and learning-loop hardening — **todo**
 
 ## Known issues
 
@@ -57,10 +63,16 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - ~~**Preference regex hijacks analysis questions**~~ — fixed in task 0020 (**done**).
 - ~~**Tooling polish**~~ — fixed in task 0021 (**done**).
 - Candidate JSONL grows without automatic pruning — curation workflow documented only.
+- ~~Explicit oversized SQL `LIMIT` values are not clamped yet; MCP query payloads are not independently row-capped~~ — fixed in task 0022 (**pending_review**).
+- LLM guard label parser uses substring matching and can misread negated/mixed labels (task 0023).
+- Valid empty query results currently take the same retry path as failures; recorded live eval has `cancelled-order-rate` fallback (task 0024).
+- Dry-run eval is strong for orchestration but not live NL-to-SQL quality; no CI gate exists yet (task 0025).
+- Human docs need final assignment/dataset alignment to remove overclaims and clarify schema/eval/setup details (task 0026).
+- Golden Bucket keyword fallback can inject arbitrary no-overlap trios; incomplete reports can be captured as candidates (task 0027).
 - Preference phrase detection is deterministic and may miss unusual phrasing.
 - Live eval gate requires LLM + BigQuery credentials; dry-run is CI-default.
 - llama3.2 (local) SQL quality: complex questions (e.g. cancelled-order share) can exhaust 3 self-heal attempts; Gemini fallback or a larger local model handles them.
 
 ## Version
 
-- Project version **0.19.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (task 0021 tooling polish).
+- Project version **0.20.0** in `pyproject.toml` and `src/retail_agent/__init__.py` (task 0022 SQL/MCP caps).

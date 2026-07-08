@@ -162,6 +162,7 @@ def _build_settings(work_dir: Path, *, live: bool) -> Settings:
         personas_dir=None,
         max_bytes_billed=1_073_741_824,
         default_limit=1000,
+        mcp_max_response_rows=100,
     )
 
 

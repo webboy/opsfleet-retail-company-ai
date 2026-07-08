@@ -111,7 +111,7 @@ flowchart TB
 | **reports_router** | Save, list, delete saved reports. Delete resolves candidates scoped to `owner = current_user`, lists exact matches, then pauses for confirmation. |
 | **retrieve_trios** | Top-k similarity search over Golden Bucket question embeddings; keyword fallback if embedding API is down. |
 | **generate_sql** | LLM generates SQL using schema context + retrieved trios + conversation history. |
-| **sql_guard** | Deterministic pre-execution checks inside `BigQueryRunner.execute()`: single statement, SELECT-only, allowed tables only, LIMIT injection, `maximum_bytes_billed` cap. Not a separate LangGraph node in the prototype. |
+| **sql_guard** | Deterministic pre-execution checks inside `BigQueryRunner.execute()`: single statement, SELECT-only, allowed tables only, LIMIT injection/clamping to `BQ_DEFAULT_LIMIT`, `maximum_bytes_billed` cap. Not a separate LangGraph node in the prototype. |
 | **execute_bq** | Graph node that calls `BigQueryRunner` (sql_guard + BigQuery client); returns rows or typed errors that trigger the self-heal loop. |
 | **self_heal** | On SQL error, guard block, or empty result, feeds error + prior SQL back to LLM; max N retries (default **3**); then graceful fallback message. Implemented as conditional routing from `execute_bq` → `generate_sql`, not a separate graph node. |
 | **pii_mask** | Deterministic masking on DataFrame columns and final report text — never trust the LLM for PII. |
@@ -216,7 +216,7 @@ The prototype also ships an **optional** stdio MCP server (`retail-agent-mcp`) t
 
 | Tool | Capability | Safety boundary |
 |------|------------|-----------------|
-| `query_retail_data` | Guarded BigQuery SQL execution | `sql_guard` + `pii_mask` enforced server-side |
+| `query_retail_data` | Guarded BigQuery SQL execution | `sql_guard` + `pii_mask` enforced server-side; MCP response capped by `MCP_MAX_RESPONSE_ROWS` |
 | `retrieve_trios` | Read-only Golden Bucket search | No write path; no candidate capture |
 
 Install with `pip install -e ".[mcp]"`. See [MCP Server Guide](./MCP.md). The CLI agent does not depend on this server.
@@ -262,7 +262,7 @@ The prototype demonstrates this pattern with a thin MCP wrapper over `bq.py` and
 - **Read-only warehouse:** No DML/DDL; sql_guard rejects multi-statement and non-allowed tables.
 - **PII:** Customer emails and phones are masked in output even if SQL selects them; prompts are advisory only.
 - **Destructive ops:** Saved-report deletes require explicit confirmation after listing exact targets; cross-user deletion is impossible by design.
-- **Cost control:** `maximum_bytes_billed`, mandatory LIMIT, per-turn LLM call budget, early exit on guard refusals.
+- **Cost control:** `maximum_bytes_billed`, mandatory LIMIT injection/clamping (`BQ_DEFAULT_LIMIT`), MCP response row cap (`MCP_MAX_RESPONSE_ROWS`), per-turn LLM call budget, early exit on guard refusals.
 - **Audit:** Every node emits structured events (turn id, user, SQL, error class, retry count) for compliance review.
 
 ## Related documentation

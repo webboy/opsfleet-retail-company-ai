@@ -21,6 +21,7 @@ def make_settings(**overrides) -> Settings:
         "personas_dir": None,
         "max_bytes_billed": 1_073_741_824,
         "default_limit": 1000,
+        "mcp_max_response_rows": 100,
     }
     defaults.update(overrides)
     return Settings(**defaults)

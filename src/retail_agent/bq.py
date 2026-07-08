@@ -68,11 +68,39 @@ def sql_guard(sql: str, settings: Settings) -> GuardResult:
                 error=f"Table not allowed: {_table_label(table)}",
             )
 
-    if expression.args.get("limit") is None:
-        expression = expression.limit(settings.default_limit)
+    expression = _apply_limit_cap(expression, settings.default_limit)
 
     sanitized = expression.sql(dialect="bigquery")
     return GuardResult(ok=True, sql=sanitized)
+
+
+def _apply_limit_cap(expression: exp.Expression, max_limit: int) -> exp.Expression:
+    """Inject or clamp the top-level LIMIT to the configured maximum."""
+
+    limit_node = expression.args.get("limit")
+    if limit_node is None:
+        return expression.limit(max_limit)
+
+    literal_limit = _extract_literal_limit(limit_node)
+    if literal_limit is None or literal_limit > max_limit:
+        return expression.limit(max_limit)
+
+    return expression
+
+
+def _extract_literal_limit(limit_node: exp.Expression) -> int | None:
+    """Return a positive integer LIMIT when the expression is a literal."""
+
+    limit_expr = limit_node.args.get("expression")
+    if limit_expr is None or not isinstance(limit_expr, exp.Literal):
+        return None
+
+    raw = str(limit_expr.this).strip()
+    if not raw.isdigit():
+        return None
+
+    value = int(raw)
+    return value if value > 0 else None
 
 
 def _is_read_query(expression: exp.Expression) -> bool:

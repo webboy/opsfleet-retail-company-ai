@@ -96,10 +96,11 @@ Execute a read-only BigQuery `SELECT` against allowed tables (`orders`, `order_i
 
 **Safety (server-side, cannot be bypassed by clients):**
 
-- `sql_guard` — single statement, SELECT-only, table whitelist, LIMIT injection, bytes billed cap
+- `sql_guard` — single statement, SELECT-only, table whitelist, LIMIT injection/clamping, bytes billed cap
 - `pii_mask` — email/phone columns masked before rows are returned
+- **Response row cap** — MCP returns at most `MCP_MAX_RESPONSE_ROWS` rows (default **100**), even when BigQuery returns more after SQL guard clamping (`BQ_DEFAULT_LIMIT`, default **1000**)
 
-**Response fields:** `ok`, `sql`, `rows`, `row_count`, `masked_columns`, `pii_mask_hits`, `error`
+**Response fields:** `ok`, `sql`, `rows`, `row_count` (full masked result size), `returned_row_count`, `response_row_limit`, `truncated`, `masked_columns`, `pii_mask_hits`, `error`
 
 **Example — allowed query:**
 

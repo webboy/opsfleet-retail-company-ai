@@ -83,6 +83,7 @@ def score_intent(
         personas_dir=None,
         max_bytes_billed=1_073_741_824,
         default_limit=1000,
+        mcp_max_response_rows=100,
     )
     judge_settings = _judge_settings(settings)
     llm = llm or create_chat_model(judge_settings)
