@@ -2,13 +2,13 @@
 
 ## Current focus
 
-Full assignment review pass (2026-07-08, reviewer stance against `docs/AI Technical Assignment - Retail Company.pdf`) produced new backlog tasks **0022–0027**. Tasks **0016** through **0024** are **done** or **pending_review** (0024 awaiting user approval); tasks **0025–0027** are **todo**.
+Full assignment review pass (2026-07-08, reviewer stance against `docs/AI Technical Assignment - Retail Company.pdf`) produced new backlog tasks **0022–0027**. Tasks **0016** through **0024** are **done** (user approved 2026-07-08); tasks **0025–0027** are **todo**.
 
 Review backlog (created 2026-07-08):
 
 1. **0022 (high)** — ~~SQL cost controls and MCP payload caps~~ — **done** (user approved 2026-07-08): clamp oversized explicit `LIMIT`, cap MCP rows.
 2. **0023 (high)** — ~~input guard structured labels~~ — **done** (user approved 2026-07-08): replace brittle substring label parsing.
-3. **0024 (high)** — empty results and live eval regression: **pending_review** — valid empty results report without retry; eval failure diagnostics; dry-run regressions; version **0.22.0**.
+3. **0024 (high)** — ~~empty results and live eval regression~~ — **done** (user approved 2026-07-08): valid empty results report without retry; eval failure diagnostics; version **0.22.0**.
 4. **0025 (medium/high)** — CI and eval gate hardening: add enforceable local/CI gate and clarify dry-run vs live eval.
 5. **0026 (medium)** — submission docs alignment: remove dataset/docs overclaims and improve reviewer-facing capability/schema/eval docs.
 6. **0027 (medium)** — Golden Bucket and learning-loop hardening: avoid arbitrary no-overlap trios and incomplete candidate captures.
@@ -45,13 +45,14 @@ First-pass status: ~~0012~~ ~~0013~~ ~~0014~~ ~~0015~~ ~~0016~~ ~~0017~~ ~~0018~
 ## Open questions / risks
 
 - Task 0022 should decide whether `default_limit` is also the hard maximum or whether a separate max/result cap setting is clearer. **Resolved:** `BQ_DEFAULT_LIMIT` is the SQL hard max; `MCP_MAX_RESPONSE_ROWS` is a separate MCP payload cap (default 100).
-- Task 0024 live eval: `cancelled-order-rate` still fails live due to invalid LLM SQL (GROUP BY), not empty results; diagnostics now capture root cause. **Resolved for empty-result routing**; live NL-to-SQL quality remains model-dependent.
+- Live eval with Ollama primary: capability layer **9/11** with `--no-judge` when settings/credentials OK; remaining live failures are NL-to-SQL quality (e.g. `cancelled-order-rate`), not empty-result routing. Shell env overrides `.env` — verify provider before live runs.
 - Live eval judge scores may vary; dry-run baseline is committed for CI-stable regression checks.
 - Preference phrase detection is deterministic; edge phrasing may need expansion over time.
 - README transcripts are curated; spot-check with live chat recommended before final demo.
 
 ## Recent changes
 
+- 2026-07-08: Task 0024 **done** (user approved) — empty-result routing, eval diagnostics, follow-up LLM graceful errors + Ollama judge; version **0.22.0**; pytest 216, dry-run 16/16.
 - 2026-07-08: Task 0024 **pending_review** — empty-result routing fix, eval diagnostics, regressions; version **0.22.0**; pytest 212, dry-run eval 16/16, live eval 14/16.
 - 2026-07-08: Task 0023 **pending_review** — exact LLM guard label parsing + regressions; version **0.21.0**.
 - 2026-07-08: Task 0022 **done** (user approved) — SQL LIMIT clamping + MCP response row cap (`MCP_MAX_RESPONSE_ROWS`); version **0.20.0**.

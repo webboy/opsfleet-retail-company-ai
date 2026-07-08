@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, **0020**, **0021**, **0022**, and **0023** **done** (user approved). Task **0024** **pending_review**. Tasks **0025–0027** are **todo**.
+Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, **0020**, **0021**, **0022**, **0023**, and **0024** **done** (user approved). Tasks **0025–0027** are **todo**.
 
 ## What works
 
@@ -18,8 +18,8 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - QA eval suite: 16 cases, dry-run default, judge scoring, baseline regression (task 0008, **done**).
 - **Human docs package**: README, USAGE, EVALUATION, drift-corrected architecture/technical (task 0009, **done**).
 - **Optional MCP server**: `retail-agent-mcp`, guarded `query_retail_data` + `retrieve_trios` (task 0010, **done**).
-- `pytest` **212 passed**; eval dry-run **16/16 passed**; safety subset **5/5 passed**.
-- **Empty-result routing** (task 0024, **pending_review**): valid zero-row queries report without retry; eval failure diagnostics; dry-run regressions.
+- `pytest` **216 passed**; eval dry-run **16/16 passed**; safety subset **5/5 passed**.
+- **Empty-result routing** (task 0024, **done**): valid zero-row queries report without retry; eval failure diagnostics; dry-run regressions; live eval diagnostics verified.
 - **SQL LIMIT clamping and MCP payload caps** (task 0022, **done**): explicit oversized limits clamped; MCP responses capped via `MCP_MAX_RESPONSE_ROWS`.
 - **Input guard structured labels** (task 0023, **done**): exact first-line/JSON LLM label parsing with `analysis` fallback.
 - **LLM budget per-turn reset** (task 0013, **done**): `input_guard` uses `fresh_budget`; 6-turn regression test; live CLI verified.
@@ -48,7 +48,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 12. ~~`0021` tooling polish~~ — **done**
 13. ~~`0022` SQL cost controls and MCP payload caps~~ — **done**
 14. ~~`0023` Input guard structured labels~~ — **done**
-15. `0024` Empty results and live eval regression — **pending_review**
+15. ~~`0024` Empty results and live eval regression~~ — **done**
 16. `0025` CI and eval gate hardening — **todo**
 17. `0026` Submission docs alignment — **todo**
 18. `0027` Golden Bucket and learning-loop hardening — **todo**
@@ -68,7 +68,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - Candidate JSONL grows without automatic pruning — curation workflow documented only.
 - ~~Explicit oversized SQL `LIMIT` values are not clamped yet; MCP query payloads are not independently row-capped~~ — fixed in task 0022 (**done**).
 - ~~LLM guard label parser uses substring matching and can misread negated/mixed labels~~ — fixed in task 0023 (**done**).
-- ~~Valid empty query results currently take the same retry path as failures~~ — fixed in task 0024 (**pending_review**): empty results route to report composition; live `cancelled-order-rate` failure is invalid SQL generation, documented via eval diagnostics.
+- ~~Valid empty query results currently take the same retry path as failures~~ — fixed in task 0024 (**done**).
 - Dry-run eval is strong for orchestration but not live NL-to-SQL quality; no CI gate exists yet (task 0025).
 - Human docs need final assignment/dataset alignment to remove overclaims and clarify schema/eval/setup details (task 0026).
 - Golden Bucket keyword fallback can inject arbitrary no-overlap trios; incomplete reports can be captured as candidates (task 0027).

@@ -58,7 +58,9 @@ Embedding API hit 429 quota during live run; keyword fallback was used (degraded
 
 - Empty-result handling intentionally does not retry — a semantically wrong filter that returns zero rows will be reported as “no data” rather than self-healed. This matches the task goal of not wasting retries on correct zero-row answers.
 
-## Acceptance criteria check
+## User approval
+
+- **2026-07-08**: User confirmed task **0024** done after live eval investigation and Ollama-primary verification.
 
 - [x] Correct empty result sets do not automatically consume all SQL self-heal attempts.
 - [x] SQL errors and invalid SQL still retry up to the configured bound.
