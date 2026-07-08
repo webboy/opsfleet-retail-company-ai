@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009, **0011**, **0012**, and **0013** **done** (user approved). **0010** MCP **pending_review**. **0014** PII masking **pending_review**. Bug-fix tasks **0015–0016** **todo**.
+Tasks 0001–0009, **0011**, **0012**, **0013**, and **0014** **done** (user approved). **0010** MCP **pending_review**. Bug-fix tasks **0015–0016** **todo**.
 
 ## What works
 
@@ -21,7 +21,7 @@ Tasks 0001–0009, **0011**, **0012**, and **0013** **done** (user approved). **
 - `pytest` **139 passed**; eval dry-run **16/16 passed**; live eval (Ollama) **14/16** on 2026-07-08 (failures documented in task 0016).
 - **LLM budget per-turn reset** (task 0013, **done**): `input_guard` uses `fresh_budget`; 6-turn regression test; live CLI verified.
 - **CTE support in sql_guard** (task 0012, **done**): bare CTE aliases allowed; 4 regression tests; live BQ verified.
-- **Name-flagged PII column masking** (task 0014, **pending_review**): unformatted phones and arbitrary strings masked in PII-named columns; content-detected path unchanged.
+- **Name-flagged PII column masking** (task 0014, **done**): unformatted phones and arbitrary strings masked in PII-named columns; content-detected path unchanged.
 
 ## What's left to build
 

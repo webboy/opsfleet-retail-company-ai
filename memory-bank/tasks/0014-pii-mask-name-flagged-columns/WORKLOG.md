@@ -9,3 +9,4 @@
 - Added `_mask_pii_named_cell_value` for strict name-flagged masking; removed dead `_column_is_pii(text)` branch from `_mask_cell_value`.
 - Added regression tests: unformatted phone, arbitrary strings, content-flagged bare digits, numeric columns.
 - Verification: pytest **139 passed**; eval **16/16**; sanity `5551234567` → `***-***-4567`; version **0.12.0**.
+- User approved 2026-07-08 — task marked **done**.

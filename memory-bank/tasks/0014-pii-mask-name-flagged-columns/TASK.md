@@ -4,7 +4,7 @@
 
 - **Task ID**: 0014
 - **Title**: PII mask: fully mask name-flagged columns (unformatted phones leak)
-- **Status**: pending_review
+- **Status**: done
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08
