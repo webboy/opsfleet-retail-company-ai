@@ -4,7 +4,7 @@
 
 - **Task ID**: 0013
 - **Title**: Fix LLM call budget: reset per turn, not per thread
-- **Status**: pending_review
+- **Status**: done
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08
