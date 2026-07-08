@@ -1,5 +1,7 @@
 # Handoff — Task 0020
 
+**Status:** done (user approved 2026-07-08)
+
 ## Summary
 
 Tightened deterministic preference detection so database-table analysis questions are no longer routed to `preferences_router` or allowed to overwrite saved output formats. Preference patterns now require explicit formatting intent and skip text that references warehouse tables.

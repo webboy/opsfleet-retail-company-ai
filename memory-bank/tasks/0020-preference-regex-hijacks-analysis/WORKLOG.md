@@ -10,3 +10,4 @@
 - Added safety parametric tests and graph regression for preference preservation.
 - Verification: safety/prefs tests 40 passed; full pytest 183 passed; eval dry-run 16/16.
 - Version bumped to **0.18.0**; task set to `pending_review`.
+- User approved 2026-07-08 — task marked **done**.

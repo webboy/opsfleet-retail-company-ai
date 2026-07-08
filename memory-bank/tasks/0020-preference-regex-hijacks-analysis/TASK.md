@@ -4,7 +4,7 @@
 
 - **Task ID**: 0020
 - **Title**: Preference regex hijacks analysis questions mentioning "table"
-- **Status**: pending_review
+- **Status**: done
 - **Owner**: Engineer
 - **Created**: 2026-07-08
 - **Updated**: 2026-07-08

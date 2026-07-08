@@ -2,7 +2,7 @@
 
 ## Status snapshot (2026-07-08)
 
-Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, and **0019** **done** (user approved). Second deep-review pass tasks **0020–0021**: **0020** is **pending_review**, **0021** remains **todo**.
+Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, **0016**, **0017**, **0018**, **0019**, and **0020** **done** (user approved). Second deep-review pass task **0021** remains **todo**.
 
 ## What works
 
@@ -27,7 +27,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - **PII marker token matching** (task 0017, **done**): metric columns like `cancelled_rate`/`email_count` no longer falsely masked; string PII columns still strictly masked.
 - **Save last analysis report** (task 0018, **done**): `/save` uses `last_analysis_*` instead of latest turn answer.
 - **Golden Bucket robust loading** (task 0019, **done**): malformed trio files skipped with warning; CLI/MCP keep running.
-- **Preference formatting intent** (task 0020, **pending_review**): DB-table analysis questions no longer hijack preference routing.
+- **Preference formatting intent** (task 0020, **done**): DB-table analysis questions no longer hijack preference routing.
 
 ## What's left to build
 
@@ -41,7 +41,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 8. ~~`0017` PII marker over-match~~ — **done**
 9. ~~`0018` `/save` scope fix~~ — **done**
 10. ~~`0019` Golden Bucket robust loading~~ — **done**
-11. `0020` preference regex tightening — **pending_review**
+11. ~~`0020` preference regex tightening~~ — **done**
 12. `0021` tooling polish — **todo** (see `tasks/INDEX.md`)
 
 ## Known issues
@@ -54,7 +54,7 @@ Tasks 0001–0009, **0010**, **0011**, **0012**, **0013**, **0014**, **0015**, *
 - ~~**PII markers over-match**~~ — fixed in task 0017 (**done**).
 - ~~**/save persists non-analysis output**~~ — fixed in task 0018 (**done**).
 - ~~**Malformed trio file crashes CLI startup**~~ — fixed in task 0019 (**done**).
-- ~~**Preference regex hijacks analysis questions**~~ — fixed in task 0020 (**pending_review**): formatting-intent patterns + DB-table guard.
+- ~~**Preference regex hijacks analysis questions**~~ — fixed in task 0020 (**done**).
 - **Tooling polish** (task 0021, **todo**) — eval `--layer` phantom regressions (exit 1); `self_heal_events` ~6x inflated; stale SQL/trios in node events; `.env` overrides shell env.
 - Candidate JSONL grows without automatic pruning — curation workflow documented only.
 - Preference phrase detection is deterministic and may miss unusual phrasing.
