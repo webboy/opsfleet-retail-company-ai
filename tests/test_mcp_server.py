@@ -7,10 +7,12 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pandas as pd
+import pytest
 
 from retail_agent.bq import BigQueryRunner, QueryResult
 from retail_agent.golden import FakeEmbedder, TrioStore
 from retail_agent.mcp_server import (
+    build_arg_parser,
     query_retail_data_handler,
     retrieve_trios_handler,
 )
@@ -125,3 +127,20 @@ def test_retrieve_trios_clamps_k_and_rejects_empty_question(tmp_path: Path):
 
     clamped = retrieve_trios_handler("monthly revenue", k=99, store=store)
     assert clamped["count"] <= 10
+
+
+def test_cli_help_and_version(capsys):
+    parser = build_arg_parser()
+
+    with pytest.raises(SystemExit) as exc:
+        parser.parse_args(["--help"])
+    assert exc.value.code == 0
+    help_text = capsys.readouterr().out
+    assert "retail-agent-mcp" in help_text
+    assert "stdio" in help_text.lower()
+
+    with pytest.raises(SystemExit) as exc:
+        parser.parse_args(["--version"])
+    assert exc.value.code == 0
+    version_text = capsys.readouterr().out
+    assert "retail-agent-mcp" in version_text

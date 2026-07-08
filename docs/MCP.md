@@ -28,30 +28,61 @@ Optional: `GOOGLE_API_KEY` for embedding-based trio retrieval (otherwise keyword
 Stdio transport (default for MCP clients):
 
 ```bash
-retail-agent-mcp
+retail-agent-mcp --help    # usage; exits immediately
+retail-agent-mcp --version # package version
+retail-agent-mcp           # blocks on stdin — normal when started by an MCP client
 # equivalent:
 python -m retail_agent.mcp_server
 ```
 
-The server reads configuration from `.env` in the repository root (same as the CLI).
+**Note:** Running `retail-agent-mcp` without flags produces no visible output in the terminal. The process waits on stdin for JSON-RPC messages from an MCP client. Use `--help` to confirm the install, then register the command in your MCP client config (see below).
 
 ## Register in Cursor
 
-Add to your MCP config (example):
+### Project-local only (recommended)
+
+Create `.cursor/mcp.json` in the repository root. Cursor loads it **only** when this project is open — it does not affect other workspaces.
 
 ```json
 {
   "mcpServers": {
     "retail-agent": {
-      "command": "/absolute/path/to/opsfleet-retail-company-ai/.venv/bin/python",
+      "command": "${workspaceFolder}/.venv/bin/python",
       "args": ["-m", "retail_agent.mcp_server"],
-      "cwd": "/absolute/path/to/opsfleet-retail-company-ai"
+      "cwd": "${workspaceFolder}"
     }
   }
 }
 ```
 
-Replace paths with your clone location. Restart Cursor after saving.
+`${workspaceFolder}` resolves to the project root (the folder containing `.cursor/mcp.json`). The app loads `.env` from the repo root automatically.
+
+**Steps:**
+
+1. `pip install -e ".[mcp]"` in the project venv
+2. Save `.cursor/mcp.json` (included in this repo)
+3. `Ctrl+Shift+P` → **Developer: Reload Window**
+4. **Cursor Settings → MCP** — `retail-agent` should show connected; enable tools if toggled off
+
+### Global (all projects)
+
+Put the same JSON in `~/.cursor/mcp.json` if you want the server in every workspace. Project-local config wins when the same server name exists in both files.
+
+### Absolute paths (WSL example)
+
+```json
+{
+  "mcpServers": {
+    "retail-agent": {
+      "command": "/home/nemanja/opsfleet-retail-company-ai/.venv/bin/python",
+      "args": ["-m", "retail_agent.mcp_server"],
+      "cwd": "/home/nemanja/opsfleet-retail-company-ai"
+    }
+  }
+}
+```
+
+Replace paths with your clone location. Reload Cursor after saving.
 
 ## Tools
 

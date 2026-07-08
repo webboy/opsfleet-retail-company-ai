@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import logging
+import sys
 from typing import Any
 
+from retail_agent import __version__
 from retail_agent.bq import BigQueryRunner
 from retail_agent.golden import TrioStore
 from retail_agent.safety import mask_dataframe
@@ -142,7 +145,31 @@ def create_mcp_server():
     return mcp
 
 
-def main() -> int:
+def build_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="retail-agent-mcp",
+        description=(
+            "Stdio MCP server exposing guarded BigQuery query and Golden Bucket retrieval."
+        ),
+        epilog=(
+            "With no arguments the process blocks on stdin waiting for an MCP client "
+            "(stdio transport). That is expected — register this command in your MCP "
+            "client config instead of running it interactively."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__}",
+    )
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_arg_parser()
+    parser.parse_args(argv)
+
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     server = create_mcp_server()
     server.run(transport="stdio")
@@ -150,4 +177,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(main(sys.argv[1:]))
